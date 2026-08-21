@@ -1,0 +1,120 @@
+# CLAUDE.md
+
+Guidance for Claude Code when working in this repository.
+
+## What this repo is
+
+`qrspi` is a **Claude Code plugin**, not an application. There is no runtime code, no
+build, no dependency manifest, no test suite. Every file that matters is Markdown or
+JSON, and the "product" is the prompt text itself.
+
+It ships two things:
+
+1. **A workflow** — QRSPI: Questions → Research → Spec (Design + Structure) → Plan →
+   Implement. Each phase burns whatever context it needs, compresses what it learned
+   into one Markdown artifact on disk, and the next phase starts from a *fresh
+   session* reading only that artifact. This is "intentional compaction".
+2. **A reference skill** — `token-efficiency`: the reasoning behind the workflow
+   (measurement, compaction ratios, subagents as context firewalls, effort
+   allocation, prompt-cache invalidation, tool hygiene, KPIs).
+
+The plugin produces artifacts in the *user's* repo under `thoughts/<task-id>-<slug>/`.
+Nothing in this repo is generated at runtime.
+
+## Layout
+
+```
+.claude-plugin/
+  plugin.json          plugin manifest (name, version, author, keywords)
+  marketplace.json     single-plugin marketplace manifest for `/plugin marketplace add`
+commands/
+  new.md               /qrspi:new  — bootstrap thoughts/<dir> and run phase 0
+  next.md              /qrspi:next — detect current phase, gate, emit the next prompt
+skills/
+  qrspi/
+    SKILL.md           the workflow index: 6 rules, phase table, context budgets
+    references/
+      00-questions.md  phase prompt + artifact skeleton
+      01-research.md   idem
+      02-design.md     idem
+      03-structure.md  idem
+      04-plan.md       idem
+      05-implement.md  prompt only — the phase output is code, not an artifact
+      99-progress.md   implement-phase state file skeleton
+  token-efficiency/
+    SKILL.md           index of the five levers and five KPIs
+    references/        measuring, compaction, subagents, effort, caching,
+                       tool-hygiene, anti-patterns, playbook
+README.md              user-facing pitch; overlaps SKILL.md numbers — keep in sync
+```
+
+Note the dual role of `skills/qrspi/references/*.md`: they are both the **phase
+prompts** (`> PROMPT` blockquote at the top) and the **artifact templates** that
+`/qrspi:new` copies into the user's `thoughts/<dir>/`. Editing one edits both.
+
+## The rules the content encodes
+
+Do not weaken these when editing; they are the plugin's whole thesis.
+
+1. Fresh session at every phase boundary — never continue.
+2. The artifact is the only channel between phases.
+3. Artifacts are self-contained: repo-root-relative paths, explicit symbols, line
+   numbers. Never "the file from before".
+4. The ticket does **not** enter Research (it returns in Design).
+5. The 40% context rule — stop and compact, do not push through.
+6. Do not outsource the thinking; every phase is a human checkpoint.
+
+## Conventions to follow when editing
+
+- **A `SKILL.md` is an index, not a manual.** Target ~100 lines. Detail goes to
+  `references/` and is loaded on demand. A skill that preaches context economy while
+  spending 9k tokens on every trigger refutes itself.
+- **Skill frontmatter** is only `name` + `description`. The `description` sits in
+  context permanently for every installed skill, so it must be one dense sentence of
+  trigger conditions — not a summary.
+- **Do not add one skill per phase.** This was decided deliberately (README, "Two
+  design notes"): six near-identical descriptions would burn the permanent budget and
+  compete to trigger. Phases are sequential and user-driven, so they are *commands*.
+- **Command frontmatter** carries `description`, `argument-hint`, and a tight
+  `allowed-tools` list. Keep `allowed-tools` minimal; widen only with a reason.
+- **Plugin paths in commands use `${CLAUDE_PLUGIN_ROOT}`**, never a relative path.
+- **Template placeholders** are `<...>` and `_(to be filled …)_`, and every artifact
+  ends with a `## Status` checkbox block. `/qrspi:next` greps for exactly these to
+  decide whether a phase is complete — changing the markers breaks phase detection in
+  [commands/next.md](commands/next.md).
+- **Phase prompts live in a `> PROMPT` blockquote** at the top of the reference file.
+  `/qrspi:next` prints that block verbatim with real paths substituted.
+- **Numbers appear in three places** — [README.md](README.md), the budget/phase
+  tables in [skills/qrspi/SKILL.md](skills/qrspi/SKILL.md), and the routing table in
+  [commands/next.md](commands/next.md). Change one, change all three.
+- **Versions must match** across [.claude-plugin/plugin.json](.claude-plugin/plugin.json)
+  and [.claude-plugin/marketplace.json](.claude-plugin/marketplace.json).
+- Prose style: British-leaning spelling ("utilisation"), em-dashes, no emoji, no
+  marketing filler. Match it.
+
+## Verifying a change
+
+There is nothing to build or run. Check by hand:
+
+```bash
+python3 -m json.tool .claude-plugin/plugin.json  >/dev/null && echo ok
+python3 -m json.tool .claude-plugin/marketplace.json >/dev/null && echo ok
+wc -l skills/*/SKILL.md                 # each should stay ~100 lines
+grep -rn 'CLAUDE_PLUGIN_ROOT' commands/ # plugin-root refs still correct
+grep -rn '](' README.md CLAUDE.md       # links resolve
+```
+
+End-to-end check: install locally with `/plugin marketplace add .` then
+`/plugin install qrspi`, and run `/qrspi:new TEST-1 <some ticket>` in a scratch repo —
+it must create `thoughts/TEST-1-<slug>/` with all seven files copied and the H1s
+renamed, then **stop** without entering Research.
+
+## Things to avoid here
+
+- Adding runtime code, package manifests, or a toolchain. The plugin is text.
+- Executing a phase inside `/qrspi:new` or `/qrspi:next` — both commands must emit a
+  prompt and stop. Continuing violates rule 1.
+- Relaxing the gates in [commands/next.md](commands/next.md). Refusing to advance on
+  an unfinished artifact is the feature, not friction.
+- Pasting code into an artifact template. Artifacts carry paths, symbols and line
+  numbers; the whole compression ratio depends on that.

@@ -122,4 +122,4 @@ Other public reconstructions worth reading:
 
 ## License
 
-MIT
+MIT. Working on the plugin itself? See [CONTRIBUTING.md](CONTRIBUTING.md).

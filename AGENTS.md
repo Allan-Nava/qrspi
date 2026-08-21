@@ -27,6 +27,7 @@ allocation, prompt caching, tool hygiene, KPIs.
 | `assets/social-preview.*` | OG card: `.html` is the source, `.png` is rendered from it |
 | `site/build.mjs` | generates the GitHub Pages site from `README.md` |
 | `.github/workflows/ci.yml` | `npm test` + site build + `npm pack` on PRs and `main` |
+| `.github/workflows/release.yml` | on tag `qrspi--v*`: npm publish, GitHub release, close milestone |
 | `.github/workflows/pages.yml` | builds and deploys that site on push to `main` |
 | `bin/qrspi.mjs` | installer CLI: `install` / `uninstall` / `path` / `check` |
 | `.claude-plugin/plugin.json` | plugin manifest |
@@ -112,6 +113,12 @@ command); `assets/` is not shipped in the npm tarball.
 `/qrspi:next` must keep refusing to advance on unresolved placeholders, an open
 "More research needed" list, a structure step without a verification command, or a
 plan that fails the zero-context test.
+
+## Releasing
+
+Bump the version in all three manifests, then `claude plugin tag . --push`. CI does
+the rest: publish with provenance, GitHub release, close the `v{version}` milestone
+if it has no open issues. Needs the `NPM_TOKEN` secret (npm automation token).
 
 ## Commit conventions
 

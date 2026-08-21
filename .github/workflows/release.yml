@@ -1,0 +1,137 @@
+name: Release
+
+# Cut a release by pushing the tag that `claude plugin tag` creates:
+#
+#   npm test && claude plugin tag . --push     # -> qrspi--v0.1.0
+#
+# Everything after that happens here. Requires one repository secret,
+# NPM_TOKEN — an npm *automation* token, which is the kind that bypasses 2FA.
+
+on:
+  push:
+    tags: ['qrspi--v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to release, e.g. qrspi--v0.1.0'
+        required: true
+
+permissions:
+  contents: write   # create the GitHub release
+  issues: write     # close the milestone
+  id-token: write   # npm provenance
+
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.tag || github.ref_name }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      # Fail here rather than half way through: without the token the publish
+      # step would push an incomplete release.
+      - name: Require NPM_TOKEN
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "$NPM_TOKEN" ]; then
+            echo "::error::NPM_TOKEN is not set. Create an npm automation token and add it under Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+
+      # The tag is the source of truth for what is being released; package.json
+      # must agree, and `npm test` checks the other two manifests against it.
+      - name: Resolve and verify the version
+        id: v
+        run: |
+          TAG="${{ inputs.tag || github.ref_name }}"
+          TAG_VERSION="${TAG#qrspi--v}"
+          PKG_VERSION="$(node -p "require('./package.json').version")"
+          if [ "$TAG_VERSION" != "$PKG_VERSION" ]; then
+            echo "::error::tag $TAG says $TAG_VERSION but package.json says $PKG_VERSION"
+            exit 1
+          fi
+          echo "tag=$TAG"         >> "$GITHUB_OUTPUT"
+          echo "version=$PKG_VERSION" >> "$GITHUB_OUTPUT"
+
+      - run: npm install --no-audit --no-fund
+      - run: npm test
+      - run: npm run build:site
+
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance --access public
+
+      # The registry takes a moment to serve a freshly published version.
+      - name: Verify the published version
+        run: |
+          for i in 1 2 3 4 5 6; do
+            if [ "$(npm view "qrspi@${{ steps.v.outputs.version }}" version 2>/dev/null)" = "${{ steps.v.outputs.version }}" ]; then
+              echo "qrspi@${{ steps.v.outputs.version }} is live"; exit 0
+            fi
+            echo "not visible yet, retrying…"; sleep 10
+          done
+          echo "::error::qrspi@${{ steps.v.outputs.version }} did not appear on the registry"
+          exit 1
+
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.v.outputs.tag }}
+          VERSION: ${{ steps.v.outputs.version }}
+        run: |
+          gh release create "$TAG" --title "v$VERSION" --generate-notes --verify-tag
+          {
+            echo "## Install"
+            echo
+            echo '```'
+            echo "/plugin marketplace add Allan-Nava/qrspi"
+            echo "/plugin install qrspi"
+            echo '```'
+            echo
+            echo "Or from a shell:"
+            echo
+            echo '```'
+            echo "npx qrspi@$VERSION install"
+            echo '```'
+            echo
+            echo "Docs: https://allan-nava.github.io/qrspi/"
+            echo
+            echo "---"
+            echo
+            gh release view "$TAG" --json body --jq .body
+          } > /tmp/notes.md
+          gh release edit "$TAG" --notes-file /tmp/notes.md
+
+      # Only when it is actually finished — a milestone with open issues stays
+      # open, and says so in the log.
+      - name: Close the milestone
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.v.outputs.version }}
+        run: |
+          NUM=$(gh api "repos/$GITHUB_REPOSITORY/milestones?state=open" \
+                  --jq ".[] | select(.title | startswith(\"v$VERSION\")) | .number" | head -1)
+          if [ -z "$NUM" ]; then
+            echo "::notice::no open milestone titled v$VERSION — nothing to close"
+            exit 0
+          fi
+          OPEN=$(gh api "repos/$GITHUB_REPOSITORY/milestones/$NUM" --jq .open_issues)
+          if [ "$OPEN" != "0" ]; then
+            echo "::warning::milestone #$NUM still has $OPEN open issue(s) — leaving it open"
+            exit 0
+          fi
+          gh api -X PATCH "repos/$GITHUB_REPOSITORY/milestones/$NUM" -f state=closed \
+            --jq '"closed milestone: \(.title)"'

@@ -28,6 +28,12 @@ Nothing in this repo is generated at runtime.
 ```
 bin/
   qrspi.mjs            `npx qrspi` installer (install / uninstall / path / check)
+assets/
+  logo.svg             the mark — single source for the favicon, the site, the README
+  logo-mono.svg        same shapes in currentColor, no tile
+  wordmark.svg         mark + QRSPI lockup
+  social-preview.html  source of the OG card
+  social-preview.png   1280x640, rendered from that HTML, committed
 site/
   build.mjs            generates site/dist/index.html FROM README.md (gitignored output)
 .github/workflows/
@@ -161,6 +167,31 @@ a `<pre>`), and each `##` becomes a section. Renaming a README heading renames a
 entry and an anchor; reshaping the pipeline block silently drops rows, so re-run the
 build and look at the output. `marked` is a devDependency used only here — it never
 reaches the published npm package, which stays dependency-free.
+
+## Brand assets
+
+[assets/logo.svg](assets/logo.svg) is the single source: four bars converging on one
+solid block — the phases compacting into an artifact. Terracotta `#b7552f`, white
+shapes, 64×64 grid, 14px corner radius. It has to survive 16px, so do not add detail
+to it; if you restyle it, re-check it at 16px before committing.
+
+The site inlines that file as its favicon and draws it in the header and hero, so the
+mark never gets a second copy. The README points at the raw GitHub URL, not a relative
+path, so it also renders on npm.
+
+`social-preview.png` (the OG card, and what you upload under Settings → General →
+Social preview) is rendered from `assets/social-preview.html` with headless Chrome —
+no dependency, no CI step:
+
+```bash
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new \
+  --disable-gpu --hide-scrollbars --allow-file-access-from-files \
+  --window-size=1280,640 --screenshot=assets/social-preview.png \
+  --virtual-time-budget=2500 "file://$PWD/assets/social-preview.html"
+```
+
+Regenerate it whenever the card's text goes stale. `assets/` is deliberately **not** in
+`package.json#files`: the npm tarball stays small and links to the GitHub copy.
 
 ## Releasing
 

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="QRSPI">
+  <title>QRSPI</title>
+  <rect width="64" height="64" rx="14" fill="#b7552f"/>
+  <g fill="#fff">
+    <rect x="14" y="9" width="36" height="6" rx="3"/>
+    <rect x="20" y="22" width="24" height="6" rx="3"/>
+    <rect x="24" y="35" width="16" height="6" rx="3"/>
+    <rect x="27" y="45" width="10" height="10" rx="3" fill-opacity=".8"/>
+  </g>
+</svg>

@@ -23,6 +23,8 @@ allocation, prompt caching, tool hygiene, KPIs.
 | Path | Role |
 |---|---|
 | `package.json` | npm distribution: `bin` → `bin/qrspi.mjs`, `test` → `qrspi check` |
+| `assets/logo.svg` | the mark — single source for favicon, site, README |
+| `assets/social-preview.*` | OG card: `.html` is the source, `.png` is rendered from it |
 | `site/build.mjs` | generates the GitHub Pages site from `README.md` |
 | `.github/workflows/pages.yml` | builds and deploys that site on push to `main` |
 | `bin/qrspi.mjs` | installer CLI: `install` / `uninstall` / `path` / `check` |
@@ -63,6 +65,14 @@ CLAUDE_CONFIG_DIR=/tmp/fake node bin/qrspi.mjs install --copy
 the skills read off disk. The page carries no prose of its own: to change its text,
 edit the README. `marked` is a devDependency used only by the generator — the
 published package stays dependency-free.
+
+## Brand
+
+`assets/logo.svg` is the only copy of the mark: the site inlines it as favicon and
+draws it in header and hero, the README links the raw GitHub URL. Terracotta
+`#b7552f`, 64×64 grid, must stay readable at 16px. `assets/social-preview.png` is a
+headless-Chrome render of `assets/social-preview.html` (see CLAUDE.md for the exact
+command); `assets/` is not shipped in the npm tarball.
 
 ## Editing rules
 

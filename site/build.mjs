@@ -8,7 +8,7 @@
 //   node site/build.mjs [--out site/dist]
 
 import { marked } from 'marked'
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -20,6 +20,11 @@ const SITE = 'https://allan-nava.github.io/qrspi/'
 
 const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8'))
 const md = readFileSync(join(ROOT, 'README.md'), 'utf8')
+
+// One logo, three consumers: the favicon (inlined), the header, the hero.
+const logo = readFileSync(join(ROOT, 'assets', 'logo.svg'), 'utf8')
+const favicon = `data:image/svg+xml,${encodeURIComponent(logo.replace(/\n\s*/g, '').replace(/<title>.*?<\/title>/, ''))}`
+const mark = (size, cls) => logo.replace('<svg', `<svg class="${cls}" width="${size}" height="${size}"`)
 
 marked.setOptions({ mangle: false, headerIds: false })
 
@@ -62,7 +67,13 @@ function parseReadme(source) {
 // The intro carries three things: the lede, the pipeline diagram, and the
 // paragraph that explains why the pipeline matters. Pull them apart so the hero
 // can lay them out instead of dumping one blob of prose.
-function parseIntro(intro) {
+function parseIntro(raw) {
+  // The README opens with an HTML logo block for GitHub; the page draws its own.
+  const intro = raw
+    .split('\n')
+    .filter((l) => !/^\s*<\/?(p|img|div|a|picture|source)\b/i.test(l))
+    .join('\n')
+    .trim()
   const m = intro.match(/^([\s\S]*?)```\n([\s\S]*?)```([\s\S]*)$/)
   if (!m) return { lede: intro, pipeline: null, after: '' }
   return { lede: m[1].trim(), pipeline: m[2].replace(/\n$/, ''), after: m[3].trim() }
@@ -183,10 +194,11 @@ const html = `<!doctype html>
 <meta property="og:url" content="${SITE}">
 <meta property="og:title" content="${esc(title)} — phase-gated context engineering for coding agents">
 <meta property="og:description" content="${esc(description)}">
-<meta name="twitter:card" content="summary">
-<link rel="icon" href="data:image/svg+xml,${encodeURIComponent(
-  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="#c2653d"/><path d="M8 9h16M8 16h11M8 23h6" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>',
-)}">
+<meta property="og:image" content="${SITE}assets/social-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="${SITE}assets/social-preview.png">
+<link rel="icon" href="${favicon}">
+<link rel="apple-touch-icon" href="assets/logo.svg">
 <style>
 :root {
   --bg: #fbfaf8; --panel: #fff; --line: #e6e1d9; --ink: #1b1a18; --muted: #6b665e;
@@ -223,7 +235,9 @@ header.top {
   border-bottom: 1px solid var(--line);
 }
 header.top .wrap { display: flex; align-items: center; gap: 1.5rem; height: 3.75rem; }
-.brand { font-weight: 650; letter-spacing: .06em; color: var(--ink); text-decoration: none; }
+.brand { display: inline-flex; align-items: center; font-weight: 650; letter-spacing: .06em; color: var(--ink); text-decoration: none; }
+.brand-mark { border-radius: 5px; margin-right: .55rem; }
+.hero-mark { display: block; margin-bottom: 1.5rem; border-radius: 15px; }
 .brand span { color: var(--accent); }
 header.top nav { margin-left: auto; display: flex; gap: 1.15rem; flex-wrap: wrap; }
 header.top nav a { color: var(--muted); text-decoration: none; font-size: .88rem; }
@@ -318,7 +332,7 @@ footer .row { display: flex; gap: 1.25rem; flex-wrap: wrap; }
 <body>
 <header class="top">
   <div class="wrap">
-    <a class="brand" href="#top">QR<span>SPI</span></a>
+    <a class="brand" href="#top">${mark(22, 'brand-mark')}QR<span>SPI</span></a>
     <nav>
 ${nav.map((s) => `      <a href="#${slug(s.heading)}">${esc(s.heading)}</a>`).join('\n')}
       <a class="gh" href="${REPO}">GitHub</a>
@@ -328,6 +342,7 @@ ${nav.map((s) => `      <a href="#${slug(s.heading)}">${esc(s.heading)}</a>`).jo
 
 <main class="wrap" id="top">
   <div class="hero">
+    ${mark(66, 'hero-mark')}
     <span class="eyebrow">Claude Code plugin · v${esc(pkg.version)}</span>
     <h1>${esc(title)}</h1>
     <div class="lede">${marked.parseInline(lede.split('\n\n')[0].replace(/\n/g, ' '))}</div>
@@ -375,6 +390,7 @@ for (const pre of document.querySelectorAll('pre')) {
 `
 
 mkdirSync(OUT, { recursive: true })
+cpSync(join(ROOT, 'assets'), join(OUT, 'assets'), { recursive: true, filter: (src) => !src.endsWith('.html') })
 writeFileSync(join(OUT, 'index.html'), html)
 writeFileSync(join(OUT, '.nojekyll'), '')
 console.log(`built ${join(OUT, 'index.html')} — ${(html.length / 1024).toFixed(1)} kB, ${rendered.length} sections, pipeline: ${rows ? `${rows.length} rows` : 'fallback <pre>'}`)

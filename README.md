@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Allan-Nava/qrspi/main/assets/logo.svg" width="84" alt="QRSPI">
+</p>
+
 # QRSPI
 
 A Claude Code plugin for running coding tasks through phase-gated

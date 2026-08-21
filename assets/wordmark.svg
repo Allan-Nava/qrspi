@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 268 64" width="268" height="64" role="img" aria-label="QRSPI">
+  <title>QRSPI</title>
+  <rect width="64" height="64" rx="14" fill="#b7552f"/>
+  <g fill="#fff">
+    <rect x="14" y="9" width="36" height="6" rx="3"/>
+    <rect x="20" y="22" width="24" height="6" rx="3"/>
+    <rect x="24" y="35" width="16" height="6" rx="3"/>
+    <rect x="27" y="45" width="10" height="10" rx="3" fill-opacity=".8"/>
+  </g>
+  <text x="84" y="43" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Helvetica, Arial, sans-serif"
+        font-size="36" font-weight="700" letter-spacing="1.5" fill="#1b1a18">QR<tspan fill="#b7552f">SPI</tspan></text>
+</svg>

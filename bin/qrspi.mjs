@@ -1,0 +1,250 @@
+#!/usr/bin/env node
+// qrspi installer — zero dependencies.
+//
+// Claude Code has no native npm plugin source: this CLI is a thin wrapper that
+// takes the plugin files shipped in this package and registers them with Claude
+// Code, either through the `claude plugin` CLI (preferred) or by copying them
+// into ~/.claude/ (fallback, and for setups without the plugin system).
+
+import { spawnSync } from 'node:child_process'
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import { homedir } from 'node:os'
+import { dirname, join, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+const CLAUDE_DIR = process.env.CLAUDE_CONFIG_DIR || join(homedir(), '.claude')
+const MARKETPLACE = 'allan-nava'
+const PLUGIN = 'qrspi'
+const SKILLS = ['qrspi', 'token-efficiency']
+const COMMANDS = ['new', 'next']
+
+const ESC = String.fromCharCode(27)
+const tty = process.stdout.isTTY && !process.env.NO_COLOR
+const paint = (code) => (s) => (tty ? `${ESC}[${code}m${s}${ESC}[0m` : s)
+const c = { bold: paint(1), dim: paint(2), red: paint(31), green: paint(32) }
+const say = (...a) => console.log(...a)
+const die = (msg) => {
+  console.error(`${c.red('qrspi:')} ${msg}`)
+  process.exit(1)
+}
+
+// --- claude CLI discovery -------------------------------------------------
+
+function findClaude() {
+  const candidates = [
+    process.env.CLAUDE_BIN,
+    'claude',
+    join(homedir(), '.local', 'bin', 'claude'),
+    join(homedir(), '.claude', 'local', 'claude'),
+  ].filter(Boolean)
+  for (const bin of candidates) {
+    const r = spawnSync(bin, ['--version'], { stdio: 'ignore' })
+    if (!r.error && r.status === 0) return bin
+  }
+  return null
+}
+
+function run(bin, args) {
+  say(c.dim(`  $ ${[bin, ...args].join(' ')}`))
+  const r = spawnSync(bin, args, { stdio: 'inherit' })
+  return !r.error && r.status === 0
+}
+
+// --- install paths --------------------------------------------------------
+
+const skillTarget = (name) => join(CLAUDE_DIR, 'skills', name)
+const commandTarget = (name) => join(CLAUDE_DIR, 'commands', PLUGIN, `${name}.md`)
+
+// Commands address plugin files as `${CLAUDE_PLUGIN_ROOT}/skills/...`. Outside
+// the plugin runtime that variable is unset, so copy mode rewrites it to the
+// directory the skills actually land in. The rewrite assumes every reference is
+// followed by `/skills`, which `check` enforces.
+function rewritePluginRoot(text) {
+  return text.replaceAll('${CLAUDE_PLUGIN_ROOT}/skills', join(CLAUDE_DIR, 'skills'))
+}
+
+function copyInstall({ dryRun }) {
+  say(`Installing into ${c.bold(CLAUDE_DIR)} ${c.dim('(copy mode)')}`)
+  for (const name of SKILLS) {
+    const to = skillTarget(name)
+    say(`  skill    ${name} -> ${to}`)
+    if (dryRun) continue
+    rmSync(to, { recursive: true, force: true })
+    mkdirSync(dirname(to), { recursive: true })
+    cpSync(join(ROOT, 'skills', name), to, { recursive: true })
+  }
+  for (const name of COMMANDS) {
+    const to = commandTarget(name)
+    say(`  command  /${PLUGIN}:${name} -> ${to}`)
+    if (dryRun) continue
+    mkdirSync(dirname(to), { recursive: true })
+    writeFileSync(to, rewritePluginRoot(readFileSync(join(ROOT, 'commands', `${name}.md`), 'utf8')))
+  }
+  if (dryRun) return say(c.dim('\nDry run — nothing written.'))
+  say(`\n${c.green('Installed.')} Restart Claude Code, then: /${PLUGIN}:new ENG-1234 <ticket>`)
+}
+
+function pluginInstall(bin) {
+  say(`Registering the plugin with ${c.bold(bin)}`)
+  // `marketplace add` fails when the marketplace is already registered; that is
+  // an update, not an error.
+  if (!run(bin, ['plugin', 'marketplace', 'add', ROOT])) {
+    run(bin, ['plugin', 'marketplace', 'update', MARKETPLACE])
+  }
+  if (!run(bin, ['plugin', 'install', `${PLUGIN}@${MARKETPLACE}`])) return false
+  say(`\n${c.green('Installed.')} Restart Claude Code, then: /${PLUGIN}:new ENG-1234 <ticket>`)
+  return true
+}
+
+// --- commands -------------------------------------------------------------
+
+function install(flags) {
+  const dryRun = flags.has('--dry-run')
+  if (flags.has('--copy')) return copyInstall({ dryRun })
+
+  const bin = findClaude()
+  if (!bin) {
+    say(c.dim('claude CLI not found — falling back to copy mode.\n'))
+    return copyInstall({ dryRun })
+  }
+  if (dryRun) {
+    say(`Would run, with ${c.bold(bin)}:`)
+    say(c.dim(`  $ ${bin} plugin marketplace add ${ROOT}`))
+    say(c.dim(`  $ ${bin} plugin install ${PLUGIN}@${MARKETPLACE}`))
+    return
+  }
+  if (!pluginInstall(bin)) {
+    say(c.dim('\nPlugin install failed — falling back to copy mode.\n'))
+    copyInstall({ dryRun })
+  }
+}
+
+function uninstall(flags) {
+  const dryRun = flags.has('--dry-run')
+  const targets = [...SKILLS.map(skillTarget), join(CLAUDE_DIR, 'commands', PLUGIN)]
+  let found = false
+  for (const t of targets) {
+    if (!existsSync(t)) continue
+    found = true
+    say(`  remove ${t}`)
+    if (!dryRun) rmSync(t, { recursive: true, force: true })
+  }
+  if (!found) say(c.dim(`Nothing copied under ${CLAUDE_DIR}.`))
+  const bin = findClaude()
+  if (bin) {
+    say('\nIf you installed through the plugin system, also run:')
+    say(c.dim(`  $ ${bin} plugin uninstall ${PLUGIN}`))
+    say(c.dim(`  $ ${bin} plugin marketplace remove ${MARKETPLACE}`))
+  }
+}
+
+// Package sanity check — also `npm test`. Verifies the invariants the installer
+// and the plugin runtime both depend on.
+function check() {
+  const problems = []
+  const versions = new Set()
+  for (const f of ['package.json', '.claude-plugin/plugin.json', '.claude-plugin/marketplace.json']) {
+    const p = join(ROOT, f)
+    if (!existsSync(p)) {
+      problems.push(`missing ${f}`)
+      continue
+    }
+    let json
+    try {
+      json = JSON.parse(readFileSync(p, 'utf8'))
+    } catch (e) {
+      problems.push(`${f}: invalid JSON — ${e.message}`)
+      continue
+    }
+    versions.add(json.version ?? json.metadata?.version)
+  }
+  if (versions.size > 1) problems.push(`version mismatch across manifests: ${[...versions].join(', ')}`)
+
+  for (const name of SKILLS) {
+    const p = join(ROOT, 'skills', name, 'SKILL.md')
+    if (!existsSync(p)) {
+      problems.push(`missing skills/${name}/SKILL.md`)
+      continue
+    }
+    const body = readFileSync(p, 'utf8')
+    if (!/^name:\s*\S+/m.test(body.split('---')[1] ?? '')) {
+      problems.push(`skills/${name}/SKILL.md: no name in frontmatter`)
+    }
+    const lines = body.split('\n').length
+    if (lines > 150) {
+      problems.push(`skills/${name}/SKILL.md is ${lines} lines — a SKILL.md is an index, keep it near 100`)
+    }
+  }
+
+  for (const name of COMMANDS) {
+    const p = join(ROOT, 'commands', `${name}.md`)
+    if (!existsSync(p)) {
+      problems.push(`missing commands/${name}.md`)
+      continue
+    }
+    const body = readFileSync(p, 'utf8')
+    for (const m of body.matchAll(/\$\{CLAUDE_PLUGIN_ROOT\}(\/[\w.-]*)?/g)) {
+      if (m[1] !== '/skills') {
+        problems.push(`commands/${name}.md: \${CLAUDE_PLUGIN_ROOT}${m[1] ?? ''} is not rewritten by copy mode — see rewritePluginRoot()`)
+      }
+    }
+  }
+
+  const refDir = join(ROOT, 'skills', 'qrspi', 'references')
+  const refs = existsSync(refDir) ? readdirSync(refDir).filter((f) => f.endsWith('.md')) : []
+  if (!refs.length) problems.push('skills/qrspi/references/ is empty — /qrspi:new has nothing to copy')
+  for (const f of refs) {
+    // 05 is a prompt, not an artifact; 99 is mutable state.
+    if (f === '05-implement.md' || f === '99-progress.md') continue
+    if (!readFileSync(join(refDir, f), 'utf8').includes('- [ ]')) {
+      problems.push(`skills/qrspi/references/${f}: no unticked checkbox — /qrspi:next detects phase completion by grepping for them`)
+    }
+  }
+
+  if (problems.length) {
+    for (const p of problems) console.error(`${c.red('x')} ${p}`)
+    process.exit(1)
+  }
+  say(`${c.green('ok')} — ${SKILLS.length} skills, ${COMMANDS.length} commands, ${refs.length} references, manifests in sync`)
+}
+
+function help() {
+  say(`${c.bold('qrspi')} — install the QRSPI plugin for Claude Code
+
+  npx qrspi install            register the plugin (claude CLI, or copy fallback)
+  npx qrspi install --copy     force copy into ${CLAUDE_DIR}
+  npx qrspi install --dry-run  show what would happen, change nothing
+  npx qrspi uninstall          remove the copied skills and commands
+  npx qrspi path               print the plugin root (for /plugin marketplace add)
+  npx qrspi check              validate this package
+
+Manual alternative, no npm involved:
+  /plugin marketplace add Allan-Nava/qrspi
+  /plugin install qrspi`)
+}
+
+const [cmd, ...rest] = process.argv.slice(2)
+const flags = new Set(rest.filter((a) => a.startsWith('-')))
+switch (cmd) {
+  case 'install':
+    install(flags)
+    break
+  case 'uninstall':
+    uninstall(flags)
+    break
+  case 'path':
+    say(ROOT)
+    break
+  case 'check':
+    check()
+    break
+  case undefined:
+  case 'help':
+  case '--help':
+  case '-h':
+    help()
+    break
+  default:
+    die(`unknown command "${cmd}" — try \`npx qrspi help\``)
+}

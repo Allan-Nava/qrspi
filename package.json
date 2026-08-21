@@ -1,0 +1,45 @@
+{
+  "name": "qrspi",
+  "version": "0.1.0",
+  "description": "Questions → Research → Spec → Plan → Implement: a phase-gated Claude Code plugin that keeps a coding agent under 40% context by writing one artifact to disk per phase.",
+  "type": "module",
+  "bin": {
+    "qrspi": "bin/qrspi.mjs"
+  },
+  "files": [
+    "bin",
+    "commands",
+    "skills",
+    ".claude-plugin",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node bin/qrspi.mjs check"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "claude-code-plugin",
+    "context-engineering",
+    "token-efficiency",
+    "intentional-compaction",
+    "workflow",
+    "qrspi",
+    "subagents",
+    "prompt-caching"
+  ],
+  "author": "Allan Nava (https://github.com/Allan-Nava)",
+  "license": "MIT",
+  "homepage": "https://github.com/Allan-Nava/qrspi",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Allan-Nava/qrspi.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Allan-Nava/qrspi/issues"
+  }
+}

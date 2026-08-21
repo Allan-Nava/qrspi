@@ -4,9 +4,11 @@ Guidance for Claude Code when working in this repository.
 
 ## What this repo is
 
-`qrspi` is a **Claude Code plugin**, not an application. There is no runtime code, no
-build, no dependency manifest, no test suite. Every file that matters is Markdown or
-JSON, and the "product" is the prompt text itself.
+`qrspi` is a **Claude Code plugin**, not an application. There is no build step and no
+dependency: every file that matters is Markdown or JSON, and the "product" is the
+prompt text itself. The single piece of executable code is
+[bin/qrspi.mjs](bin/qrspi.mjs), the `npx qrspi` installer — it exists only to put the
+Markdown where Claude Code can see it.
 
 It ships two things:
 
@@ -24,6 +26,9 @@ Nothing in this repo is generated at runtime.
 ## Layout
 
 ```
+bin/
+  qrspi.mjs            `npx qrspi` installer (install / uninstall / path / check)
+package.json           npm distribution; `bin` → bin/qrspi.mjs, `test` → qrspi check
 .claude-plugin/
   plugin.json          plugin manifest (name, version, author, keywords)
   marketplace.json     single-plugin marketplace manifest for `/plugin marketplace add`
@@ -87,21 +92,42 @@ Do not weaken these when editing; they are the plugin's whole thesis.
 - **Numbers appear in three places** — [README.md](README.md), the budget/phase
   tables in [skills/qrspi/SKILL.md](skills/qrspi/SKILL.md), and the routing table in
   [commands/next.md](commands/next.md). Change one, change all three.
-- **Versions must match** across [.claude-plugin/plugin.json](.claude-plugin/plugin.json)
-  and [.claude-plugin/marketplace.json](.claude-plugin/marketplace.json).
+- **Versions must match** across [package.json](package.json),
+  [.claude-plugin/plugin.json](.claude-plugin/plugin.json) and
+  [.claude-plugin/marketplace.json](.claude-plugin/marketplace.json). `npm test`
+  fails if they drift.
+- **Copy mode rewrites `${CLAUDE_PLUGIN_ROOT}/skills`** to `~/.claude/skills` — see
+  `rewritePluginRoot()` in [bin/qrspi.mjs](bin/qrspi.mjs). A `${CLAUDE_PLUGIN_ROOT}`
+  reference pointing anywhere *other* than `/skills` would survive unrewritten and
+  break the copy install, so `npx qrspi check` rejects it. Add such a reference only
+  together with its rewrite rule.
+- **The installer stays dependency-free** and Node-18-compatible. No bundler, no
+  TypeScript, no `postinstall` hook — installing a package must never write to
+  `~/.claude` behind the user's back; that only happens on an explicit
+  `qrspi install`.
 - Prose style: British-leaning spelling ("utilisation"), em-dashes, no emoji, no
   marketing filler. Match it.
 
 ## Verifying a change
 
-There is nothing to build or run. Check by hand:
+There is nothing to build. The one automated check is the installer's own:
 
 ```bash
-python3 -m json.tool .claude-plugin/plugin.json  >/dev/null && echo ok
-python3 -m json.tool .claude-plugin/marketplace.json >/dev/null && echo ok
-wc -l skills/*/SKILL.md                 # each should stay ~100 lines
-grep -rn 'CLAUDE_PLUGIN_ROOT' commands/ # plugin-root refs still correct
-grep -rn '](' README.md CLAUDE.md       # links resolve
+npm test                  # == node bin/qrspi.mjs check
+```
+
+It validates the three manifests and their versions, skill frontmatter, SKILL.md
+length, every `${CLAUDE_PLUGIN_ROOT}` reference, and the checkbox markers that
+`/qrspi:next` greps for. Run it before every commit and extend it whenever you add
+an invariant.
+
+Then, by hand:
+
+```bash
+npm pack --dry-run                       # tarball carries .claude-plugin/, skills/, commands/
+CLAUDE_CONFIG_DIR=/tmp/fake node bin/qrspi.mjs install --copy   # safe end-to-end test
+node bin/qrspi.mjs install --dry-run     # what the claude-CLI path would run
+grep -rn '](' README.md CLAUDE.md        # links resolve
 ```
 
 End-to-end check: install locally with `/plugin marketplace add .` then
@@ -109,9 +135,23 @@ End-to-end check: install locally with `/plugin marketplace add .` then
 it must create `thoughts/TEST-1-<slug>/` with all seven files copied and the H1s
 renamed, then **stop** without entering Research.
 
+## Releasing
+
+Version lives in three manifests and they must agree; `npm test` enforces it.
+
+```bash
+# bump package.json, .claude-plugin/plugin.json, .claude-plugin/marketplace.json
+npm test
+npm pack --dry-run          # inspect the tarball
+npm publish --access public
+claude plugin tag . --push  # {name}--v{version} git tag, validates the manifests agree
+```
+
 ## Things to avoid here
 
-- Adding runtime code, package manifests, or a toolchain. The plugin is text.
+- Growing [bin/qrspi.mjs](bin/qrspi.mjs) into an application. It installs Markdown;
+  anything beyond install/uninstall/path/check belongs elsewhere. No dependencies,
+  no build, no `postinstall`.
 - Executing a phase inside `/qrspi:new` or `/qrspi:next` — both commands must emit a
   prompt and stop. Continuing violates rule 1.
 - Relaxing the gates in [commands/next.md](commands/next.md). Refusing to advance on

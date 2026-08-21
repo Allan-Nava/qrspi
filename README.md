@@ -22,10 +22,36 @@ decision.
 
 ## Install
 
+From inside Claude Code:
+
 ```
 /plugin marketplace add Allan-Nava/qrspi
 /plugin install qrspi
 ```
+
+Or from a shell, with npm:
+
+```
+npx qrspi install
+```
+
+Claude Code has no npm plugin source, so `npx qrspi install` is a wrapper: it ships
+the plugin files in the package and registers them for you — through
+`claude plugin marketplace add` when the `claude` CLI is on `PATH`, otherwise by
+copying the skills and commands into `~/.claude/` (`--copy` forces that mode).
+Either way you end up with the same `/qrspi:new` and `/qrspi:next`.
+
+```
+npx qrspi install --dry-run   # show what it would do, change nothing
+npx qrspi install --copy      # skip the plugin system, copy into ~/.claude
+npx qrspi uninstall           # remove what copy mode installed
+npx qrspi path                # print the plugin root
+npx qrspi check               # validate the package
+```
+
+Pin a version with `npx qrspi@0.1.0 install`; `npm i -g qrspi` then `qrspi install`
+works too. Copy mode is a snapshot — re-run `npx qrspi install` to update. The plugin
+route updates itself through `/plugin`.
 
 ## Use
 
@@ -47,6 +73,7 @@ feature: the whole workflow is worthless if you rubber-stamp your way through it
 | `skills/token-efficiency/` | the reference behind it: measurement, compaction, subagent firewalls, effort allocation, prompt-caching invalidation, tool hygiene, KPIs |
 | `commands/new.md` | bootstrap a task and run phase 0 |
 | `commands/next.md` | advance a task across a phase boundary |
+| `bin/qrspi.mjs` | the `npx qrspi` installer — zero dependencies, no build |
 
 ## Six non-negotiable rules
 

@@ -23,6 +23,8 @@ allocation, prompt caching, tool hygiene, KPIs.
 | Path | Role |
 |---|---|
 | `package.json` | npm distribution: `bin` → `bin/qrspi.mjs`, `test` → `qrspi check` |
+| `site/build.mjs` | generates the GitHub Pages site from `README.md` |
+| `.github/workflows/pages.yml` | builds and deploys that site on push to `main` |
 | `bin/qrspi.mjs` | installer CLI: `install` / `uninstall` / `path` / `check` |
 | `.claude-plugin/plugin.json` | plugin manifest |
 | `.claude-plugin/marketplace.json` | marketplace manifest (`source: "./"`) |
@@ -54,6 +56,13 @@ greps for. Manual end-to-end, safe because it writes to a throwaway config dir:
 npm pack --dry-run
 CLAUDE_CONFIG_DIR=/tmp/fake node bin/qrspi.mjs install --copy
 ```
+
+## The site
+
+`npm run build:site` writes `site/dist/index.html` (gitignored) from `README.md` plus
+the skills read off disk. The page carries no prose of its own: to change its text,
+edit the README. `marked` is a devDependency used only by the generator — the
+published package stays dependency-free.
 
 ## Editing rules
 

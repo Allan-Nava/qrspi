@@ -37,6 +37,7 @@ assets/
 site/
   build.mjs            generates site/dist/index.html FROM README.md (gitignored output)
 .github/workflows/
+  ci.yml               npm test + site build + npm pack on every PR and push to main
   pages.yml            builds and deploys the site to GitHub Pages on push to main
 package.json           npm distribution; `bin` → bin/qrspi.mjs, `test` → qrspi check
 .claude-plugin/
@@ -129,7 +130,8 @@ npm test                  # == node bin/qrspi.mjs check
 It validates the three manifests and their versions, skill frontmatter, SKILL.md
 length, every `${CLAUDE_PLUGIN_ROOT}` reference, and the checkbox markers that
 `/qrspi:next` greps for. Run it before every commit and extend it whenever you add
-an invariant.
+an invariant — [.github/workflows/ci.yml](.github/workflows/ci.yml) runs it, the site
+build and `npm pack --dry-run` on every pull request.
 
 Then, by hand:
 

@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      # Validates the manifests agree on a version, the skill frontmatter and
+      # length, every ${CLAUDE_PLUGIN_ROOT} reference, and the checkbox markers
+      # /qrspi:next greps for.
+      - run: npm install --no-audit --no-fund
+      - run: npm test
+      # The site is generated from README.md — a broken README breaks the build.
+      - run: npm run build:site
+      # What `npm publish` would actually ship.
+      - run: npm pack --dry-run

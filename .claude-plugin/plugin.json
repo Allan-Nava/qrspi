@@ -1,0 +1,21 @@
+{
+  "name": "qrspi",
+  "version": "0.1.0",
+  "description": "Questions → Research → Spec → Plan → Implement: a phase-gated workflow that keeps a coding agent under 40% context by writing one artifact to disk per phase.",
+  "author": {
+    "name": "Allan Nava",
+    "url": "https://github.com/Allan-Nava"
+  },
+  "homepage": "https://github.com/Allan-Nava/qrspi",
+  "repository": "https://github.com/Allan-Nava/qrspi",
+  "license": "MIT",
+  "keywords": [
+    "context-engineering",
+    "token-efficiency",
+    "intentional-compaction",
+    "workflow",
+    "qrspi",
+    "subagents",
+    "prompt-caching"
+  ]
+}

@@ -2,6 +2,12 @@
   <img src="https://raw.githubusercontent.com/Allan-Nava/qrspi/main/assets/logo.svg" width="84" alt="QRSPI">
 </p>
 
+<p align="center">
+  <a href="https://www.npmjs.com/package/qrspi"><img src="https://img.shields.io/npm/v/qrspi?color=b7552f&labelColor=1b1a18&label=npm" alt="npm"></a>
+  <a href="https://allan-nava.github.io/qrspi/"><img src="https://img.shields.io/badge/docs-allan--nava.github.io%2Fqrspi-b7552f?labelColor=1b1a18" alt="Documentation"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-b7552f?labelColor=1b1a18" alt="MIT licence"></a>
+</p>
+
 # QRSPI
 
 A Claude Code plugin for running coding tasks through phase-gated

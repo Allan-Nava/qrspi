@@ -26,6 +26,7 @@ allocation, prompt caching, tool hygiene, KPIs.
 | `assets/logo.svg` | the mark — single source for favicon, site, README |
 | `assets/social-preview.*` | OG card: `.html` is the source, `.png` is rendered from it |
 | `site/build.mjs` | generates the GitHub Pages site from `README.md` |
+| `.github/workflows/ci.yml` | `npm test` + site build + `npm pack` on PRs and `main` |
 | `.github/workflows/pages.yml` | builds and deploys that site on push to `main` |
 | `bin/qrspi.mjs` | installer CLI: `install` / `uninstall` / `path` / `check` |
 | `.claude-plugin/plugin.json` | plugin manifest |
@@ -44,7 +45,8 @@ blockquote is the prompt for that phase.
 
 ## Build, test, run
 
-No build. One automated check, run it before every commit:
+No build. One automated check — CI runs it on every pull request, run it locally
+before every commit:
 
 ```bash
 npm test        # == node bin/qrspi.mjs check

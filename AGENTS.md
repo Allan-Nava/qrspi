@@ -116,9 +116,9 @@ plan that fails the zero-context test.
 
 ## Releasing
 
-Bump the version in all three manifests, then `claude plugin tag . --push`. CI does
-the rest: publish with provenance, GitHub release, close the `v{version}` milestone
-if it has no open issues. Needs the `NPM_TOKEN` secret (npm automation token).
+See [CONTRIBUTING.md](CONTRIBUTING.md#releasing). Bump the version in all three
+manifests, `npm test`, `claude plugin tag . --push`; the tag triggers the release
+workflow, which publishes to npm, creates the release and closes the milestone.
 
 ## Commit conventions
 

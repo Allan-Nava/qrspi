@@ -198,32 +198,12 @@ Regenerate it whenever the card's text goes stale. `assets/` is deliberately **n
 
 ## Releasing
 
-Releases run from CI. Pushing the tag is the whole manual part:
-
-```bash
-# bump package.json, .claude-plugin/plugin.json, .claude-plugin/marketplace.json
-npm test                    # fails if the three versions disagree
-npm pack --dry-run          # inspect the tarball
-claude plugin tag . --push  # creates and pushes qrspi--v{version}
-```
-
-[.github/workflows/release.yml](.github/workflows/release.yml) takes it from there:
-it re-checks that the tag matches `package.json`, runs the tests and the site build,
-publishes with `npm publish --provenance --access public`, polls the registry until
-the version is actually served, creates the GitHub release (install instructions on
-top of the generated notes), and closes the milestone titled `v{version}` — but only
-if it has no open issues left; otherwise it logs a warning and leaves it open.
-
-It needs one repository secret, **`NPM_TOKEN`**, an npm *automation* token (the kind
-that bypasses 2FA), under Settings → Secrets and variables → Actions. The workflow
-fails on its first step with a clear message when the secret is missing, rather than
-publishing half a release. `--provenance` works because the job requests
-`id-token: write` and `package.json#repository` points at this repo.
-
-Re-run a failed release with the `workflow_dispatch` trigger and the existing tag —
-no need to delete and re-push it. What is *not* retryable is the publish itself: npm
-refuses to overwrite a version that already exists, so a rerun past that point needs
-a version bump.
+The runbook lives in [CONTRIBUTING.md](CONTRIBUTING.md#releasing) — one home, so it
+cannot drift. In short: bump the version in all three manifests, `npm test`, then
+`claude plugin tag . --push`. The tag triggers
+[.github/workflows/release.yml](.github/workflows/release.yml), which publishes to npm
+with provenance, cuts the GitHub release and closes the matching milestone. It needs
+the `NPM_TOKEN` repository secret and fails loudly without it.
 
 ## Things to avoid here
 

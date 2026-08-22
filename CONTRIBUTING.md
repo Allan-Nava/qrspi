@@ -35,9 +35,43 @@ CLAUDE_CONFIG_DIR=/tmp/qrspi-scratch node bin/qrspi.mjs uninstall
 
 Releases run from GitHub Actions. Pushing the tag is the whole manual part.
 
-**One-time setup** (already done for this repository): a repository secret
-`NPM_TOKEN`, holding an npm **automation** token — the kind that bypasses 2FA, since
-CI cannot answer an OTP prompt. Settings → Secrets and variables → Actions.
+**One-time setup — npm Trusted Publishing.** There is no npm token anywhere in this
+repository: the release job authenticates to npm over OIDC. On npmjs.com, the package
+page → Settings → Trusted Publisher → GitHub Actions:
+
+| Field | Value |
+|---|---|
+| Organization or user | `Allan-Nava` |
+| Repository | `qrspi` |
+| Workflow filename | `release.yml` |
+| Environment | *(leave empty)* |
+
+The equivalent from the CLI, with npm ≥ 11.15.0 and an interactively logged-in
+account:
+
+```bash
+npm trust github qrspi --repo Allan-Nava/qrspi --file release.yml --allow-publish
+npm trust list qrspi
+```
+
+**The bootstrap exception.** npm will not let you configure a trusted publisher for a
+package that does not exist yet — `npm trust` says so outright: *"The package you're
+configuring must already exist on the npm registry."* Unlike PyPI, there is no
+pre-registration. So the **first** version of a new package is published by hand:
+
+```bash
+npm login                    # interactive 2FA is fine; it is CI that cannot answer an OTP
+npm publish --access public
+```
+
+then you configure the trusted publisher, and every release after that runs from CI
+with no credentials. A version published this way carries no provenance attestation —
+provenance comes from publishing through OIDC — so the first version is the only one
+without it.
+
+The release workflow tolerates this: its publish step skips a version that is already
+on the registry, so you can still run it against the bootstrap tag to get the GitHub
+release and the milestone closed.
 
 **Per release:**
 
@@ -78,7 +112,12 @@ plus a look at the npm page: the logo must load (it is linked by absolute raw UR
 exactly this reason) and the version badge in the README stops reading *invalid*.
 
 **When something fails.** Re-run with the `workflow_dispatch` trigger and the existing
-tag — no need to delete and re-push it. The publish step itself is the exception: npm
+tag — no need to delete and re-push it:
+
+```bash
+gh workflow run Release -f tag=qrspi--v<version>
+```
+ The publish step itself is the exception: npm
 refuses to overwrite a version that already exists, so a rerun that got past it needs
 a version bump. Nothing else in the workflow is destructive, and the release is only
 created after npm confirms the version.

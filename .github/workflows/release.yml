@@ -4,8 +4,9 @@ name: Release
 #
 #   npm test && claude plugin tag . --push     # -> qrspi--v0.1.0
 #
-# Everything after that happens here. Requires one repository secret,
-# NPM_TOKEN — an npm *automation* token, which is the kind that bypasses 2FA.
+# Everything after that happens here, with no npm token anywhere: the publish
+# authenticates through OIDC (npm Trusted Publishing), configured on the package
+# at npmjs.com against this repository and this workflow filename.
 
 on:
   push:
@@ -19,7 +20,7 @@ on:
 permissions:
   contents: write   # create the GitHub release
   issues: write     # close the milestone
-  id-token: write   # npm provenance
+  id-token: write   # OIDC: this is what authenticates the publish
 
 concurrency:
   group: release-${{ inputs.tag || github.ref_name }}
@@ -39,17 +40,6 @@ jobs:
           node-version: 22
           registry-url: https://registry.npmjs.org
 
-      # Fail here rather than half way through: without the token the publish
-      # step would push an incomplete release.
-      - name: Require NPM_TOKEN
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          if [ -z "$NPM_TOKEN" ]; then
-            echo "::error::NPM_TOKEN is not set. Create an npm automation token and add it under Settings → Secrets and variables → Actions."
-            exit 1
-          fi
-
       # The tag is the source of truth for what is being released; package.json
       # must agree, and `npm test` checks the other two manifests against it.
       - name: Resolve and verify the version
@@ -65,14 +55,32 @@ jobs:
           echo "tag=$TAG"         >> "$GITHUB_OUTPUT"
           echo "version=$PKG_VERSION" >> "$GITHUB_OUTPUT"
 
+      # Trusted publishing needs npm >= 11.5.1; Node 22 still bundles npm 10.
+      - name: Use an npm that speaks OIDC
+        run: |
+          npm install -g npm@latest
+          npm --version
+
       - run: npm install --no-audit --no-fund
       - run: npm test
       - run: npm run build:site
 
+      # No token: OIDC. Provenance is generated automatically for a public
+      # package published this way, so --provenance is not passed.
+      #
+      # Skipping an already-published version is what makes a bootstrap release
+      # work: npm forbids configuring a trusted publisher for a package that does
+      # not exist, so the very first version is published by hand, and this job
+      # still has to be able to cut its release and close its milestone.
       - name: Publish to npm
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish --provenance --access public
+          VERSION: ${{ steps.v.outputs.version }}
+        run: |
+          if [ "$(npm view "qrspi@$VERSION" version 2>/dev/null)" = "$VERSION" ]; then
+            echo "::notice::qrspi@$VERSION is already on the registry — skipping publish"
+            exit 0
+          fi
+          npm publish --access public
 
       # The registry takes a moment to serve a freshly published version.
       - name: Verify the published version

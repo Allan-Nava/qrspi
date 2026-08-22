@@ -202,8 +202,10 @@ The runbook lives in [CONTRIBUTING.md](CONTRIBUTING.md#releasing) — one home, 
 cannot drift. In short: bump the version in all three manifests, `npm test`, then
 `claude plugin tag . --push`. The tag triggers
 [.github/workflows/release.yml](.github/workflows/release.yml), which publishes to npm
-with provenance, cuts the GitHub release and closes the matching milestone. It needs
-the `NPM_TOKEN` repository secret and fails loudly without it.
+with provenance, cuts the GitHub release and closes the matching milestone. It authenticates to npm over OIDC (Trusted Publishing) — there is no npm token in
+this repository. Note the bootstrap exception in CONTRIBUTING.md: npm cannot
+configure a trusted publisher for a package that does not exist, so a brand-new
+package's first version is published by hand.
 
 ## Things to avoid here
 

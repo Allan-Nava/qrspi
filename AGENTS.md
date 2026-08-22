@@ -118,7 +118,8 @@ plan that fails the zero-context test.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md#releasing). Bump the version in all three
 manifests, `npm test`, `claude plugin tag . --push`; the tag triggers the release
-workflow, which publishes to npm, creates the release and closes the milestone.
+workflow, which publishes to npm over OIDC (Trusted Publishing — no token in this
+repo), creates the release and closes the milestone.
 
 ## Commit conventions
 

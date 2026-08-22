@@ -7,6 +7,10 @@ name: Release
 # Everything after that happens here, with no npm token anywhere: the publish
 # authenticates through OIDC (npm Trusted Publishing), configured on the package
 # at npmjs.com against this repository and this workflow filename.
+#
+# DO NOT RENAME THIS FILE. The trusted publisher on npm is bound to the literal
+# name `release.yml`; rename it and the publish stops authenticating, with an
+# error that does not mention the filename.
 
 on:
   push:
@@ -18,9 +22,7 @@ on:
         required: true
 
 permissions:
-  contents: write   # create the GitHub release
-  issues: write     # close the milestone
-  id-token: write   # OIDC: this is what authenticates the publish
+  contents: read
 
 concurrency:
   group: release-${{ inputs.tag || github.ref_name }}
@@ -29,6 +31,11 @@ concurrency:
 jobs:
   release:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write   # create the GitHub release
+      issues: write     # close the milestone
+      id-token: write   # OIDC: this is what authenticates the publish
     steps:
       - uses: actions/checkout@v5
         with:
@@ -55,13 +62,19 @@ jobs:
           echo "tag=$TAG"         >> "$GITHUB_OUTPUT"
           echo "version=$PKG_VERSION" >> "$GITHUB_OUTPUT"
 
-      # Trusted publishing needs npm >= 11.5.1; Node 22 still bundles npm 10.
+      # Trusted publishing needs npm >= 11.5.1 and Node 22 still bundles npm 10.
+      # Pinned on purpose: `npm@latest` would put a moving dependency in the
+      # publishing path, where a release can break because npm shipped last
+      # night. Bump this deliberately.
       - name: Use an npm that speaks OIDC
         run: |
-          npm install -g npm@latest
+          npm install -g npm@11.19.0
           npm --version
 
-      - run: npm install --no-audit --no-fund
+      # --ignore-scripts: this job holds the OIDC publishing privilege, so no
+      # dependency lifecycle script runs beside it. The only dependency is
+      # `marked`, used by the site build, and it needs no scripts.
+      - run: npm install --no-audit --no-fund --ignore-scripts
       - run: npm test
       - run: npm run build:site
 
@@ -80,6 +93,9 @@ jobs:
             echo "::notice::qrspi@$VERSION is already on the registry — skipping publish"
             exit 0
           fi
+          # Belt and braces: nothing should be able to authenticate this publish
+          # except OIDC, not even a token someone reintroduces into the env.
+          unset NODE_AUTH_TOKEN
           npm publish --access public
 
       # The registry takes a moment to serve a freshly published version.

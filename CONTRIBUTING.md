@@ -46,6 +46,11 @@ page → Settings → Trusted Publisher → GitHub Actions:
 | Workflow filename | `release.yml` |
 | Environment | *(leave empty)* |
 
+**`release.yml` is part of that configuration.** The trusted publisher matches on the
+literal workflow filename, so renaming or moving the file breaks publishing, and the
+error npm returns does not mention the filename. Rename it only together with the
+npm-side config.
+
 The equivalent from the CLI, with npm ≥ 11.15.0 and an interactively logged-in
 account:
 
@@ -110,6 +115,12 @@ npx qrspi@<version> install --dry-run         # run this OUTSIDE the repo
 
 plus a look at the npm page: the logo must load (it is linked by absolute raw URL for
 exactly this reason) and the version badge in the README stops reading *invalid*.
+
+**A note on the npm version.** The release job installs an exact npm
+(`npm install -g npm@11.19.0`) rather than `npm@latest`: trusted publishing needs
+≥ 11.5.1, and a moving version in the publishing path means a release can break
+because npm shipped something last night. Bump that pin deliberately, like any other
+dependency.
 
 **When something fails.** Re-run with the `workflow_dispatch` trigger and the existing
 tag — no need to delete and re-push it:

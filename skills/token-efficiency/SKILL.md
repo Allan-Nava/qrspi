@@ -1,6 +1,6 @@
 ---
 name: token-efficiency
-description: Diagnose and cut token consumption in agentic coding workflows — context rot, the 40% rule, intentional compaction, subagents as context firewalls, effort and model selection, prompt caching invalidation, tool-output hygiene, KPIs. Use when asked why an agent is expensive or slow, when a session is drifting or re-exploring files it already read, when cache_read_input_tokens is unexpectedly 0, when choosing effort or model per phase, when a CLAUDE.md or prompt needs slimming, or when measuring tokens per completed task.
+description: Diagnose and cut token consumption in agentic coding workflows — context rot, the 40% rule, intentional compaction, subagents as context firewalls, effort and model selection, prompt caching invalidation, tool definition and output hygiene, KPIs. Use when asked why an agent is expensive or slow, when a session is drifting or re-exploring files it already read, when cache_read_input_tokens is unexpectedly 0, when choosing effort or model per phase, when a CLAUDE.md, prompt, or tool set needs slimming, or when measuring tokens per completed task.
 ---
 
 # Token efficiency for coding agents

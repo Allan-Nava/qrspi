@@ -76,7 +76,7 @@ Load only what the question needs.
 | Subagents, programmatic tool calling | `references/subagents.md` |
 | `effort`, model choice, adaptive thinking, task budgets | `references/effort.md` |
 | Prompt caching: invariant, invalidation, gotchas | `references/caching.md` |
-| Tool output, context editing, server-side compaction, memory | `references/tool-hygiene.md` |
+| Tool definitions and output, context editing, server-side compaction, memory | `references/tool-hygiene.md` |
 | Anti-pattern table | `references/anti-patterns.md` |
 | 4-week rollout playbook, model prices, beta headers | `references/playbook.md` |
 

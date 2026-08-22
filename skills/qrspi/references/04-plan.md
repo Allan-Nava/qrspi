@@ -118,7 +118,7 @@ How to back out if something goes wrong in production:
 
 ---
 
-## Final plan checklist
+## Status
 
 - [ ] Every step has exact paths
 - [ ] Every new function has a complete signature

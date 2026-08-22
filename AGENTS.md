@@ -54,8 +54,9 @@ npm test        # == node bin/qrspi.mjs check
 ```
 
 It validates the three manifests and their versions, skill frontmatter and length,
-every `${CLAUDE_PLUGIN_ROOT}` reference, and the checkbox markers `/qrspi:next`
-greps for. Manual end-to-end, safe because it writes to a throwaway config dir:
+every `${CLAUDE_PLUGIN_ROOT}` reference, the checkbox markers `/qrspi:next` greps
+for, the `## Status` block in every artifact template, and the two tables that are
+duplicated across files — the pipeline diagram and the per-phase effort allocation. Manual end-to-end, safe because it writes to a throwaway config dir:
 
 ```bash
 npm pack --dry-run

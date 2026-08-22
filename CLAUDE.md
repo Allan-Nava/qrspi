@@ -103,7 +103,9 @@ Do not weaken these when editing; they are the plugin's whole thesis.
   `/qrspi:next` prints that block verbatim with real paths substituted.
 - **Numbers appear in three places** — [README.md](README.md), the budget/phase
   tables in [skills/qrspi/SKILL.md](skills/qrspi/SKILL.md), and the routing table in
-  [commands/next.md](commands/next.md). Change one, change all three.
+  [commands/next.md](commands/next.md). Change one, change all three. `npm test`
+  compares the pipeline diagram and the effort tables for you; the context budgets
+  are still on your honour.
 - **Versions must match** across [package.json](package.json),
   [.claude-plugin/plugin.json](.claude-plugin/plugin.json) and
   [.claude-plugin/marketplace.json](.claude-plugin/marketplace.json). `npm test`
@@ -130,7 +132,11 @@ npm test                  # == node bin/qrspi.mjs check
 
 It validates the three manifests and their versions, skill frontmatter, SKILL.md
 length, every `${CLAUDE_PLUGIN_ROOT}` reference, and the checkbox markers that
-`/qrspi:next` greps for. Run it before every commit and extend it whenever you add
+`/qrspi:next` greps for. It also enforces the content rules this file states and
+nothing else used to check: the `## Status` block in every artifact template, the
+pipeline diagram across the three files that draw it, and the per-phase effort
+allocation across the three that tabulate it. Run it before every commit and extend
+it whenever you add
 an invariant — [.github/workflows/ci.yml](.github/workflows/ci.yml) runs it, the site
 build and `npm pack --dry-run` on every pull request.
 

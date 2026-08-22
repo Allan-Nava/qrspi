@@ -36,6 +36,9 @@ assets/
   social-preview.png   1280x640, rendered from that HTML, committed
 site/
   build.mjs            generates site/dist/index.html FROM README.md (gitignored output)
+scripts/
+  measure-context-cost.mjs  count_tokens over the plugin's own text — contributor
+                       tooling, kept out of the npm tarball by package.json#files
 .github/workflows/
   ci.yml               npm test + site build + npm pack on every PR and push to main
   release.yml          on tag qrspi--v*: publish to npm, cut the release, close the milestone

@@ -26,6 +26,7 @@ allocation, prompt caching, tool hygiene, KPIs.
 | `assets/logo.svg` | the mark — single source for favicon, site, README |
 | `assets/social-preview.*` | OG card: `.html` is the source, `.png` is rendered from it |
 | `site/build.mjs` | generates the GitHub Pages site from `README.md` |
+| `scripts/measure-context-cost.mjs` | `count_tokens` over the plugin's own text; not shipped to npm |
 | `.github/workflows/ci.yml` | `npm test` + site build + `npm pack` on PRs and `main` |
 | `.github/workflows/release.yml` | on tag `qrspi--v*`: npm publish, GitHub release, close milestone |
 | `.github/workflows/pages.yml` | builds and deploys that site on push to `main` |

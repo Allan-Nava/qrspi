@@ -101,8 +101,24 @@ TTL is fine; for a team resuming a task after an hour-long meeting, use 1h.
 ## Verification
 
 If `cache_read_input_tokens` is **0** on repeated requests with a theoretically
-identical prefix, there is a silent invalidator. Diff the rendered prompt bytes
-between two requests. The usual suspects, by frequency:
+identical prefix, there is a silent invalidator.
+
+**Ask the API before you diff by hand.** Cache diagnostics reports what happened to
+the prefix, which is faster than comparing rendered bytes and catches invalidators you
+would not have thought to look for:
+
+```python
+response = client.beta.messages.create(
+    betas=["cache-diagnosis-2026-04-07"],
+    diagnostics={"previous_message_id": prev_id},   # None on the first turn
+    ...
+)
+response.diagnostics
+```
+
+Pass `previous_message_id: None` on the first turn and the previous response's `id`
+on each one after. When the diagnostic is not available to you, fall back to diffing
+the rendered prompt bytes between two requests. The usual suspects, by frequency:
 
 | Pattern | Why it breaks |
 |---|---|

@@ -1,4 +1,4 @@
-# Tool-output hygiene, context editing, compaction, memory
+# Tool hygiene: definitions, output, context editing, compaction, memory
 
 Tool results are the #1 source of hidden context bloat. They are also the easiest to
 fix.
@@ -40,6 +40,42 @@ input validates exactly — no correction rounds.
 
 > Note: top-level `output_format` is deprecated. Use `output_config: {format: {...}}`.
 > Incompatible with citations (400).
+
+## The other half: tool definitions
+
+Everything above is about what tools *return*. What they *are* costs too, and
+differently: a tool result is paid once, a schema is paid on **every request of the
+session**, rendered at position 0 of the prefix.
+
+It is the argument this plugin already makes about skills — *"every installed skill's
+`description` sits in context permanently"*, *"a `SKILL.md` is an index; the detail
+goes to `references/` and loads on demand"* — applied to tools, where it is usually
+worth more.
+
+**Measure it first.** Take the fixed-starting-context baseline from `measuring.md`:
+the weight of the schemas is what `count_tokens` reports with `tools` minus what it
+reports without. On a setup with a dozen MCP servers connected this is routinely the
+largest single line in the fixed cost, and it is paid before the task arrives.
+
+**Then defer what is not needed yet.** Mark tools `defer_loading: true` and declare a
+search tool; definitions are then pulled in on demand instead of all being carried:
+
+```python
+tools=[
+    {"type": "tool_search_tool_regex_20251119", "name": "tool_search_tool_regex"},
+    {..., "defer_loading": True},   # every tool that can be looked up later
+]
+```
+
+`tool_search_tool_bm25_20251119` is the alternative when you are matching prose rather
+than patterns.
+
+Two constraints, both returning 400: the search tool itself must not be deferred, and
+at least one tool has to stay loaded (`All tools have defer_loading set`).
+
+This is a decision taken **once, up front**, about what belongs in the prefix. It is
+not a licence to vary the tool set per request — that rule in `caching.md` still
+holds, and tools sit at position 0 where a change invalidates everything.
 
 ---
 

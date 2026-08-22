@@ -4,8 +4,9 @@ name: Release
 #
 #   npm test && claude plugin tag . --push     # -> qrspi--v0.1.0
 #
-# Everything after that happens here. Requires one repository secret,
-# NPM_TOKEN — an npm *automation* token, which is the kind that bypasses 2FA.
+# Everything after that happens here. Requires one repository secret, NPM_TOKEN:
+# a granular access token with "bypass 2FA" enabled. A token without that bypass
+# gets a 403 at the publish step — CI cannot answer an OTP prompt.
 
 on:
   push:
@@ -46,7 +47,7 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           if [ -z "$NPM_TOKEN" ]; then
-            echo "::error::NPM_TOKEN is not set. Create an npm automation token and add it under Settings → Secrets and variables → Actions."
+            echo "::error::NPM_TOKEN is not set. Create an npm granular access token with 'bypass 2FA' enabled and add it under Settings → Secrets and variables → Actions."
             exit 1
           fi
 

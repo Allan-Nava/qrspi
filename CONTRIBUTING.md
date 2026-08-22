@@ -35,9 +35,26 @@ CLAUDE_CONFIG_DIR=/tmp/qrspi-scratch node bin/qrspi.mjs uninstall
 
 Releases run from GitHub Actions. Pushing the tag is the whole manual part.
 
-**One-time setup** (already done for this repository): a repository secret
-`NPM_TOKEN`, holding an npm **automation** token — the kind that bypasses 2FA, since
-CI cannot answer an OTP prompt. Settings → Secrets and variables → Actions.
+**One-time setup:** a repository secret `NPM_TOKEN` under Settings → Secrets and
+variables → Actions.
+
+It has to be a **granular access token with "bypass 2FA" enabled**. Not any token
+will do — npm rejects the publish with
+
+```
+403 Forbidden - PUT https://registry.npmjs.org/qrspi
+Two-factor authentication or granular access token with bypass 2fa enabled is required
+```
+
+when the token cannot bypass 2FA, because CI has no way to answer an OTP prompt. On
+npmjs.com: Access Tokens → Generate New Token → **Granular Access Token**, then
+
+- **Packages and scopes**: Read and write. For the first publish of a package that
+  does not exist yet, the token needs permission over *all* packages (or the scope it
+  will live in) — a token restricted to an existing package cannot create a new one.
+- **Bypass 2FA**: enabled.
+- Expiration: set one, and put a reminder where you will see it — an expired token
+  fails the release at the publish step.
 
 **Per release:**
 
@@ -78,7 +95,11 @@ plus a look at the npm page: the logo must load (it is linked by absolute raw UR
 exactly this reason) and the version badge in the README stops reading *invalid*.
 
 **When something fails.** Re-run with the `workflow_dispatch` trigger and the existing
-tag — no need to delete and re-push it. The publish step itself is the exception: npm
+tag — no need to delete and re-push it:
+
+```bash
+gh workflow run Release -f tag=qrspi--v<version>
+``` The publish step itself is the exception: npm
 refuses to overwrite a version that already exists, so a rerun that got past it needs
 a version bump. Nothing else in the workflow is destructive, and the release is only
 created after npm confirms the version.

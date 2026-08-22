@@ -24,6 +24,25 @@ stays index-sized, every `${CLAUDE_PLUGIN_ROOT}` reference is one copy mode can
 rewrite, and each phase reference still carries the checkboxes `/qrspi:next` greps
 for. CI runs it, the site build and `npm pack --dry-run` on every pull request.
 
+### Measuring what the plugin costs
+
+The static half of the plugin's own numbers — what it occupies in a session before
+doing any work — can be settled without running a task:
+
+```bash
+ANTHROPIC_API_KEY=sk-ant-… node scripts/measure-context-cost.mjs
+```
+
+It reports the permanent cost (the two `description` lines, in context every session
+whether a skill fires or not), the cost of each `SKILL.md` on trigger, each reference
+on demand, and the artifact templates. Counts come from `count_tokens` and are
+model-specific — pass `--model` to compare. No dependencies, and it is excluded from
+the npm tarball by `package.json#files`.
+
+The *dynamic* figures — the Research burn, the compression ratios, the per-phase
+starting contexts — need a real six-phase run and the instrumentation snippet in
+`skills/token-efficiency/references/measuring.md`. That is issue #10.
+
 Try an install without touching your own configuration:
 
 ```bash

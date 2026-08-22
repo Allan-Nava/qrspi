@@ -139,6 +139,51 @@ function uninstall(flags) {
   }
 }
 
+// --- content invariants ----------------------------------------------------
+// CLAUDE.md hands a future editor three rules about content that is deliberately
+// duplicated across files. Until this block existed it enforced none of them.
+
+const PHASES = ['Questions', 'Research', 'Design', 'Structure', 'Plan', 'Implement']
+
+// The pipeline diagram is drawn in three files, and compaction.md draws an extra
+// arrow — so compare the parsed rows, not the bytes. The row shape is the one
+// site/build.mjs parses; keep the two in step.
+function pipelineRows(text) {
+  const block = [...text.matchAll(/```\n([\s\S]*?)```/g)]
+    .map((m) => m[1])
+    .find((b) => b.includes('00-questions.md'))
+  if (!block) return null
+  const rows = []
+  for (const line of block.split('\n')) {
+    const m = line.match(/^(\S+)\s{2,}(.+?)\s+\u2192\s+(.+?)(?:\s{2,}\((.+)\))?\s*$/)
+    if (!m) continue
+    rows.push([m[1], m[2].replace(/^\u2192\s*/, ''), m[3], m[4] ?? ''].map((c) => c.trim()).join(' | '))
+  }
+  return rows
+}
+
+// The per-phase effort allocation is tabulated three times, in three different
+// column layouts. Reduce each to phase -> set of effort levels, then compare.
+function effortByPhase(text) {
+  const map = new Map()
+  let last = null
+  for (const line of text.split('\n')) {
+    if (!line.trim().startsWith('|')) continue
+    const cells = line.split('|').slice(1, -1).map((c) => c.trim())
+    const phase = cells.find((c) => PHASES.includes(c.replace(/[`*]/g, '').trim()))
+    // effort.md gives the research subagents their own row; it belongs to Research.
+    const key = phase ?? (cells.some((c) => /subagent/i.test(c)) ? last : null)
+    if (phase) last = phase
+    if (!key) continue
+    const found = [...line.matchAll(/`(low|medium|high|xhigh|max)`/g)].map((m) => m[1])
+    if (!found.length) continue
+    map.set(key, new Set([...(map.get(key) ?? []), ...found]))
+  }
+  return map
+}
+
+const efforts = (set) => [...(set ?? [])].sort().join('+') || '\u2014'
+
 // Package sanity check — also `npm test`. Verifies the invariants the installer
 // and the plugin runtime both depend on.
 function check() {
@@ -197,8 +242,46 @@ function check() {
   for (const f of refs) {
     // 05 is a prompt, not an artifact; 99 is mutable state.
     if (f === '05-implement.md' || f === '99-progress.md') continue
-    if (!readFileSync(join(refDir, f), 'utf8').includes('- [ ]')) {
+    const body = readFileSync(join(refDir, f), 'utf8')
+    if (!body.includes('- [ ]')) {
       problems.push(`skills/qrspi/references/${f}: no unticked checkbox — /qrspi:next detects phase completion by grepping for them`)
+    }
+    if (!/^## Status$/m.test(body)) {
+      problems.push(`skills/qrspi/references/${f}: no '## Status' section — CLAUDE.md requires every artifact to end with one, and commands/next.md describes phase detection in those terms`)
+    }
+  }
+
+  // The pipeline diagram, duplicated in three files.
+  const drawn = ['README.md', 'skills/qrspi/SKILL.md', 'skills/token-efficiency/references/compaction.md'].map(
+    (f) => ({ f, rows: existsSync(join(ROOT, f)) ? pipelineRows(readFileSync(join(ROOT, f), 'utf8')) : null }),
+  )
+  const [canonical, ...copies] = drawn
+  if (!canonical.rows?.length) {
+    problems.push(`${canonical.f}: no pipeline block found — site/build.mjs reads it too`)
+  } else {
+    for (const copy of copies) {
+      if (!copy.rows?.length) {
+        problems.push(`${copy.f}: no pipeline block found`)
+        continue
+      }
+      for (let i = 0; i < Math.max(canonical.rows.length, copy.rows.length); i++) {
+        if (canonical.rows[i] !== copy.rows[i]) {
+          problems.push(
+            `pipeline row ${i + 1} disagrees\n      ${canonical.f}: ${canonical.rows[i] ?? '(missing)'}\n      ${copy.f}: ${copy.rows[i] ?? '(missing)'}`,
+          )
+        }
+      }
+    }
+  }
+
+  // The per-phase effort allocation, tabulated three times.
+  const allocations = ['skills/qrspi/SKILL.md', 'commands/next.md', 'skills/token-efficiency/references/effort.md'].map(
+    (f) => ({ f, map: existsSync(join(ROOT, f)) ? effortByPhase(readFileSync(join(ROOT, f), 'utf8')) : new Map() }),
+  )
+  for (const phase of PHASES) {
+    const said = allocations.map((a) => efforts(a.map.get(phase)))
+    if (new Set(said).size > 1) {
+      problems.push(`effort for ${phase} disagrees — ${allocations.map((a, i) => `${a.f}: ${said[i]}`).join(', ')}`)
     }
   }
 

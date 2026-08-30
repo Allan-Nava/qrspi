@@ -1,6 +1,6 @@
 {
   "name": "qrspi",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Questions → Research → Spec → Plan → Implement: a phase-gated workflow that keeps a coding agent under 40% context by writing one artifact to disk per phase.",
   "author": {
     "name": "Allan Nava",

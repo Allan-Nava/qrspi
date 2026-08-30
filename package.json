@@ -1,6 +1,6 @@
 {
   "name": "qrspi",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Questions \u2192 Research \u2192 Spec \u2192 Plan \u2192 Implement: a phase-gated Claude Code plugin that keeps a coding agent under 40% context by writing one artifact to disk per phase.",
   "type": "module",
   "bin": {

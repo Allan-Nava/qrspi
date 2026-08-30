@@ -50,6 +50,12 @@ CLAUDE_CONFIG_DIR=/tmp/qrspi-scratch node bin/qrspi.mjs install --copy
 CLAUDE_CONFIG_DIR=/tmp/qrspi-scratch node bin/qrspi.mjs uninstall
 ```
 
+Copy mode replaces a skill directory wholesale, so it writes a `.qrspi-installed`
+marker into every directory it creates and refuses to delete one that lacks it —
+`~/.claude/skills/token-efficiency` is a plausible name for someone's own skill, and
+copy mode is the automatic fallback when the `claude` CLI is missing. `--force`
+overrides, and says what it replaced; `uninstall` applies the same rule in reverse.
+
 ## Releasing
 
 Releases run from GitHub Actions. Pushing the tag is the whole manual part.

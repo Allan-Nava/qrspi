@@ -54,7 +54,45 @@ function run(bin, args) {
 // --- install paths --------------------------------------------------------
 
 const skillTarget = (name) => join(CLAUDE_DIR, 'skills', name)
-const commandTarget = (name) => join(CLAUDE_DIR, 'commands', PLUGIN, `${name}.md`)
+const commandDir = join(CLAUDE_DIR, 'commands', PLUGIN)
+const commandTarget = (name) => join(commandDir, `${name}.md`)
+
+// Copy mode replaces a skill directory wholesale, so it must be certain the
+// directory is its own before deleting it. `token-efficiency` is exactly what
+// someone would call a hand-written skill on the same subject, and copy mode is
+// not opt-in — it is the fallback when the claude CLI is missing. Every
+// directory this installer writes carries the marker; anything without one is
+// someone else's work and is left alone.
+const MARKER = '.qrspi-installed'
+const VERSION = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')).version
+const managed = (dir) => existsSync(join(dir, MARKER))
+const copyTargets = () => [...SKILLS.map(skillTarget), commandDir]
+
+function filesUnder(dir) {
+  const out = []
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    const p = join(dir, e.name)
+    if (e.isDirectory()) out.push(...filesUnder(p))
+    else if (e.name !== MARKER) out.push(p)
+  }
+  return out
+}
+
+const unmanaged = () => copyTargets().filter((d) => existsSync(d) && !managed(d))
+
+function refuse(dirs) {
+  console.error(`${c.red('x')} refusing to delete content this installer did not write:\n`)
+  for (const d of dirs) {
+    const n = filesUnder(d).length
+    console.error(`    ${d} ${c.dim(`— ${n} file${n === 1 ? '' : 's'}`)}`)
+  }
+  console.error(`
+  Copy mode replaces a directory wholesale, so everything above would be lost,
+  not merely the files that collide by name.
+
+  Move it aside, or re-run with --force to overwrite it.`)
+  process.exit(1)
+}
 
 // Commands address plugin files as `${CLAUDE_PLUGIN_ROOT}/skills/...`. Outside
 // the plugin runtime that variable is unset, so copy mode rewrites it to the
@@ -64,24 +102,41 @@ function rewritePluginRoot(text) {
   return text.replaceAll('${CLAUDE_PLUGIN_ROOT}/skills', join(CLAUDE_DIR, 'skills'))
 }
 
-function copyInstall({ dryRun }) {
+function copyInstall({ dryRun, force }) {
+  // A dry run reports rather than exits: it has to be able to say what would be
+  // destroyed, which is the whole reason someone runs it first.
+  const clashes = unmanaged()
+  if (clashes.length && !force && !dryRun) refuse(clashes)
+
+  const warn = (to) =>
+    clashes.includes(to)
+      ? ` ${c.red(`— deletes ${filesUnder(to).length} file(s) qrspi did not install`)}`
+      : ''
+
   say(`Installing into ${c.bold(CLAUDE_DIR)} ${c.dim('(copy mode)')}`)
   for (const name of SKILLS) {
     const to = skillTarget(name)
-    say(`  skill    ${name} -> ${to}`)
+    say(`  skill    ${name} -> ${to}${warn(to)}`)
     if (dryRun) continue
     rmSync(to, { recursive: true, force: true })
     mkdirSync(dirname(to), { recursive: true })
     cpSync(join(ROOT, 'skills', name), to, { recursive: true })
+    writeFileSync(join(to, MARKER), `${VERSION}\n`)
   }
+  const cmdWarn = warn(commandDir)
   for (const name of COMMANDS) {
     const to = commandTarget(name)
-    say(`  command  /${PLUGIN}:${name} -> ${to}`)
+    say(`  command  /${PLUGIN}:${name} -> ${to}${name === COMMANDS[0] ? cmdWarn : ''}`)
     if (dryRun) continue
     mkdirSync(dirname(to), { recursive: true })
     writeFileSync(to, rewritePluginRoot(readFileSync(join(ROOT, 'commands', `${name}.md`), 'utf8')))
   }
-  if (dryRun) return say(c.dim('\nDry run — nothing written.'))
+  if (!dryRun) writeFileSync(join(commandDir, MARKER), `${VERSION}\n`)
+
+  if (dryRun) {
+    if (clashes.length) say(c.red('\nDry run — but note the deletions above; --force would be required.'))
+    return say(c.dim('\nDry run — nothing written.'))
+  }
   say(`\n${c.green('Installed.')} Restart Claude Code, then: /${PLUGIN}:new ENG-1234 <ticket>`)
 }
 
@@ -101,12 +156,13 @@ function pluginInstall(bin) {
 
 function install(flags) {
   const dryRun = flags.has('--dry-run')
-  if (flags.has('--copy')) return copyInstall({ dryRun })
+  const force = flags.has('--force')
+  if (flags.has('--copy')) return copyInstall({ dryRun, force })
 
   const bin = findClaude()
   if (!bin) {
     say(c.dim('claude CLI not found — falling back to copy mode.\n'))
-    return copyInstall({ dryRun })
+    return copyInstall({ dryRun, force })
   }
   if (dryRun) {
     say(`Would run, with ${c.bold(bin)}:`)
@@ -116,21 +172,27 @@ function install(flags) {
   }
   if (!pluginInstall(bin)) {
     say(c.dim('\nPlugin install failed — falling back to copy mode.\n'))
-    copyInstall({ dryRun })
+    copyInstall({ dryRun, force })
   }
 }
 
 function uninstall(flags) {
   const dryRun = flags.has('--dry-run')
-  const targets = [...SKILLS.map(skillTarget), join(CLAUDE_DIR, 'commands', PLUGIN)]
+  const force = flags.has('--force')
   let found = false
-  for (const t of targets) {
+  for (const t of copyTargets()) {
     if (!existsSync(t)) continue
+    // Same rule as install: without the marker it is not ours to delete. An
+    // install predating the marker lands here — say so rather than guess.
+    if (!managed(t) && !force) {
+      say(c.dim(`  keep   ${t} — no ${MARKER}, so not removing it; --force overrides`))
+      continue
+    }
     found = true
     say(`  remove ${t}`)
     if (!dryRun) rmSync(t, { recursive: true, force: true })
   }
-  if (!found) say(c.dim(`Nothing copied under ${CLAUDE_DIR}.`))
+  if (!found) say(c.dim(`Nothing of ours to remove under ${CLAUDE_DIR}.`))
   const bin = findClaude()
   if (bin) {
     say('\nIf you installed through the plugin system, also run:')
@@ -298,6 +360,7 @@ function help() {
   npx qrspi install            register the plugin (claude CLI, or copy fallback)
   npx qrspi install --copy     force copy into ${CLAUDE_DIR}
   npx qrspi install --dry-run  show what would happen, change nothing
+  npx qrspi install --force    overwrite directories qrspi did not install
   npx qrspi uninstall          remove the copied skills and commands
   npx qrspi path               print the plugin root (for /plugin marketplace add)
   npx qrspi check              validate this package

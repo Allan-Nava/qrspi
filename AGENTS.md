@@ -30,7 +30,7 @@ allocation, prompt caching, tool hygiene, KPIs.
 | `.github/workflows/ci.yml` | `npm test` + site build + `npm pack` on PRs and `main` |
 | `.github/workflows/release.yml` | on tag `qrspi--v*`: npm publish, GitHub release, close milestone |
 | `.github/workflows/pages.yml` | builds and deploys that site on push to `main` |
-| `bin/qrspi.mjs` | installer CLI: `install` / `uninstall` / `path` / `check` |
+| `bin/qrspi.mjs` | installer CLI: `install` / `uninstall` / `path` / `check`; copy mode guards unmarked directories |
 | `.claude-plugin/plugin.json` | plugin manifest |
 | `.claude-plugin/marketplace.json` | marketplace manifest (`source: "./"`) |
 | `commands/new.md` | `/qrspi:new` — bootstrap `thoughts/<dir>`, run phase 0, stop |

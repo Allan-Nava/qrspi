@@ -113,6 +113,10 @@ Do not weaken these when editing; they are the plugin's whole thesis.
   [.claude-plugin/plugin.json](.claude-plugin/plugin.json) and
   [.claude-plugin/marketplace.json](.claude-plugin/marketplace.json). `npm test`
   fails if they drift.
+- **Copy mode never deletes what it did not write.** It drops a
+  `.qrspi-installed` marker in each directory it creates and refuses an unmarked
+  target without `--force` — see `unmanaged()` in [bin/qrspi.mjs](bin/qrspi.mjs).
+  `uninstall` obeys the same marker. Keep both sides in step.
 - **Copy mode rewrites `${CLAUDE_PLUGIN_ROOT}/skills`** to `~/.claude/skills` — see
   `rewritePluginRoot()` in [bin/qrspi.mjs](bin/qrspi.mjs). A `${CLAUDE_PLUGIN_ROOT}`
   reference pointing anywhere *other* than `/skills` would survive unrewritten and

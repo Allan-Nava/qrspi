@@ -176,6 +176,16 @@ gitignored. To change what the page says, edit [README.md](README.md) and rebuil
 npm run build:site && open site/dist/index.html
 ```
 
+It also emits `sitemap.xml` — one URL, because the site is one page and the section
+anchors are fragments of it, not separate resources — plus JSON-LD (`WebSite` and
+`SoftwareApplication`) built from the same title and description the meta tags use, so
+the four cannot drift. There is deliberately **no** `robots.txt`: crawlers read one
+only from the host root, and
+[allan-nava.github.io/robots.txt](https://allan-nava.github.io/robots.txt) already
+speaks for every project site under it, generating its `Sitemap:` lines in CI from the
+sites whose `sitemap.xml` returns 200. Shipping the sitemap is what gets qrspi listed
+there.
+
 The generator parses the README: the H1 becomes the hero, the first fenced block is
 parsed into the pipeline diagram (`Phase  context  →  artifact  (size)` — a row that
 does not match is skipped, and if fewer than three match the whole block falls back to

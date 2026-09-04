@@ -182,23 +182,69 @@ ${renderInventory()}
 const rendered = body.map(renderSection)
 rendered.splice(priorArtAt === -1 ? rendered.length : priorArtAt, 0, inventorySection)
 
+// One derived headline, reused by <title>, Open Graph, Twitter and JSON-LD, so
+// the four can never drift apart. Like everything else on the page, the words
+// come from README.md — the generator adds none of its own.
+const headline = `${title} — phase-gated context engineering for coding agents`
+
+// Structured data. The strings are the same two the meta tags use; nothing here
+// is written for the crawler that is not already on the page.
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${SITE}#website`,
+      url: SITE,
+      name: title,
+      description,
+      inLanguage: 'en',
+    },
+    {
+      '@type': 'SoftwareApplication',
+      '@id': `${SITE}#plugin`,
+      name: title,
+      description,
+      url: SITE,
+      applicationCategory: 'DeveloperApplication',
+      operatingSystem: 'macOS, Linux, Windows',
+      softwareVersion: pkg.version,
+      codeRepository: REPO,
+      license: 'https://opensource.org/licenses/MIT',
+      author: { '@type': 'Person', name: 'Allan Nava' },
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    },
+  ],
+}).replace(/</g, '\\u003c')
+
 const html = `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${esc(title)} — phase-gated context engineering for coding agents</title>
+<title>${esc(headline)}</title>
 <meta name="description" content="${esc(description)}">
 <link rel="canonical" href="${SITE}">
+<meta name="theme-color" content="#b7552f" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1b1a18" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="${esc(title)}">
+<meta property="og:locale" content="en">
 <meta property="og:url" content="${SITE}">
-<meta property="og:title" content="${esc(title)} — phase-gated context engineering for coding agents">
+<meta property="og:title" content="${esc(headline)}">
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:image" content="${SITE}assets/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="${esc(headline)}">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${esc(headline)}">
+<meta name="twitter:description" content="${esc(description)}">
 <meta name="twitter:image" content="${SITE}assets/social-preview.png">
+<meta name="twitter:image:alt" content="${esc(headline)}">
 <link rel="icon" href="${favicon}">
 <link rel="apple-touch-icon" href="assets/logo.svg">
+<script type="application/ld+json">${jsonLd}</script>
 <style>
 :root {
   --bg: #fbfaf8; --panel: #fff; --line: #e6e1d9; --ink: #1b1a18; --muted: #6b665e;
@@ -393,4 +439,30 @@ mkdirSync(OUT, { recursive: true })
 cpSync(join(ROOT, 'assets'), join(OUT, 'assets'), { recursive: true, filter: (src) => !src.endsWith('.html') })
 writeFileSync(join(OUT, 'index.html'), html)
 writeFileSync(join(OUT, '.nojekyll'), '')
-console.log(`built ${join(OUT, 'index.html')} — ${(html.length / 1024).toFixed(1)} kB, ${rendered.length} sections, pipeline: ${rows ? `${rows.length} rows` : 'fallback <pre>'}`)
+
+// One page, so one URL. Section anchors are fragments of this document, not
+// separate resources, and listing them would misdescribe the site. lastmod is
+// the build date because Pages deploys on push to main — the page really was
+// regenerated then.
+//
+// There is deliberately NO robots.txt here. Crawlers read robots.txt only from
+// the host root, and https://allan-nava.github.io/robots.txt already speaks for
+// every project site under it: its Sitemap: lines are generated in CI from the
+// Allan-Nava Pages sites whose sitemap.xml returns 200. Shipping this file is
+// what gets qrspi listed there; a robots.txt at /qrspi/ would be dead weight.
+const lastmod = new Date().toISOString().slice(0, 10)
+writeFileSync(
+  join(OUT, 'sitemap.xml'),
+  `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${SITE}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>
+`,
+)
+
+console.log(`built ${join(OUT, 'index.html')} — ${(html.length / 1024).toFixed(1)} kB, ${rendered.length} sections, pipeline: ${rows ? `${rows.length} rows` : 'fallback <pre>'}, + sitemap.xml`)

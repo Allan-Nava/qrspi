@@ -44,7 +44,7 @@ jobs:
 
       - uses: actions/setup-node@v5
         with:
-          node-version: 22
+          node-version: 24
           registry-url: https://registry.npmjs.org
 
       # The tag is the source of truth for what is being released; package.json

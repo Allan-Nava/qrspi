@@ -61,7 +61,9 @@ Refuse to advance, and say which artifact needs work, if:
 - **Plan → Implement** and `04-plan.md` fails the zero-context test: missing exact
   paths, missing function signatures, or test cases without expected outputs;
 - `99-progress.md` has an open deviation pointing at an upstream artifact — that
-  artifact gets fixed first, not worked around.
+  artifact gets fixed first, not worked around. Emit the prompt for the phase its
+  **Re-enter** field names, scoped to the deviation, per
+  `${CLAUDE_PLUGIN_ROOT}/skills/qrspi/references/recovery.md`.
 
 ## 4. Always close with
 

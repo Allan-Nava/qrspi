@@ -334,8 +334,11 @@ function check() {
   // prints that block verbatim, and commands/new.md tells the model to delete
   // exactly this marker from each copied artifact, so both break silently if a
   // reference stops carrying it. 99-progress.md is state, not a phase.
+  // Phase references are the numbered files; anything else in the directory is a
+  // guide (recovery, reviewing, landing) with neither a prompt nor a Status block.
+  const isPhase = (f) => /^\d\d-.*\.md$/.test(f)
   for (const f of readdirSync(join(ROOT, 'skills/qrspi/references')).sort()) {
-    if (f === '99-progress.md') continue
+    if (!isPhase(f) || f === '99-progress.md') continue
     if (!/^> \*\*PROMPT/m.test(readFileSync(join(ROOT, 'skills/qrspi/references', f), 'utf8'))) {
       problems.push(`skills/qrspi/references/${f}: no \`> **PROMPT\` block — commands/next.md prints it, commands/new.md strips it`)
     }
@@ -384,7 +387,7 @@ function check() {
   }
 
   const refDir = join(ROOT, 'skills', 'qrspi', 'references')
-  const refs = existsSync(refDir) ? readdirSync(refDir).filter((f) => f.endsWith('.md')) : []
+  const refs = existsSync(refDir) ? readdirSync(refDir).filter(isPhase) : []
   if (!refs.length) problems.push('skills/qrspi/references/ is empty — /qrspi:new has nothing to copy')
   for (const f of refs) {
     // 05 is a prompt, not an artifact; 99 is mutable state.

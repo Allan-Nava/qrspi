@@ -65,7 +65,8 @@ phase's prompt and the artifact skeleton to fill. `05-implement.md` is a prompt
 only — its output is code — and Implement keeps state in `99-progress.md`.
 
 Bootstrap with `/qrspi:new <TASK-ID> <ticket>`, then `/qrspi:next` at each boundary
-for the next phase prompt.
+for the next phase prompt. When Implement finds an upstream artifact wrong, the path
+back is `references/recovery.md` — one phase re-entered narrowly, not a restart.
 
 ## The test that matters
 

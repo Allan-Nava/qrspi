@@ -94,4 +94,4 @@ S1 ──┬── S2 ──── S4
 - [ ] Every step leaves the repo working
 - [ ] Dependencies and parallelism mapped
 
-> ⏭️ Next phase: **Plan**. It receives: this file + `02-design.md`.
+> Next phase: **Plan**. It receives: this file + `02-design.md`.

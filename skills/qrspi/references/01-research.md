@@ -116,5 +116,5 @@ letters. It is the most valuable output of the phase.
 - [ ] Zero solution proposals
 - [ ] Reviewed
 
-> 📊 **Compression ratio:** <tokens burned> → <artifact tokens> = <N>×
-> ⏭️ Next phase: **Design**. It receives: this file + `00-questions.md` + the ticket.
+> **Compression ratio:** <tokens burned> → <artifact tokens> = <N>×
+> Next phase: **Design**. It receives: this file + `00-questions.md` + the ticket.

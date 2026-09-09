@@ -155,8 +155,12 @@ Do not weaken these when editing; they are the plugin's whole thesis.
   [bin/qrspi.mjs](bin/qrspi.mjs) switches to the slug from `package.json#repository`
   when it sees `_npx` in the path — so that field has to name the GitHub repo, and
   `check` fails if it does not. `npm i -g` and a checkout keep registering `ROOT`.
-- Prose style: British-leaning spelling ("utilisation"), em-dashes, no emoji, no
-  marketing filler. Match it.
+- Prose style: British-leaning spelling ("utilisation"), em-dashes, no marketing
+  filler. **No decorative emoji** — none in prose, headings, or the "Next phase"
+  footers. Two functional uses stay: the status glyphs in `99-progress.md` (a column
+  read at a glance, with a legend) and `# ❌` / `# ✅` above do/don't code examples.
+  A decision table gets words (`kept` / `lost`), not ticks — a tick under a column
+  called "cache" does not say which way it points.
 
 ## Verifying a change
 

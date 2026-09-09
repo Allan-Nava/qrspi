@@ -69,5 +69,5 @@ Things the ticket might suggest but that we are **not** doing in this task:
 - [ ] Reviewed by a human
 - [ ] Answers collected (or assumptions explicitly accepted)
 
-> ⏭️ Next phase: **Research**. The ticket is **not** passed to Research — only the
+> Next phase: **Research**. The ticket is **not** passed to Research — only the
 > questions and their answers.

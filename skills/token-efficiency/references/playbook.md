@@ -1,7 +1,7 @@
 # Playbook: where to start
 
-**Order matters.** Caching on a workflow that does not compact intentionally saves
-you 10%. Intentional compaction saves you 90%. Do not invert them.
+Four weeks, in the order of the levers table in `SKILL.md` — compaction before caching,
+because the second saves a tenth of what the first does.
 
 ## Week 1 — Baseline
 
@@ -43,6 +43,7 @@ Re-measure on the **same tasks** as week 1. It is the only valid comparison.
 
 | Model | ID | Context | Input $/1M | Output $/1M |
 |---|---|---|---|---|
+| Claude Fable 5.1 | `claude-fable-5-1` | 1M | $10.00 | $50.00 |
 | Claude Fable 5 | `claude-fable-5` | 1M | $10.00 | $50.00 |
 | Claude Opus 5 | `claude-opus-5` | 1M | $5.00 | $25.00 |
 | Claude Opus 4.8 | `claude-opus-4-8` | 1M | $5.00 | $25.00 |

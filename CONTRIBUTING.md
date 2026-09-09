@@ -56,6 +56,25 @@ marker into every directory it creates and refuses to delete one that lacks it �
 copy mode is the automatic fallback when the `claude` CLI is missing. `--force`
 overrides, and says what it replaced; `uninstall` applies the same rule in reverse.
 
+## Measuring a run
+
+The context budgets in `skills/qrspi/SKILL.md` and the pipeline figures in the README
+are assertions until a real task has been run through all six phases (#10). When you
+run one — fresh session per phase, as the workflow requires — every session lands as a
+JSONL under `~/.claude/projects/<repo-slug>/`, with `usage` on each assistant turn.
+Afterwards:
+
+```bash
+node scripts/measure-run.mjs ~/.claude/projects/<repo-slug>/
+```
+
+prints, per session, the phase (read off the pasted prompt), peak context and its
+share of the window (KPI 1), output and uncached input, cache writes and reads, and the
+hit ratio (KPI 4); the total row is KPI 3. No API key, nothing leaves the machine. Put
+the peaks next to the `Budget / alarm` column in `SKILL.md`, and if the two disagree,
+the table moves — not the run. Compression ratio (KPI 2) additionally needs the
+artifact's token count from `scripts/measure-context-cost.mjs`.
+
 ## Releasing
 
 Releases run from GitHub Actions. Pushing the tag is the whole manual part — and the

@@ -47,7 +47,7 @@ scripts/
                        Both are contributor tooling, kept out of the npm tarball by
                        package.json#files
 .github/workflows/
-  ci.yml               check on Node 18/20/22 with no npm install, plus a copy-mode round
+  ci.yml               check on Node 18/20/22/24 with no npm install, plus a copy-mode round
                        trip; site build + npm pack on 22 — every PR and push to main
   release.yml          on tag qrspi--v*: publish to npm, cut the release, close the milestone
   release-drift.yml    fails when main carries a version with no tag for 2h; runs daily
@@ -168,7 +168,8 @@ Do not weaken these when editing; they are the plugin's whole thesis.
   break the copy install, so `npx qrspi check` rejects it. Add such a reference only
   together with its rewrite rule.
 - **The installer stays dependency-free** and Node-18-compatible, and CI now proves
-  both: `check` runs on Node 18, 20 and 22 without `npm install`. No bundler, no
+  both: `check` runs on Node 18, 20, 22 and 24 without `npm install` — the floor and
+  the current line, so a removal in a newer Node is caught as early as a post-18 syntax. No bundler, no
   TypeScript, no `postinstall` hook — installing a package must never write to
   `~/.claude` behind the user's back; that only happens on an explicit
   `qrspi install`.

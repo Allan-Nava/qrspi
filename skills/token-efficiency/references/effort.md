@@ -71,3 +71,23 @@ with client.beta.messages.stream(
 
 Minimum `total`: 20,000. Use streaming: with large `max_tokens`, non-streaming
 requests hit HTTP timeouts.
+
+## In Claude Code
+
+Effort is a session setting, not a request parameter, and a fresh session per phase
+means it is set once at the boundary:
+
+| Where | How |
+|---|---|
+| at launch | `claude --effort xhigh` |
+| in the session | `/effort xhigh` — takes effect on the next request; `/effort` alone opens a slider; `/effort auto` clears the saved level |
+| in the `/model` picker | left/right adjusts effort alongside the model |
+| persistently | `effortLevel` in `~/.claude/settings.json`, or per model under `modelSettings.<model-id>.effortLevel` |
+| everywhere, overriding the file | `CLAUDE_CODE_EFFORT_LEVEL=xhigh` |
+| per subagent | `effort:` in the agent's frontmatter |
+
+`max` is session-only unless set through the environment variable. Models that do not
+support effort — Haiku 4.5 among them — ignore the setting; for those the lever is
+`MAX_THINKING_TOKENS`, which adaptive-reasoning models in turn ignore. The phase
+prompts state their recommended effort; `claude --effort <level>` when opening the
+phase session is the cheapest way to honour it.

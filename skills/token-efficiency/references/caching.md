@@ -142,3 +142,25 @@ the rendered prompt bytes between two requests. The usual suspects, by frequency
 | session/user ID interpolated into system | per-user prefix, zero sharing |
 | `if flag: system += ...` | every flag combination is a distinct prefix |
 | `tools=build_tools(user)` | tools are at position 0 |
+
+## In Claude Code
+
+Caching is automatic; what you control is whether the prefix stays stable, and the
+harness now tells you when it did not. After the first response, `/usage` carries a
+`Prompt cache (main)` line: requests, share of input served from cache, **misses with
+the last one's likely cause** (`tool definitions changed`, for instance), expected
+rebuilds (compaction, tool-result clearing), and whether the cache is warm and on which
+TTL. The KPI 4 target — over 70% in Implement — is read off that line.
+
+What breaks the prefix from inside a session, in the harness's terms:
+
+- **Enabling or disabling an MCP server, or a tool.** Tool definitions render first; the
+  line will say so.
+- **`/model`.** Caches are model-scoped. Switching mid-phase rebuilds everything.
+- **A long idle gap.** The TTL is one hour on a subscription, five minutes on an API
+  key or once usage credits are being drawn; the first message after that misses.
+- **Editing `CLAUDE.md` mid-session.** It sits in the system prompt.
+
+None of these are reasons not to do the thing — they are reasons to do it at a phase
+boundary, where the cache is being rebuilt anyway. Subagents have their own entry;
+`experimental.cacheTtl: 1h` in an agent's frontmatter lengthens theirs.

@@ -127,3 +127,25 @@ Tool `memory_20250818`. The agent reads and writes a `/memories` directory; you
 implement the backend. In a QRSPI context the phase artifacts **already are** your
 memory — versioned, reviewable, diffable. The memory tool is for state that cuts
 across tasks (discovered conventions, recurring codebase gotchas).
+
+## In Claude Code
+
+**Definitions.** MCP tool definitions are deferred by default — only names and server
+instructions enter context until a tool is used — so the schema cost above is mostly
+paid by servers you leave connected and never call. `/context` shows what is taking
+the space; `/mcp` disables a server for the session. A CLI (`gh`, `aws`, `kubectl`)
+costs no schema at all and is usually the better tool. A subagent's `tools:` and a
+command's `allowed-tools` are the same idea one level down: what is not listed is
+not carried.
+
+**Output.** The truncation table above is what to type. To stop having to type it, a
+`PreToolUse` hook on `Bash` can rewrite `npm test` into `npm test 2>&1 | grep -A 5 -E
+'(FAIL|ERROR)' | head -100` before it runs — the docs' *Manage costs* page has the
+script. Code-intelligence plugins replace grep-then-read-three-candidates with one
+go-to-definition. And a `skill` that describes the codebase's shape saves the
+exploration that would otherwise rediscover it.
+
+**Instructions.** `CLAUDE.md` is paid on every request; the docs say keep it under
+200 lines, this skill says 100. Anything that is only needed for one kind of task
+belongs in a skill, loaded when invoked. That is the same rule as the deferred tool
+definitions, applied to prose.

@@ -70,3 +70,23 @@ task even arrives.
 
 Short phases are not only about compressing tokens: they are about **staying inside
 the instruction budget**.
+
+## In Claude Code
+
+Intentional compaction is two things you already have: `/clear` and a file. Close the
+phase by writing the artifact, `/clear` (or a new terminal), open the next phase from
+the artifact. `/rename` the session first if you may want `/resume` later.
+
+The harness's own compaction is the safety net, not the method — and it is tunable:
+
+| Control | What it does |
+|---|---|
+| `/compact <instructions>` | summarise now, keeping what the instructions name — `/compact Focus on the deviations and the failing test` |
+| `# Compact instructions` in `CLAUDE.md` | standing instructions for every compaction in that repo |
+| `/autocompact 400k` · `autoCompactWindow` · `CLAUDE_CODE_AUTO_COMPACT_WINDOW` · `--autocompact` | the context size at which auto-compact fires; default is the model's limit (Sonnet 5: ~967k) |
+
+Setting the window to 400k on a 1M model makes the harness enforce the 40% rule for
+you — but it enforces it *blindly*, which is the whole objection in the table above.
+Treat auto-compact firing as the alarm that you missed a phase boundary, not as the
+boundary. `/usage` shows the session's tokens; a status line can show context use
+continuously.

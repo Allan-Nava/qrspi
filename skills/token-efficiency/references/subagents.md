@@ -56,3 +56,34 @@ Setup: declare `{"type": "code_execution_20260120", "name": "code_execution"}` a
 set `"allowed_callers": ["code_execution_20260120"]` on your custom tool.
 Incompatible with `strict: true`, `disable_parallel_tool_use`, and forced
 `tool_choice`.
+
+## In Claude Code
+
+A subagent is a Markdown file in `.claude/agents/` (project) or `~/.claude/agents/`
+(user). Frontmatter carries the whole firewall:
+
+```markdown
+---
+name: research-reader
+description: Reads code and returns path · symbol · two lines. Use for any "where is X" question.
+tools: Read, Glob, Grep
+model: sonnet
+effort: low
+maxTurns: 30
+---
+Return ONLY: repo-root-relative path, symbol, at most two lines of explanation.
+No preamble, no pasted code.
+```
+
+- `model:` — `haiku`, `sonnet`, `opus`, a full ID, or `inherit`. Per-invocation
+  override and `CLAUDE_CODE_SUBAGENT_MODEL` also exist; the file wins over the env var.
+- `effort:` — the effort level, overriding the session's. The effort table above maps
+  onto this: `low` here, `xhigh` in the main loop.
+- `tools:` — an allowlist. A reader that cannot `Write` cannot wander.
+- The body is the imposed output format. It is the only place the format can live,
+  because the subagent starts from a **fresh, isolated context** — not your history,
+  not files you already read. What comes back is one Agent tool result.
+
+The built-in `Explore` agent already does the reading role; it inherits the session's
+model. Forks are the exception to isolation — they inherit the parent's whole context,
+which is the cache-reuse case above.

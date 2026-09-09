@@ -83,3 +83,20 @@ def log_usage(phase: str, turn: int, resp) -> None:
 ```
 
 One week of this log on real tasks is worth more than any amount of theory.
+
+## In Claude Code
+
+- **`/usage`** — the Session block: tokens by model, cache read and write, and after
+  the first response the `Prompt cache (main)` line with hit share and misses. Resets
+  on `/clear`, which is what makes it a per-phase number.
+- **`/context`** — what is occupying the window right now: CLAUDE.md, tool schemas,
+  MCP servers, the conversation. This is the "fixed starting context" item above, read
+  directly.
+- **The transcripts.** Every session is a JSONL under `~/.claude/projects/<slug>/`,
+  with `usage` on each assistant turn. `scripts/measure-run.mjs` in the plugin
+  repository reads a directory of them and prints, per session, peak context (KPI 1),
+  output and cache traffic, hit ratio (KPI 4), and a total (KPI 3). No key, nothing
+  leaves the machine. A fresh session per phase makes one file per phase.
+- **`/insights`** — a report on how you work rather than how much you spent: friction,
+  misunderstood requests, sessions that re-explored. It is the qualitative half of
+  KPI 5.

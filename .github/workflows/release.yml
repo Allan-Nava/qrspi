@@ -32,6 +32,13 @@ jobs:
   release:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    # Half of the npm trusted publisher's identity. The publisher on npmjs.com is
+    # scoped to the environment `release`, so the OIDC token GitHub signs has to
+    # carry that claim or the match fails — and npm does not fail loudly: it
+    # degrades to an anonymous publish and the registry answers
+    # `404 Not Found - PUT`, naming neither OIDC nor the environment. Change this
+    # only together with the Environment field on npm. See CONTRIBUTING.md.
+    environment: release
     permissions:
       contents: write   # create the GitHub release
       issues: write     # close the milestone

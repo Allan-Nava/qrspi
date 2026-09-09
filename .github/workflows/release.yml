@@ -32,13 +32,6 @@ jobs:
   release:
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    # Half of the npm trusted publisher's identity. The publisher on npmjs.com is
-    # scoped to the environment `release`, so the OIDC token GitHub signs has to
-    # carry that claim or the match fails — and npm does not fail loudly: it
-    # degrades to an anonymous publish and the registry answers
-    # `404 Not Found - PUT`, naming neither OIDC nor the environment. Change this
-    # only together with the Environment field on npm. See CONTRIBUTING.md.
-    environment: release
     permissions:
       contents: write   # create the GitHub release
       issues: write     # close the milestone
@@ -49,10 +42,17 @@ jobs:
           ref: ${{ inputs.tag || github.ref_name }}
           fetch-depth: 0
 
+      # No `registry-url`. It looks like the obvious thing to set, and it is the
+      # reason this job could not publish: setup-node then writes an .npmrc
+      # holding `_authToken=${NODE_AUTH_TOKEN}` and exports NODE_AUTH_TOKEN as a
+      # placeholder. npm finds a credential configured for the registry, so it
+      # never performs the OIDC exchange — it publishes with the placeholder, and
+      # npm answers 404 rather than 401 so as not to reveal whether the package
+      # exists. Trusted publishing needs *no* credential in the environment;
+      # registry.npmjs.org is already npm's default registry.
       - uses: actions/setup-node@v5
         with:
           node-version: 22
-          registry-url: https://registry.npmjs.org
 
       # The tag is the source of truth for what is being released; package.json
       # must agree, and `npm test` checks the other two manifests against it.
@@ -101,9 +101,14 @@ jobs:
             exit 0
           fi
           # Belt and braces: nothing should be able to authenticate this publish
-          # except OIDC, not even a token someone reintroduces into the env.
+          # except OIDC, not even a token someone reintroduces into the env. Note
+          # that unsetting it is not enough on its own — an .npmrc naming the
+          # variable counts as a configured credential even when it expands to
+          # nothing, which is why setup-node above is given no registry-url.
           unset NODE_AUTH_TOKEN
-          npm publish --access public
+          # verbose while OIDC is unproven here: it prints the token exchange, so
+          # a failure names its own cause instead of returning a bare 404.
+          npm publish --access public --loglevel verbose
 
       # The registry takes a moment to serve a freshly published version.
       - name: Verify the published version

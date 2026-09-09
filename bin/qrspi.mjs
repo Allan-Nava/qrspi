@@ -284,6 +284,17 @@ function check() {
     }
   }
 
+  // Every phase reference opens with a `> **PROMPT` blockquote. commands/next.md
+  // prints that block verbatim, and commands/new.md tells the model to delete
+  // exactly this marker from each copied artifact, so both break silently if a
+  // reference stops carrying it. 99-progress.md is state, not a phase.
+  for (const f of readdirSync(join(ROOT, 'skills/qrspi/references')).sort()) {
+    if (f === '99-progress.md') continue
+    if (!/^> \*\*PROMPT/m.test(readFileSync(join(ROOT, 'skills/qrspi/references', f), 'utf8'))) {
+      problems.push(`skills/qrspi/references/${f}: no \`> **PROMPT\` block — commands/next.md prints it, commands/new.md strips it`)
+    }
+  }
+
   for (const name of COMMANDS) {
     const p = join(ROOT, 'commands', `${name}.md`)
     if (!existsSync(p)) {

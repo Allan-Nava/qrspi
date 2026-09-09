@@ -127,5 +127,5 @@ How to back out if something goes wrong in production:
 - [ ] **Zero-context test:** an agent reading only this file can execute it
 - [ ] Rollback plan present
 
-> ⏭️ Next phase: **Implement**. It receives: this file + `99-progress.md`.
+> Next phase: **Implement**. It receives: this file + `99-progress.md`.
 > One session per step.

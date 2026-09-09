@@ -78,15 +78,17 @@ loops, or many text and image blocks.
 
 Not everything invalidates everything:
 
+Read each cell as *what happens to that tier's cache*.
+
 | Change | tools cache | system cache | messages cache |
 |---|:---:|:---:|:---:|
-| Tool definitions (add/remove/reorder) | ❌ | ❌ | ❌ |
-| Model change | ❌ | ❌ | ❌ |
-| `speed`, web-search, citations | ✅ | ❌ | ❌ |
-| System prompt content | ✅ | ❌ | ❌ |
-| `tool_choice`, images | ✅ | ✅ | ❌ |
-| `thinking` or `effort` change | model-specific | model-specific | ❌ |
-| Message content | ✅ | ✅ | ❌ |
+| Tool definitions (add/remove/reorder) | lost | lost | lost |
+| Model change | lost | lost | lost |
+| `speed`, web-search, citations | kept | lost | lost |
+| System prompt content | kept | lost | lost |
+| `tool_choice`, images | kept | kept | lost |
+| `thinking` or `effort` change | model-specific | model-specific | lost |
+| Message content | kept | kept | lost |
 
 Useful implication: `tool_choice` and images survive the tools+system cache, and only
 tool changes and model changes force a full rebuild. **Thinking and effort do not

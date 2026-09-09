@@ -113,4 +113,4 @@ Facts the design assumes but `01-research.md` did not verify:
 - [ ] Comments resolved
 - [ ] Approved
 
-> ⏭️ Next phase: **Structure**. It receives: this file only.
+> Next phase: **Structure**. It receives: this file only.

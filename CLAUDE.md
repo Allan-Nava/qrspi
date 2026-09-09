@@ -68,6 +68,8 @@ skills/
       99-progress.md   implement-phase state file skeleton
       recovery.md      what to re-enter, and how narrowly, when Implement finds an
                        upstream artifact wrong — a prompt-less reference, not a template
+      landing.md       artifacts into a reviewable PR: what the description carries,
+                       commit-per-step, thoughts/ ships in the same PR
   token-efficiency/
     SKILL.md           index of the five levers and five KPIs
     references/        measuring, compaction, subagents, effort, caching,

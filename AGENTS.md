@@ -25,7 +25,7 @@ allocation, prompt caching, tool hygiene, KPIs.
 | `package.json` | npm distribution: `bin` → `bin/qrspi.mjs`, `test` → `qrspi check` |
 | `assets/logo.svg` | the mark — single source for favicon, site, README |
 | `assets/social-preview.*` | OG card: `.html` is the source, `.png` is rendered from it |
-| `site/build.mjs` | generates the GitHub Pages site from `README.md` |
+| `site/build.mjs` | generates the GitHub Pages site from `README.md`, plus `sitemap.xml` and JSON-LD |
 | `scripts/measure-context-cost.mjs` | `count_tokens` over the plugin's own text; not shipped to npm |
 | `.github/workflows/ci.yml` | `npm test` + site build + `npm pack` on PRs and `main` |
 | `.github/workflows/release.yml` | on tag `qrspi--v*`: npm publish, GitHub release, close milestone |

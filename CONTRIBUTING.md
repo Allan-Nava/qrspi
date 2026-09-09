@@ -58,7 +58,13 @@ overrides, and says what it replaced; `uninstall` applies the same rule in rever
 
 ## Releasing
 
-Releases run from GitHub Actions. Pushing the tag is the whole manual part.
+Releases run from GitHub Actions. Pushing the tag is the whole manual part — and the
+part that gets forgotten, so
+[release-drift.yml](.github/workflows/release-drift.yml) watches for it: once `main`
+has carried a version with no matching tag for two hours it fails, and it runs daily,
+so a quiet repo still hears about it. `0.1.1` is the precedent — merged in #40, never
+tagged, never published. It stays a gap in the version line, superseded by 0.1.2;
+tagging it now would publish a tarball nobody asked for.
 
 **One-time setup — npm Trusted Publishing.** There is no npm token anywhere in this
 repository: the release job authenticates to npm over OIDC. On npmjs.com, the package

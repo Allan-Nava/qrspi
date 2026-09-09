@@ -42,6 +42,7 @@ scripts/
 .github/workflows/
   ci.yml               npm test + site build + npm pack on every PR and push to main
   release.yml          on tag qrspi--v*: publish to npm, cut the release, close the milestone
+  release-drift.yml    fails when main carries a version with no tag for 2h; runs daily
   pages.yml            builds and deploys the site to GitHub Pages on push to main
 package.json           npm distribution; `bin` → bin/qrspi.mjs, `test` → qrspi check
 .claude-plugin/
@@ -162,8 +163,10 @@ length, every `${CLAUDE_PLUGIN_ROOT}` reference, the `> **PROMPT` blockquote tha
 `/qrspi:next` prints and `/qrspi:new` strips, and the checkbox markers that
 `/qrspi:next` greps for. It also enforces the content rules this file states and
 nothing else used to check: the `## Status` block in every artifact template, the
-pipeline diagram across the three files that draw it, and the per-phase effort
-allocation across the three that tabulate it. Run it before every commit and extend
+pipeline diagram across the three files that draw it, the per-phase effort
+allocation across the three that tabulate it, and what `/qrspi:new` would leave in
+`thoughts/` — each template with its prompt block removed is still gateable (Status,
+checkboxes, placeholders) and the block itself was contiguous. Run it before every commit and extend
 it whenever you add
 an invariant — [.github/workflows/ci.yml](.github/workflows/ci.yml) runs it, the site
 build and `npm pack --dry-run` on every pull request.

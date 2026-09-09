@@ -295,6 +295,34 @@ function check() {
     }
   }
 
+  // What /qrspi:new leaves in the user's thoughts/: the artifact templates with the
+  // `> **PROMPT` block deleted. Simulate that deletion — the rule the awk in
+  // commands/next.md applies, start at the marker and stop at the first line not
+  // starting with `>` — and check two things. The block was contiguous, so nothing
+  // of the prompt is stranded in the copy or dropped from what next.md prints; and
+  // the remainder is still an artifact /qrspi:next can gate on.
+  for (const f of ['00-questions.md', '01-research.md', '02-design.md', '03-structure.md', '04-plan.md']) {
+    const lines = readFileSync(join(ROOT, 'skills/qrspi/references', f), 'utf8').split('\n')
+    const start = lines.findIndex((l) => /^> \*\*PROMPT/.test(l))
+    if (start < 0) continue // reported above
+    let end = start
+    while (end < lines.length && lines[end].startsWith('>')) end++
+    const tail = lines.slice(end)
+    const cut = tail.findIndex((l) => /^(---|## )/.test(l))
+    const stray = tail.slice(0, cut < 0 ? tail.length : cut).find((l) => l.startsWith('>'))
+    if (stray) {
+      problems.push(
+        `skills/qrspi/references/${f}: the \`> **PROMPT\` block is not contiguous — a blank line inside it must be a bare \`>\`, or commands/next.md prints a prompt truncated before "${stray.slice(2, 50).trim()}…"`,
+      )
+    }
+    const copy = [...lines.slice(0, start), ...tail].join('\n')
+    if (!/^## Status/m.test(copy)) problems.push(`skills/qrspi/references/${f}: stripped of its prompt, the artifact has no '## Status' left`)
+    if (!/\[ \]/.test(copy)) problems.push(`skills/qrspi/references/${f}: stripped of its prompt, the artifact has no unticked checkbox left`)
+    if (!/<[^>\n]+>|_\(to be filled/.test(copy)) {
+      problems.push(`skills/qrspi/references/${f}: stripped of its prompt, the artifact has no placeholder left — /qrspi:next would count it complete`)
+    }
+  }
+
   for (const name of COMMANDS) {
     const p = join(ROOT, 'commands', `${name}.md`)
     if (!existsSync(p)) {

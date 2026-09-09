@@ -22,20 +22,26 @@ terser confirmations, less thinking.
 |---|---|---|---|
 | Questions | `medium` | Opus 5 | needs judgement, not depth |
 | Research | `medium` | Opus 5 | it is search, not reasoning |
-| ↳ research subagents | `low` | Haiku 4.5 | they read and summarise |
+| ↳ research subagents | `low` | Sonnet 5 | they read and summarise |
 | Design | `xhigh` | Opus 5 | errors here cost the most downstream |
 | Structure | `high` | Opus 5 | decomposition, structured work |
 | Plan | `xhigh` / `max` | Opus 5 | the plan multiplies everything |
 | Implement | `high` / `xhigh` | Opus 5 | quality/token sweet spot |
 | Review / verification | `high` | Opus 5 | |
 
+`effort` is **rejected on Haiku 4.5** — hence Sonnet 5 on the subagent row, which is
+the cheapest current model that takes it. Haiku 4.5 is cheaper still ($1/$5 against
+$2/$10) and remains a fine reading subagent, but it is configured the old way:
+`thinking: {type: "enabled", budget_tokens: N}`, no `effort`.
+
 The principle: **spend effort where errors propagate.** A Plan error multiplies
 across the whole implementation; a Research error gets caught by the Design review.
 
 ## Adaptive thinking
 
-On all current models use `thinking: {type: "adaptive"}` — Claude decides how much to
-think. `budget_tokens` is **removed** on Opus 5 / 4.8 / 4.7, Sonnet 5 and Fable 5
+On every current model except Haiku 4.5 use `thinking: {type: "adaptive"}` — Claude
+decides how much to think. Haiku 4.5 still takes `{type: "enabled", budget_tokens: N}`
+(minimum 1024, and less than `max_tokens`). `budget_tokens` is **removed** on Opus 5 / 4.8 / 4.7, Sonnet 5 and Fable 5
 (returns 400). On Opus 5 thinking is **on by default**: omit the parameter and it
 still runs adaptive.
 

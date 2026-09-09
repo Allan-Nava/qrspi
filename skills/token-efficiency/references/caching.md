@@ -52,19 +52,23 @@ It sits **after** the history, so the cached prefix stays intact. It is also the
 unforgeable operator channel (unlike a `<system-reminder>` inside a user turn, which
 anyone writing to user input can forge).
 
-Available on Opus 5, Opus 4.8, Fable 5, Mythos 5. **Not on Sonnet 5** — there it
-returns 400; fall back to a text block in the user turn.
+Available on Opus 5, Opus 4.8, Fable 5, Fable 5.1, Mythos 5, Mythos 5.1. **Not on
+Sonnet 5** — there it returns 400 (`role 'system' is not supported on this model`);
+catch it and fall back to a text block in the user turn.
 
 Constraints: it must follow a `user` message, cannot be `messages[0]`, and must be
 the last element or be followed by an `assistant` turn.
 
 ## Two agent-loop-specific gotchas
 
-**The 20-block lookback window.** Each breakpoint walks backwards **at most 20
-content blocks** to find a previous cache entry. An agentic turn with many
-`tool_use`/`tool_result` pairs easily exceeds 20 blocks: the next breakpoint finds no
-cache and **silently misses**.
-→ Fix: place an intermediate breakpoint every ~15 blocks in long turns.
+**The 20-position lookback window.** Each breakpoint walks backwards **at most 20
+positions** to find a previous cache entry; past that the next breakpoint finds no
+cache and **silently misses**. Positions, not blocks: a run of consecutive `tool_use`
+blocks counts as one, and so does a run of consecutive `tool_result` blocks — so a
+turn with many *parallel* tool calls does **not** push the previous entry out. What
+does is a turn adding more than 20 positions of other content: long *sequential* tool
+loops, or many text and image blocks.
+→ Fix: an intermediate breakpoint inside long sequential turns.
 
 **Concurrent requests.** A cache entry becomes readable only once the first response
 **starts streaming**. N parallel requests with the same prefix all pay full price.
@@ -80,12 +84,18 @@ Not everything invalidates everything:
 | Model change | ❌ | ❌ | ❌ |
 | `speed`, web-search, citations | ✅ | ❌ | ❌ |
 | System prompt content | ✅ | ❌ | ❌ |
-| `tool_choice`, images, thinking on/off | ✅ | ✅ | ❌ |
+| `tool_choice`, images | ✅ | ✅ | ❌ |
+| `thinking` or `effort` change | model-specific | model-specific | ❌ |
 | Message content | ✅ | ✅ | ❌ |
 
-Useful implication: you can change `tool_choice` or toggle thinking per request
-**without** losing the tools+system cache. Only tool changes and model changes force
-a full rebuild.
+Useful implication: `tool_choice` and images survive the tools+system cache, and only
+tool changes and model changes force a full rebuild. **Thinking and effort do not
+belong in that sentence:** whether toggling them invalidates the upper tiers is
+model-specific, so do not assume a free per-request switch — measure it on the model
+you are on. On Opus 5, Fable 5.1 and Mythos 5.1 a `role: "system"` message carrying
+`output_config: {effort: …}` and an empty `content` changes effort from that point
+without the messages-cache invalidation a top-level change causes (beta
+`mid-conversation-output-config-2026-07-01`).
 
 ## Economics
 
@@ -117,7 +127,9 @@ response.diagnostics
 ```
 
 Pass `previous_message_id: None` on the first turn and the previous response's `id`
-on each one after. When the diagnostic is not available to you, fall back to diffing
+on each one after — and send the beta header on **every** request, not just the one
+you are diagnosing: fingerprints are only stored for requests that carried it, so
+retrofitting it to a single call fails with `previous_message_not_found`. When the diagnostic is not available to you, fall back to diffing
 the rendered prompt bytes between two requests. The usual suspects, by frequency:
 
 | Pattern | Why it breaks |

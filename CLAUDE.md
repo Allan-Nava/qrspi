@@ -117,6 +117,15 @@ Do not weaken these when editing; they are the plugin's whole thesis.
   [commands/next.md](commands/next.md). Change one, change all three. `npm test`
   compares the pipeline diagram and the effort tables for you; the context budgets
   are still on your honour.
+- **The API claims in `token-efficiency/references/` are dated.** `caching.md`,
+  `effort.md`, `measuring.md` and `playbook.md` assert model IDs, prices, minimum
+  cacheable prefixes, an invalidation matrix, effort and thinking parameters, and beta
+  headers — facts about someone else's product, on their release cadence, not ours.
+  They are the likeliest thing here to be quietly wrong. Re-verify them against the
+  current API reference rather than from memory, keep the `(cached: YYYY-MM-DD)` date
+  on the model table honest, and treat a stale price as a bug: the whole skill argues
+  from those numbers. Last audited 2026-09-09 — five claims were wrong.
+
 - **Versions must match** across [package.json](package.json),
   [.claude-plugin/plugin.json](.claude-plugin/plugin.json) and
   [.claude-plugin/marketplace.json](.claude-plugin/marketplace.json). `npm test`

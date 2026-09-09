@@ -51,6 +51,12 @@ For Implement, read `99-progress.md` to find the next unblocked step in the
 
 ## 3. Gate before emitting
 
+These gates are mechanical: they catch an artifact that is *unfinished*. For one that
+is finished and wrong — plausible, self-contained, resting on a false fact or a hidden
+decision — the judgement-level rubric is `/qrspi:review <file>`, backed by
+`${CLAUDE_PLUGIN_ROOT}/skills/qrspi/references/reviewing.md`. Suggest it at the
+Design and Plan boundaries; do not run it here.
+
 Refuse to advance, and say which artifact needs work, if:
 
 - the previous artifact still has unresolved placeholders or unticked Status boxes;

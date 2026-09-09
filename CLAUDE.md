@@ -55,6 +55,7 @@ package.json           npm distribution; `bin` → bin/qrspi.mjs, `test` → qrs
 commands/
   new.md               /qrspi:new  — bootstrap thoughts/<dir> and run phase 0
   next.md              /qrspi:next — detect current phase, gate, emit the next prompt
+  review.md            /qrspi:review — one artifact against the judgement rubric; read-only
 skills/
   qrspi/
     SKILL.md           the workflow index: 6 rules, phase table, context budgets
@@ -70,6 +71,8 @@ skills/
                        upstream artifact wrong — a prompt-less reference, not a template
       landing.md       artifacts into a reviewable PR: what the description carries,
                        commit-per-step, thoughts/ ships in the same PR
+      reviewing.md     judgement-level rubric per artifact: wrong-but-plausible Research,
+                       over-specified Design, a step that hides a decision
   token-efficiency/
     SKILL.md           index of the five levers and five KPIs
     references/        measuring, compaction, subagents, effort, caching,
@@ -282,7 +285,8 @@ package's first version is published by hand.
   anything beyond install/uninstall/path/check belongs elsewhere. No dependencies,
   no build, no `postinstall`.
 - Executing a phase inside `/qrspi:new` or `/qrspi:next` — both commands must emit a
-  prompt and stop. Continuing violates rule 1.
+  prompt and stop. Continuing violates rule 1. `/qrspi:review` reports and stops for
+  the same reason: fixing what it finds would make the artifact the reviewer's.
 - Relaxing the gates in [commands/next.md](commands/next.md). Refusing to advance on
   an unfinished artifact is the feature, not friction.
 - Pasting code into an artifact template. Artifacts carry paths, symbols and line

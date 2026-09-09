@@ -58,7 +58,9 @@ artifact that needs correcting.
 - **Reality is:** <...> (`path:line`)
 - **What I did:** stopped / deviated with approval / <...>
 - **Artifact to fix:** `04-plan.md` § S3
-- **Status:** open / resolved
+- **Re-enter:** none / Structure / Design / Research / Questions — see `recovery.md`
+- **Landed steps:** S1 keep · S2 adapt (new step) · S3 revert (`<sha>`)
+- **Status:** open / resolved — <corrected artifact § entry, commit>
 
 ---
 

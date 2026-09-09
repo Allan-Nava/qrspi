@@ -57,7 +57,8 @@ Stop and write to `99-progress.md` if:
 - you discover a constraint `01-research.md` missed.
 
 The last two matter most: they signal that an upstream artifact needs fixing.
-Brute-forcing past them costs more than going back.
+Brute-forcing past them costs more than going back — `recovery.md` says which phase to
+re-enter, how narrowly, and what happens to the steps already landed.
 
 ---
 

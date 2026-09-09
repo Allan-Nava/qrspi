@@ -66,6 +66,8 @@ skills/
       04-plan.md       idem
       05-implement.md  prompt only — the phase output is code, not an artifact
       99-progress.md   implement-phase state file skeleton
+      recovery.md      what to re-enter, and how narrowly, when Implement finds an
+                       upstream artifact wrong — a prompt-less reference, not a template
   token-efficiency/
     SKILL.md           index of the five levers and five KPIs
     references/        measuring, compaction, subagents, effort, caching,
@@ -116,8 +118,10 @@ Do not weaken these when editing; they are the plugin's whole thesis.
 - **Phase prompts live in a `> **PROMPT` blockquote** at the top of the reference
   file. `/qrspi:next` extracts that block with `awk` — not the whole file — and prints
   it with real paths substituted; `/qrspi:new` deletes the same block from the artifact
-  copies. `npm test` therefore requires every reference except `99-progress.md` to
-  carry the marker. The extraction stops at the first line that does not start with
+  copies. `npm test` therefore requires every **numbered** reference except
+  `99-progress.md` to carry the marker; un-numbered files in `references/` are guides
+  (`recovery.md` and its kind) with neither a prompt nor a Status block, and the check
+  leaves them alone. The extraction stops at the first line that does not start with
   `>`, so the block must be **contiguous**: a blank line inside it must be a bare `>`,
   never empty, or everything after it is silently dropped from the printed prompt.
 - **Numbers appear in three places** — [README.md](README.md), the budget/phase

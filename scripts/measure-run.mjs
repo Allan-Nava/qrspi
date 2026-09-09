@@ -29,7 +29,7 @@ import { basename, join } from 'node:path'
 const argv = process.argv.slice(2)
 const wi = argv.indexOf('--window')
 const WINDOW = wi >= 0 ? Number(argv[wi + 1]) : 1_000_000
-const paths = argv.filter((a, i) => !a.startsWith('--') && i !== wi + 1)
+const paths = argv.filter((a, i) => !a.startsWith('--') && (wi < 0 || i !== wi + 1))
 if (!paths.length) {
   console.error('usage: node scripts/measure-run.mjs [--window N] <session.jsonl | project-dir>...')
   process.exit(1)

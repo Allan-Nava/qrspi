@@ -1,0 +1,82 @@
+[
+  {
+    "query": "my claude code sessions on the hiway-api repo are costing about $40 a day. where is that going and what do I change first",
+    "should_trigger": true
+  },
+  {
+    "query": "cache_read_input_tokens is 0 on every request even though the system prompt is byte-identical. python sdk, opus 5",
+    "should_trigger": true
+  },
+  {
+    "query": "the agent keeps re-reading the same three files every turn like it forgot them. is this the context rot thing? what do I actually do about it",
+    "should_trigger": true
+  },
+  {
+    "query": "which effort level should each phase of my research → plan → implement pipeline run at, and does xhigh pay for itself on the plan step",
+    "should_trigger": true
+  },
+  {
+    "query": "I have 9 MCP servers and /context says tool schemas are 60k tokens before I type anything. how do I cut that down",
+    "should_trigger": true
+  },
+  {
+    "query": "we want to track tokens per completed ticket across the team, not per session. what do we log from the api response and how do we aggregate it",
+    "should_trigger": true
+  },
+  {
+    "query": "is the 40% context rule real or folklore? my sessions run to 70% all the time",
+    "should_trigger": true
+  },
+  {
+    "query": "our subagents return 20k-token reports and the parent's context fills up after four of them. how should the firewall work",
+    "should_trigger": true
+  },
+  {
+    "query": "is auto-compact good enough or should I be compacting on purpose? sessions get noticeably dumber after a few hours",
+    "should_trigger": true
+  },
+  {
+    "query": "write a handoff note so I can /clear and continue this tomorrow without losing what we found",
+    "should_trigger": false
+  },
+  {
+    "query": "compress notes/auth-investigation.md into something a fresh agent can start from, keep the paths",
+    "should_trigger": false
+  },
+  {
+    "query": "rewrite step 4 of this plan so someone with zero context could execute it without asking",
+    "should_trigger": false
+  },
+  {
+    "query": "bootstrap thoughts/ for ENG-42 and run the questions phase",
+    "should_trigger": false
+  },
+  {
+    "query": "reduce the docker image size for the ingest service, it's 2.1GB",
+    "should_trigger": false
+  },
+  {
+    "query": "this SQL query on orders joined to refunds takes 9 seconds, optimize it",
+    "should_trigger": false
+  },
+  {
+    "query": "how many tokens is docs/architecture.md? just the count",
+    "should_trigger": false
+  },
+  {
+    "query": "shrink the react bundle, it's 4MB gzipped",
+    "should_trigger": false
+  },
+  {
+    "query": "make this python script faster with multiprocessing, it processes 50k images",
+    "should_trigger": false
+  },
+  {
+    "query": "my anthropic bill has a charge from the 3rd I don't recognize, who do I contact",
+    "should_trigger": false
+  },
+  {
+    "query": "what's the cheapest model that can run a customer support chatbot decently",
+    "should_trigger": false
+  }
+]

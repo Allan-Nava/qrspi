@@ -46,6 +46,9 @@ scripts/
                        — no key; reads the phase off each session's first prompt.
                        Both are contributor tooling, kept out of the npm tarball by
                        package.json#files
+evals/
+  trigger/             twenty prompts per skill, should/should-not trigger, for the
+                       skill-creator harness — see CONTRIBUTING.md; not in the tarball
 .github/workflows/
   ci.yml               check on Node 18/20/22/24 with no npm install, plus a copy-mode round
                        trip; site build + npm pack on 22 — every PR and push to main

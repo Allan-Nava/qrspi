@@ -37,8 +37,11 @@ assets/
 site/
   build.mjs            generates site/dist/index.html FROM README.md (gitignored output)
 scripts/
-  measure-context-cost.mjs  count_tokens over the plugin's own text — contributor
-                       tooling, kept out of the npm tarball by package.json#files
+  measure-context-cost.mjs  count_tokens over the plugin's own text (needs a key)
+  measure-run.mjs      KPIs 1, 3, 4 of a real run, from ~/.claude/projects/<slug>/*.jsonl
+                       — no key; reads the phase off each session's first prompt.
+                       Both are contributor tooling, kept out of the npm tarball by
+                       package.json#files
 .github/workflows/
   ci.yml               check on Node 18/20/22 with no npm install, plus a copy-mode round
                        trip; site build + npm pack on 22 — every PR and push to main

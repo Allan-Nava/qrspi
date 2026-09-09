@@ -65,4 +65,5 @@ Beyond the five above, load only what the question needs:
 
 ## Related
 
-The workflow that operationalises lever #1 is the `qrspi` skill.
+The workflow that operationalises lever #1 is the `qrspi` skill. The craft of writing the artifact
+lever #1 depends on — what to keep, how to state it — is the `handoff` skill.

@@ -50,6 +50,9 @@ would start from 250k tokens of Research residue and end past 50%.
    ~40%, stop, have it write a `99-progress.md` (done / todo / unexpected discoveries
    / decisions taken), close the session, reopen from there.
 
+Which facts survive the compression, and how to state them so a zero-context reader
+can act — the craft these rules assume — is the `handoff` skill.
+
 ## Ticket context isolation
 
 A subtle but important QRSPI detail: **the original ticket text is not passed to

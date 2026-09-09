@@ -10,7 +10,7 @@ prompt text itself. The single piece of executable code is
 [bin/qrspi.mjs](bin/qrspi.mjs), the `npx qrspi` installer — it exists only to put the
 Markdown where Claude Code can see it.
 
-It ships two things:
+It ships three things:
 
 1. **A workflow** — QRSPI: Questions → Research → Spec (Design + Structure) → Plan →
    Implement. Each phase burns whatever context it needs, compresses what it learned
@@ -19,6 +19,10 @@ It ships two things:
 2. **A reference skill** — `token-efficiency`: the reasoning behind the workflow
    (measurement, compaction ratios, subagents as context firewalls, effort
    allocation, prompt-cache invalidation, tool hygiene, KPIs).
+3. **A craft skill** — `handoff`: how to write the artifact itself so it survives a
+   context reset — what survives, the load-bearing-fact test, compressing without
+   losing the evidence trail, the zero-context step. It triggers outside QRSPI
+   ("summarise this session before I lose it"), which is what earns it a skill.
 
 The plugin produces artifacts in the *user's* repo under `thoughts/<task-id>-<slug>/`.
 Nothing in this repo is generated at runtime.
@@ -77,6 +81,9 @@ skills/
     SKILL.md           index of the five levers and five KPIs
     references/        measuring, compaction, subagents, effort, caching,
                        tool-hygiene, anti-patterns, playbook
+  handoff/
+    SKILL.md           the one test, what survives a reset, the failure modes by name
+    references/        what-survives, load-bearing, zero-context-step
 README.md              user-facing pitch; overlaps SKILL.md numbers — keep in sync
 ```
 
@@ -113,6 +120,10 @@ Do not weaken these when editing; they are the plugin's whole thesis.
 - **Do not add one skill per phase.** This was decided deliberately (README, "Two
   design notes"): six near-identical descriptions would burn the permanent budget and
   compete to trigger. Phases are sequential and user-driven, so they are *commands*.
+  The bar for a skill is that it **triggers outside QRSPI** — `handoff` cleared it
+  ("summarise this session before I lose it" needs no workflow); a phase never will.
+  Keep `handoff`'s description on *writing* a handoff and `token-efficiency`'s on
+  *diagnosing cost*, or the two compete.
 - **Command frontmatter** carries `description`, `argument-hint`, and a tight
   `allowed-tools` list. Keep `allowed-tools` minimal; widen only with a reason.
 - **Plugin paths in commands use `${CLAUDE_PLUGIN_ROOT}`**, never a relative path.

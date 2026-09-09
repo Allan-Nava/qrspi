@@ -16,7 +16,7 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const CLAUDE_DIR = process.env.CLAUDE_CONFIG_DIR || join(homedir(), '.claude')
 const MARKETPLACE = 'allan-nava'
 const PLUGIN = 'qrspi'
-const SKILLS = ['qrspi', 'token-efficiency']
+const SKILLS = ['qrspi', 'token-efficiency', 'handoff']
 const COMMANDS = ['new', 'next', 'review']
 
 const ESC = String.fromCharCode(27)

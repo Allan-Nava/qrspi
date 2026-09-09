@@ -83,6 +83,7 @@ feature: the whole workflow is worthless if you rubber-stamp your way through it
 |---|---|
 | `skills/qrspi/` | the workflow: six rules, per-phase context budgets, and the seven phase templates as on-demand references |
 | `skills/token-efficiency/` | the reference behind it: measurement, compaction, subagent firewalls, effort allocation, prompt-caching invalidation, tool definitions and output, KPIs |
+| `skills/handoff/` | the craft the other two assume: what survives a context reset, the load-bearing-fact test, compressing research without losing its evidence trail, writing a step a zero-context agent can execute |
 | `commands/new.md` | bootstrap a task and run phase 0 |
 | `commands/next.md` | advance a task across a phase boundary |
 | `commands/review.md` | review one artifact for what the gates cannot see — finished, plausible, and wrong |
@@ -101,11 +102,14 @@ feature: the whole workflow is worthless if you rubber-stamp your way through it
 
 ## Two design notes
 
-**Two skills, not six.** One skill per phase would be the obvious shape and the wrong
-one: every installed skill's `description` sits in context permanently, and six
+**Three skills, not eight.** One skill per phase would be the obvious shape and the
+wrong one: every installed skill's `description` sits in context permanently, and six
 near-identical descriptions both burn that budget and compete to trigger. The phases
-are sequential and user-driven, so they are slash commands. The knowledge is
-reference material, so it is a skill with progressive disclosure.
+are sequential and user-driven, so they are slash commands. A skill has to earn its
+permanent line by triggering **outside** QRSPI: `token-efficiency` does, on any question
+about cost; `handoff` does, on "summarise this session before I lose it" from anyone
+running any agent. Knowledge that only matters mid-workflow is a reference, loaded on
+demand.
 
 **The skills practise what they document.** Each `SKILL.md` is an index of ~100
 lines; the detail lives in `references/` and is loaded only when the question needs

@@ -5,7 +5,9 @@ description: Diagnose and cut token consumption in agentic coding workflows — 
 
 # Token efficiency for coding agents
 
-Verified against the Claude API, reference model `claude-opus-5`.
+Verified against the Claude API, reference model `claude-opus-5`. Every reference
+closes with **In Claude Code** — the same lever as exercised from the CLI, for readers
+who never call the API directly.
 
 ## The mental model
 

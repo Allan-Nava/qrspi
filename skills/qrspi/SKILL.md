@@ -82,4 +82,6 @@ costs as much as the entire Research phase.
 ## Related
 
 For the *why* — measurement, compaction ratios, subagent firewalls, effort
-allocation, prompt caching — see the `token-efficiency` skill.
+allocation, prompt caching — see the `token-efficiency` skill. For the *craft* of
+filling these templates so they survive the reset — which facts, stated how — the
+`handoff` skill.

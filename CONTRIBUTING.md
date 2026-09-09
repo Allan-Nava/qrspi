@@ -69,28 +69,34 @@ page → Settings → Trusted Publisher → GitHub Actions:
 | Organization or user | `Allan-Nava` |
 | Repository | `qrspi` |
 | Workflow filename | `release.yml` |
-| Environment | `release` |
+| Environment | *(leave empty)* |
 
 **`release.yml` is part of that configuration.** The trusted publisher matches on the
 literal workflow filename, so renaming or moving the file breaks publishing, and the
 error npm returns does not mention the filename. Rename it only together with the
 npm-side config.
 
-**So is the environment.** `release.yml` declares `environment: release` on the job,
-and the two halves have to agree: an environment named on npm but not in the workflow
-(or the reverse) is a mismatch. The failure is silent — npm degrades a failed OIDC
-exchange to an anonymous publish, and the registry answers `404 Not Found - PUT
-https://registry.npmjs.org/qrspi`, which mentions neither OIDC nor the environment and
-reads exactly like a permissions problem. GitHub creates the environment on the
-workflow's first reference to it; give it protection rules only if you want a release
-to wait for a human, because the job will then sit and block until someone approves it.
+**Environment stays empty, and Label is not it.** npm's form has both, and the
+publisher row on the package page displays the *Label* — so a label reading `release`
+looks exactly like an environment named `release`. If you ever do fill Environment in,
+the job needs a matching `environment:` key; today it has none, so the field is empty.
+
+**Nothing in the job may carry an npm credential.** In particular `actions/setup-node`
+must **not** be given `registry-url`: it then writes an .npmrc holding
+`_authToken=${NODE_AUTH_TOKEN}` and exports a placeholder token, npm sees a credential
+configured for the registry and skips the OIDC exchange entirely, and the publish goes
+out with the placeholder. npm answers `404 Not Found - PUT
+https://registry.npmjs.org/qrspi` — not 401, because it will not reveal whether a
+package exists to a request it cannot authenticate — so it reads like a permissions
+problem on the package and sends you to check the trusted publisher, which is fine.
+Unsetting the variable does not help: an .npmrc naming it counts as a configured
+credential even when it expands to nothing.
 
 The equivalent from the CLI, with npm ≥ 11.15.0 and an interactively logged-in
 account:
 
 ```bash
-npm trust github qrspi --repo Allan-Nava/qrspi --file release.yml \
-  --environment release --allow-publish
+npm trust github qrspi --repo Allan-Nava/qrspi --file release.yml --allow-publish
 npm trust list qrspi
 ```
 

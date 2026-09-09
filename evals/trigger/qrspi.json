@@ -1,0 +1,82 @@
+[
+  {
+    "query": "run ENG-4410 through qrspi, start from the ticket text I'm pasting below",
+    "should_trigger": true
+  },
+  {
+    "query": "this task is way too big for one session. set up the thoughts/ artifacts and do research, then a plan, then implement, fresh session each",
+    "should_trigger": true
+  },
+  {
+    "query": "I want to research the codebase first, write a plan someone else could execute without asking questions, then implement it. structured, with checkpoints where I review",
+    "should_trigger": true
+  },
+  {
+    "query": "we're at 45% context and drifting. compact at a phase boundary and continue from an artifact instead of pushing through",
+    "should_trigger": true
+  },
+  {
+    "query": "bootstrap a questions phase for this jira ticket: 'PAY-311 refunds over the order total are accepted by the API'",
+    "should_trigger": true
+  },
+  {
+    "query": "what phase is thoughts/ENG-77-rate-limits in, and what do I run next",
+    "should_trigger": true
+  },
+  {
+    "query": "the design doc for the rate limiter is done and reviewed. give me the prompt for the structure phase",
+    "should_trigger": true
+  },
+  {
+    "query": "help me split this postgres→cockroach migration into research, spec, plan and implement, each in its own session",
+    "should_trigger": true
+  },
+  {
+    "query": "review thoughts/ENG-9-webhooks/02-design.md for anything that's plausible but wrong before I move on to structure",
+    "should_trigger": true
+  },
+  {
+    "query": "write me a handoff so the next session can continue where this one stops",
+    "should_trigger": false
+  },
+  {
+    "query": "why does my agent cost so much per task compared to last month",
+    "should_trigger": false
+  },
+  {
+    "query": "how does prompt cache invalidation work when I change tool_choice",
+    "should_trigger": false
+  },
+  {
+    "query": "fix the null pointer in UserService.java line 88, the user object can be null after logout",
+    "should_trigger": false
+  },
+  {
+    "query": "add a unit test for parseDate covering the timezone edge cases",
+    "should_trigger": false
+  },
+  {
+    "query": "create a project plan in jira for the Q4 roadmap with epics and rough dates",
+    "should_trigger": false
+  },
+  {
+    "query": "what's the difference between research and design in software engineering, conceptually",
+    "should_trigger": false
+  },
+  {
+    "query": "write an api spec for POST /v2/orders with the request and response schemas",
+    "should_trigger": false
+  },
+  {
+    "query": "run the test suite and fix whatever fails",
+    "should_trigger": false
+  },
+  {
+    "query": "summarize thoughts/ENG-77-rate-limits/01-research.md for me in five bullets",
+    "should_trigger": false
+  },
+  {
+    "query": "plan my week around the two deploys on tuesday and thursday",
+    "should_trigger": false
+  }
+]

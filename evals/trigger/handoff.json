@@ -1,0 +1,82 @@
+[
+  {
+    "query": "I'm at like 80% context on this session where we've been debugging the payment webhook retry logic in src/billing/webhooks.py. write me a note so I can /clear and pick this up in a fresh session without losing what we figured out",
+    "should_trigger": true
+  },
+  {
+    "query": "summarise everything we found about the flaky ci job into a markdown file another engineer can read tomorrow and continue from. they haven't seen any of this conversation",
+    "should_trigger": true
+  },
+  {
+    "query": "write the task description for a subagent to go implement the migration step (the one adding the status enum). it should be able to do it without asking me anything",
+    "should_trigger": true
+  },
+  {
+    "query": "compress these research notes — notes/auth-investigation.md, about 600 lines — into something a new agent can start from. keep the file references",
+    "should_trigger": true
+  },
+  {
+    "query": "before you run out of context dump the state of this refactor into HANDOFF.md: what's done, what's not, what surprised you",
+    "should_trigger": true
+  },
+  {
+    "query": "I have to hand this feature over to Marco next week and he's never seen the codebase. what should the handover doc contain so he doesn't redo my two days of exploration",
+    "should_trigger": true
+  },
+  {
+    "query": "the plan you wrote says 'follow the existing validation pattern' in step 3. rewrite that step so a fresh session knows exactly which pattern and where",
+    "should_trigger": true
+  },
+  {
+    "query": "we're switching sessions because this one got slow. write what the next one needs to know about the ffmpeg pipeline changes we made, paths and all",
+    "should_trigger": true
+  },
+  {
+    "query": "my teammate's incident summary is all 'as discussed' and 'the file from earlier'. help me turn it into something self-contained that the on-call can act on",
+    "should_trigger": true
+  },
+  {
+    "query": "why is this session burning so many tokens? every message seems to cost ~200k input even though I'm asking one-line questions",
+    "should_trigger": false
+  },
+  {
+    "query": "cache_read_input_tokens is 0 on every request in my agent loop and the system prompt hasn't changed. what's invalidating it?",
+    "should_trigger": false
+  },
+  {
+    "query": "should the research subagents in my pipeline run at low or high effort? cost matters more than speed",
+    "should_trigger": false
+  },
+  {
+    "query": "my CLAUDE.md is 400 lines. help me figure out what to cut and what to move into skills",
+    "should_trigger": false
+  },
+  {
+    "query": "run the qrspi workflow on ticket ENG-2201, start with the questions phase",
+    "should_trigger": false
+  },
+  {
+    "query": "write a git commit message for the staged changes",
+    "should_trigger": false
+  },
+  {
+    "query": "summarize this 40-page PDF contract in ~/Downloads/msa-final.pdf for me",
+    "should_trigger": false
+  },
+  {
+    "query": "write release notes for v2.3 from the PRs merged since the last tag",
+    "should_trigger": false
+  },
+  {
+    "query": "add a docstring to parse_schedule() explaining what it does",
+    "should_trigger": false
+  },
+  {
+    "query": "set up a scheduled job that summarizes yesterday's error logs every morning at 8",
+    "should_trigger": false
+  },
+  {
+    "query": "explain what a context window is, my PM keeps asking",
+    "should_trigger": false
+  }
+]

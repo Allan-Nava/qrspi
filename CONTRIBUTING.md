@@ -75,6 +75,40 @@ the peaks next to the `Budget / alarm` column in `SKILL.md`, and if the two disa
 the table moves — not the run. Compression ratio (KPI 2) additionally needs the
 artifact's token count from `scripts/measure-context-cost.mjs`.
 
+## Trigger evals for the skills
+
+`evals/trigger/<skill>.json` holds twenty realistic prompts per skill — nine that should
+trigger it, eleven that should not — in the format the `skill-creator` skill's
+`run_eval.py` consumes: `[{"query", "should_trigger"}]`. The negatives are near-misses
+on purpose: the `handoff` set's negatives include the cost-diagnosis prompts that belong
+to `token-efficiency`, and vice versa, because the two descriptions border each other
+and the README's bar for a third skill was that they must not compete. This is the
+executable form of #25's done-when.
+
+To run one:
+
+```bash
+cd <skill-creator dir> && python -m scripts.run_eval \
+  --eval-set <repo>/evals/trigger/handoff.json --skill-path <repo>/skills/handoff \
+  --model claude-opus-5 --runs-per-query 3 --verbose
+```
+
+Two things will otherwise produce a clean-looking zero and mean nothing:
+
+- **Disable the installed plugin first** (`claude plugin disable qrspi@allan-nava`, and
+  re-enable after). The harness injects a stub with a hashed name and counts a trigger
+  only when *that* stub is invoked; with the real plugin present the model invokes
+  `qrspi:handoff` instead, and every run is scored as a miss.
+- **The CLI has to be one the model accepts.** `claude -p` under an outdated Claude Code
+  answers a 400 for a model it does not know, and the harness scores the error as "did
+  not trigger". Check `claude --version` against the error text before believing 0/27.
+
+Both bit on 2026-09-09. Even with the plugin disabled and a supported model, Claude
+Code 2.1.128 fired the stub 2 times in 81 positive runs across the three skills —
+including on "run ENG-4410 through qrspi", which is as explicit as a prompt gets — so on
+that CLI version the harness measures nothing. The sets are the deliverable; the number
+needs a current CLI.
+
 ## Releasing
 
 Releases run from GitHub Actions. Pushing the tag is the whole manual part — and the

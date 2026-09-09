@@ -74,6 +74,12 @@ re-enter, how narrowly, and what happens to the steps already landed.
 
 ---
 
+## Landing
+
+When the last step is done, the PR is the final compaction: what the description
+carries from `02-design.md` and `04-plan.md`, what stays in `thoughts/`, one commit per
+Structure step, and why the artifacts ship in the same PR — `landing.md`.
+
 ## Step definition of done
 
 - [ ] Every acceptance criterion in the plan is met

@@ -13,14 +13,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # The installer declares `node >=18` and no dependencies. Run it on the floor and
-  # above without `npm install`, so both claims are tested rather than stated: a
-  # post-18 syntax fails the 18 leg, a dependency creeping in fails all three.
+  # The installer declares `node >=18` and no dependencies. Run it on the floor, the
+  # current line, and everything between, without `npm install`, so both claims are
+  # tested rather than stated: a post-18 syntax fails the 18 leg, a removal in a newer
+  # Node fails the 24 leg, a dependency creeping in fails all four.
   check:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [18, 20, 22]
+        node: [18, 20, 22, 24]
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5

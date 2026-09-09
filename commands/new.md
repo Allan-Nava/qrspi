@@ -25,19 +25,12 @@ the ticket text or a ticket URL.
 02-design,03-structure,04-plan,99-progress}.md thoughts/<dir>/
    ```
 
-   Not `*.md`: `05-implement.md` is a prompt, not an artifact — there is nothing to
-   fill in — and `/qrspi:next` reads it from the plugin when Implement starts.
+   Not `*.md`: `05-implement.md` is a prompt, not an artifact.
 
-3. **Strip and fill each copy.** In every copied file, delete the
-   `> **PROMPT (fresh session…` blockquote at the top, and replace `<TASK-ID>
-   <title>` in the H1. In `00-questions.md`, also replace the `## Ticket`
-   placeholders with the real ID, link, title, and body.
-
-   The prompts are deleted because they are already carried by the plugin, and
-   `/qrspi:next` prints the one you need with this task's paths substituted. Left in
-   place they are 36-49% of each template, which every downstream phase then re-reads
-   as the *previous* phase's instructions — Design would open `00` and `01` and pay
-   2.2 kB for prompts addressed to Questions and Research.
+3. **Strip and fill each copy.** In every copied file, delete the `> **PROMPT`
+   blockquote at the top — the plugin keeps it, and `/qrspi:next` prints it when
+   needed — and replace `<TASK-ID> <title>` in the H1. In `00-questions.md`, also
+   replace the `## Ticket` placeholders with the real ID, link, title, and body.
 
 4. **Run the Questions phase now.** Follow the `> PROMPT` block in
    `${CLAUDE_PLUGIN_ROOT}/skills/qrspi/references/00-questions.md`, then fill in the

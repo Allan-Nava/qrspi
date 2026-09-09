@@ -109,9 +109,12 @@ Do not weaken these when editing; they are the plugin's whole thesis.
   decide whether a phase is complete — changing the markers breaks phase detection in
   [commands/next.md](commands/next.md).
 - **Phase prompts live in a `> **PROMPT` blockquote** at the top of the reference
-  file. `/qrspi:next` prints that block verbatim with real paths substituted, and
-  `/qrspi:new` greps for the same marker to strip it from the artifact copies, so
-  `npm test` requires every reference except `99-progress.md` to carry it.
+  file. `/qrspi:next` extracts that block with `awk` — not the whole file — and prints
+  it with real paths substituted; `/qrspi:new` deletes the same block from the artifact
+  copies. `npm test` therefore requires every reference except `99-progress.md` to
+  carry the marker. The extraction stops at the first line that does not start with
+  `>`, so the block must be **contiguous**: a blank line inside it must be a bare `>`,
+  never empty, or everything after it is silently dropped from the printed prompt.
 - **Numbers appear in three places** — [README.md](README.md), the budget/phase
   tables in [skills/qrspi/SKILL.md](skills/qrspi/SKILL.md), and the routing table in
   [commands/next.md](commands/next.md). Change one, change all three. `npm test`

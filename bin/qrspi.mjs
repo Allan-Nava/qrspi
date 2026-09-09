@@ -17,7 +17,7 @@ const CLAUDE_DIR = process.env.CLAUDE_CONFIG_DIR || join(homedir(), '.claude')
 const MARKETPLACE = 'allan-nava'
 const PLUGIN = 'qrspi'
 const SKILLS = ['qrspi', 'token-efficiency']
-const COMMANDS = ['new', 'next']
+const COMMANDS = ['new', 'next', 'review']
 
 const ESC = String.fromCharCode(27)
 const tty = process.stdout.isTTY && !process.env.NO_COLOR

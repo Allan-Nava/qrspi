@@ -85,6 +85,7 @@ feature: the whole workflow is worthless if you rubber-stamp your way through it
 | `skills/token-efficiency/` | the reference behind it: measurement, compaction, subagent firewalls, effort allocation, prompt-caching invalidation, tool definitions and output, KPIs |
 | `commands/new.md` | bootstrap a task and run phase 0 |
 | `commands/next.md` | advance a task across a phase boundary |
+| `commands/review.md` | review one artifact for what the gates cannot see — finished, plausible, and wrong |
 | `bin/qrspi.mjs` | the `npx qrspi` installer — zero dependencies, no build |
 
 ## Six non-negotiable rules

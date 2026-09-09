@@ -68,6 +68,8 @@ Bootstrap with `/qrspi:new <TASK-ID> <ticket>`, then `/qrspi:next` at each bound
 for the next phase prompt. When Implement finds an upstream artifact wrong, the path
 back is `references/recovery.md` — one phase re-entered narrowly, not a restart.
 The last compaction, artifacts into a reviewable PR, is `references/landing.md`.
+`/qrspi:review <file>` reads one artifact against `references/reviewing.md` — the
+weaknesses the gates cannot see: finished, plausible, and wrong.
 
 ## The test that matters
 

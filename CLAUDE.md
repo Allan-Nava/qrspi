@@ -146,7 +146,8 @@ npm test                  # == node bin/qrspi.mjs check
 ```
 
 It validates the three manifests and their versions, skill frontmatter, SKILL.md
-length, every `${CLAUDE_PLUGIN_ROOT}` reference, and the checkbox markers that
+length, every `${CLAUDE_PLUGIN_ROOT}` reference, the `> **PROMPT` blockquote that
+`/qrspi:next` prints and `/qrspi:new` strips, and the checkbox markers that
 `/qrspi:next` greps for. It also enforces the content rules this file states and
 nothing else used to check: the `## Status` block in every artifact template, the
 pipeline diagram across the three files that draw it, and the per-phase effort

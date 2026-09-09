@@ -69,18 +69,28 @@ page → Settings → Trusted Publisher → GitHub Actions:
 | Organization or user | `Allan-Nava` |
 | Repository | `qrspi` |
 | Workflow filename | `release.yml` |
-| Environment | *(leave empty)* |
+| Environment | `release` |
 
 **`release.yml` is part of that configuration.** The trusted publisher matches on the
 literal workflow filename, so renaming or moving the file breaks publishing, and the
 error npm returns does not mention the filename. Rename it only together with the
 npm-side config.
 
+**So is the environment.** `release.yml` declares `environment: release` on the job,
+and the two halves have to agree: an environment named on npm but not in the workflow
+(or the reverse) is a mismatch. The failure is silent — npm degrades a failed OIDC
+exchange to an anonymous publish, and the registry answers `404 Not Found - PUT
+https://registry.npmjs.org/qrspi`, which mentions neither OIDC nor the environment and
+reads exactly like a permissions problem. GitHub creates the environment on the
+workflow's first reference to it; give it protection rules only if you want a release
+to wait for a human, because the job will then sit and block until someone approves it.
+
 The equivalent from the CLI, with npm ≥ 11.15.0 and an interactively logged-in
 account:
 
 ```bash
-npm trust github qrspi --repo Allan-Nava/qrspi --file release.yml --allow-publish
+npm trust github qrspi --repo Allan-Nava/qrspi --file release.yml \
+  --environment release --allow-publish
 npm trust list qrspi
 ```
 

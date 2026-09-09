@@ -5,8 +5,8 @@
 
 ---
 
-## PROMPT (fresh session per step)
-
+> **PROMPT (fresh session per step)**
+>
 > You are in the **Implement** phase of the QRSPI workflow.
 >
 > Input: `04-plan.md` (the section for your assigned step) + `99-progress.md`.

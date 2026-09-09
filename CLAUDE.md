@@ -72,6 +72,12 @@ Note the dual role of `skills/qrspi/references/*.md`: they are both the **phase
 prompts** (`> PROMPT` blockquote at the top) and the **artifact templates** that
 `/qrspi:new` copies into the user's `thoughts/<dir>/`. Editing one edits both.
 
+The copy is not verbatim. `/qrspi:new` copies six files — `05-implement.md` is a
+prompt with nothing to fill in — and **deletes the `> **PROMPT` blockquote from each
+one**, because the plugin already carries it and `/qrspi:next` prints the one you
+need. That block is 36-49% of a template, and left in the artifact every downstream
+phase re-reads it as the *previous* phase's instructions.
+
 ## The rules the content encodes
 
 Do not weaken these when editing; they are the plugin's whole thesis.
@@ -102,8 +108,10 @@ Do not weaken these when editing; they are the plugin's whole thesis.
   ends with a `## Status` checkbox block. `/qrspi:next` greps for exactly these to
   decide whether a phase is complete — changing the markers breaks phase detection in
   [commands/next.md](commands/next.md).
-- **Phase prompts live in a `> PROMPT` blockquote** at the top of the reference file.
-  `/qrspi:next` prints that block verbatim with real paths substituted.
+- **Phase prompts live in a `> **PROMPT` blockquote** at the top of the reference
+  file. `/qrspi:next` prints that block verbatim with real paths substituted, and
+  `/qrspi:new` greps for the same marker to strip it from the artifact copies, so
+  `npm test` requires every reference except `99-progress.md` to carry it.
 - **Numbers appear in three places** — [README.md](README.md), the budget/phase
   tables in [skills/qrspi/SKILL.md](skills/qrspi/SKILL.md), and the routing table in
   [commands/next.md](commands/next.md). Change one, change all three. `npm test`
@@ -138,7 +146,8 @@ npm test                  # == node bin/qrspi.mjs check
 ```
 
 It validates the three manifests and their versions, skill frontmatter, SKILL.md
-length, every `${CLAUDE_PLUGIN_ROOT}` reference, and the checkbox markers that
+length, every `${CLAUDE_PLUGIN_ROOT}` reference, the `> **PROMPT` blockquote that
+`/qrspi:next` prints and `/qrspi:new` strips, and the checkbox markers that
 `/qrspi:next` greps for. It also enforces the content rules this file states and
 nothing else used to check: the `## Status` block in every artifact template, the
 pipeline diagram across the three files that draw it, and the per-phase effort
@@ -158,8 +167,9 @@ grep -rn '](' README.md CLAUDE.md        # links resolve
 
 End-to-end check: install locally with `/plugin marketplace add .` then
 `/plugin install qrspi`, and run `/qrspi:new TEST-1 <some ticket>` in a scratch repo —
-it must create `thoughts/TEST-1-<slug>/` with all seven files copied and the H1s
-renamed, then **stop** without entering Research.
+it must create `thoughts/TEST-1-<slug>/` with six files (no `05-implement.md`), each
+with its H1 renamed and its `> **PROMPT` blockquote deleted, then **stop** without
+entering Research.
 
 ## The site
 

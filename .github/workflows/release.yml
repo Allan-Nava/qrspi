@@ -106,9 +106,7 @@ jobs:
           # variable counts as a configured credential even when it expands to
           # nothing, which is why setup-node above is given no registry-url.
           unset NODE_AUTH_TOKEN
-          # verbose while OIDC is unproven here: it prints the token exchange, so
-          # a failure names its own cause instead of returning a bare 404.
-          npm publish --access public --loglevel verbose
+          npm publish --access public
 
       # The registry takes a moment to serve a freshly published version.
       - name: Verify the published version

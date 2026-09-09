@@ -1,7 +1,7 @@
 ---
 description: Detect which QRSPI phase a task is in and emit the exact prompt for the next one
 argument-hint: [thoughts/<dir> — omitted if there is only one task]
-allowed-tools: Bash(ls *), Bash(grep *), Bash(head *), Bash(wc *), Read
+allowed-tools: Bash(ls *), Bash(grep *), Bash(head *), Bash(wc *), Bash(awk *), Read
 ---
 
 # Advance a QRSPI task
@@ -28,9 +28,14 @@ State what you found in one table: file, started/complete, blocking gap.
 
 ## 2. Emit the next phase prompt
 
-Read **only** the reference for the next phase from
-`${CLAUDE_PLUGIN_ROOT}/skills/qrspi/references/`, and print its `> PROMPT` block
-filled in with this task's real paths — ready to paste into a fresh session.
+Extract **only** the `> **PROMPT` block of the next phase's reference — not the
+whole file, the template skeleton below it is not needed here — and print it filled
+in with this task's real paths, ready to paste into a fresh session:
+
+```bash
+awk 'f && !/^>/ {exit} /^> \*\*PROMPT/ {f=1} f' \
+  "${CLAUDE_PLUGIN_ROOT}/skills/qrspi/references/<NN>-<phase>.md"
+```
 
 | Complete so far | Next phase | Input to hand it | Effort |
 |---|---|---|---|

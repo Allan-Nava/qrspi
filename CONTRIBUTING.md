@@ -66,7 +66,7 @@ page → Settings → Trusted Publisher → GitHub Actions:
 
 | Field | Value |
 |---|---|
-| Organization or user | `Allan-Nava` |
+| Organization or user | `Allan-Nava` — this case, exactly |
 | Repository | `qrspi` |
 | Workflow filename | `release.yml` |
 | Environment | *(leave empty)* |
@@ -75,6 +75,20 @@ page → Settings → Trusted Publisher → GitHub Actions:
 literal workflow filename, so renaming or moving the file breaks publishing, and the
 error npm returns does not mention the filename. Rename it only together with the
 npm-side config.
+
+**The owner's case has to match GitHub's.** An entry saying `allan-nava` never
+matches, because the `repository` claim GitHub signs carries the account's real case,
+`Allan-Nava/qrspi`, and npm compares the two literally. The rejection arrives from the
+token exchange as
+
+```
+POST https://registry.npmjs.org/-/npm/v1/oidc/token/exchange/package/qrspi   404
+npm verbose oidc … OIDC token exchange error - package not found
+```
+
+which says nothing about case, and "package not found" is untrue on its face — the
+package is published — so it reads as a missing configuration rather than a
+mismatched one. 0.1.2 published the moment an entry with the right case existed.
 
 **Environment stays empty, and Label is not it.** npm's form has both, and the
 publisher row on the package page displays the *Label* — so a label reading `release`

@@ -13,18 +13,42 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # The installer declares `node >=18` and no dependencies. Run it on the floor and
+  # above without `npm install`, so both claims are tested rather than stated: a
+  # post-18 syntax fails the 18 leg, a dependency creeping in fails all three.
   check:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [18, 20, 22]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node }}
+      # What `npm test` runs. Validates the three manifests and their versions, skill
+      # frontmatter and SKILL.md length, every ${CLAUDE_PLUGIN_ROOT} reference, the
+      # `> **PROMPT` block in each phase reference and its contiguity, the checkbox
+      # markers and `## Status` block /qrspi:next gates on — also on the copy
+      # /qrspi:new would leave in thoughts/ — and the pipeline diagram and effort
+      # tables across the files that duplicate them.
+      - run: node bin/qrspi.mjs check
+      # Copy mode end to end against a throwaway config dir: install, then remove
+      # what it installed and nothing else.
+      - run: CLAUDE_CONFIG_DIR="$RUNNER_TEMP/claude" node bin/qrspi.mjs install --copy
+      - run: CLAUDE_CONFIG_DIR="$RUNNER_TEMP/claude" node bin/qrspi.mjs uninstall
+      - run: test ! -e "$RUNNER_TEMP/claude/skills/qrspi" && test ! -e "$RUNNER_TEMP/claude/commands/qrspi"
+
+  # The site needs `marked`, and the tarball check needs npm — one version is enough,
+  # the engines floor is not about either.
+  site:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
         with:
           node-version: 22
-      # Validates the manifests agree on a version, the skill frontmatter and
-      # length, every ${CLAUDE_PLUGIN_ROOT} reference, and the checkbox markers
-      # /qrspi:next greps for.
       - run: npm install --no-audit --no-fund
-      - run: npm test
       # The site is generated from README.md — a broken README breaks the build.
       - run: npm run build:site
       # What `npm publish` would actually ship.

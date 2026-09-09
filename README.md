@@ -60,8 +60,10 @@ npx qrspi check               # validate the package
 ```
 
 Pin a version with `npx qrspi@0.1.0 install`; `npm i -g qrspi` then `qrspi install`
-works too. Copy mode is a snapshot — re-run `npx qrspi install` to update. The plugin
-route updates itself through `/plugin`.
+works too. Which route updates itself: the plugin route does, through `/plugin` —
+`npx` registers the marketplace from GitHub, because the npx cache it runs from is
+pruned; `npm i -g` registers the installed package directory, which is not. Copy mode
+is a snapshot — re-run `npx qrspi install` to update.
 
 ## Use
 

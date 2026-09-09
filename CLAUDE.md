@@ -40,7 +40,8 @@ scripts/
   measure-context-cost.mjs  count_tokens over the plugin's own text — contributor
                        tooling, kept out of the npm tarball by package.json#files
 .github/workflows/
-  ci.yml               npm test + site build + npm pack on every PR and push to main
+  ci.yml               check on Node 18/20/22 with no npm install, plus a copy-mode round
+                       trip; site build + npm pack on 22 — every PR and push to main
   release.yml          on tag qrspi--v*: publish to npm, cut the release, close the milestone
   release-drift.yml    fails when main carries a version with no tag for 2h; runs daily
   pages.yml            builds and deploys the site to GitHub Pages on push to main
@@ -143,10 +144,17 @@ Do not weaken these when editing; they are the plugin's whole thesis.
   reference pointing anywhere *other* than `/skills` would survive unrewritten and
   break the copy install, so `npx qrspi check` rejects it. Add such a reference only
   together with its rewrite rule.
-- **The installer stays dependency-free** and Node-18-compatible. No bundler, no
+- **The installer stays dependency-free** and Node-18-compatible, and CI now proves
+  both: `check` runs on Node 18, 20 and 22 without `npm install`. No bundler, no
   TypeScript, no `postinstall` hook — installing a package must never write to
   `~/.claude` behind the user's back; that only happens on an explicit
   `qrspi install`.
+- **`npx qrspi install` registers the marketplace from GitHub, not from `ROOT`.** Under
+  npx, `ROOT` is `~/.npm/_npx/<hash>/…`, which npm prunes; a marketplace pointing there
+  survives the install but breaks the next update. `marketplaceSource()` in
+  [bin/qrspi.mjs](bin/qrspi.mjs) switches to the slug from `package.json#repository`
+  when it sees `_npx` in the path — so that field has to name the GitHub repo, and
+  `check` fails if it does not. `npm i -g` and a checkout keep registering `ROOT`.
 - Prose style: British-leaning spelling ("utilisation"), em-dashes, no emoji, no
   marketing filler. Match it.
 

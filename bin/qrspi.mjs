@@ -64,7 +64,8 @@ const commandTarget = (name) => join(commandDir, `${name}.md`)
 // directory this installer writes carries the marker; anything without one is
 // someone else's work and is left alone.
 const MARKER = '.qrspi-installed'
-const VERSION = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')).version
+const PKG = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8'))
+const VERSION = PKG.version
 const managed = (dir) => existsSync(join(dir, MARKER))
 const copyTargets = () => [...SKILLS.map(skillTarget), commandDir]
 
@@ -140,11 +141,29 @@ function copyInstall({ dryRun, force }) {
   say(`\n${c.green('Installed.')} Restart Claude Code, then: /${PLUGIN}:new ENG-1234 <ticket>`)
 }
 
+// Under `npx qrspi`, ROOT sits in ~/.npm/_npx/<hash>/ — a cache npm prunes. A
+// marketplace registered from there survives the install, because Claude Code
+// copies the plugin into its own cache, but not the next update, which fails
+// later and far from the command that caused it. Register the GitHub source
+// instead: same manifest, a path that outlives the cache, and the self-updating
+// route intact. `npm i -g` and a checkout resolve to stable directories and keep
+// registering ROOT, so `marketplace add .` on a clone still works.
+const EPHEMERAL = /[\\/]_npx[\\/]/.test(ROOT)
+const GITHUB = (PKG.repository?.url ?? '').match(/github\.com[/:]([^/]+\/[^/.]+)/)?.[1] ?? null
+const marketplaceSource = () => (EPHEMERAL && GITHUB ? GITHUB : ROOT)
+
+function explainSource() {
+  if (EPHEMERAL && GITHUB) {
+    say(c.dim(`  running from the npx cache, which npm prunes — registering the marketplace from ${GITHUB} instead of ${ROOT}`))
+  }
+}
+
 function pluginInstall(bin) {
   say(`Registering the plugin with ${c.bold(bin)}`)
+  explainSource()
   // `marketplace add` fails when the marketplace is already registered; that is
   // an update, not an error.
-  if (!run(bin, ['plugin', 'marketplace', 'add', ROOT])) {
+  if (!run(bin, ['plugin', 'marketplace', 'add', marketplaceSource()])) {
     run(bin, ['plugin', 'marketplace', 'update', MARKETPLACE])
   }
   if (!run(bin, ['plugin', 'install', `${PLUGIN}@${MARKETPLACE}`])) return false
@@ -166,7 +185,8 @@ function install(flags) {
   }
   if (dryRun) {
     say(`Would run, with ${c.bold(bin)}:`)
-    say(c.dim(`  $ ${bin} plugin marketplace add ${ROOT}`))
+    explainSource()
+    say(c.dim(`  $ ${bin} plugin marketplace add ${marketplaceSource()}`))
     say(c.dim(`  $ ${bin} plugin install ${PLUGIN}@${MARKETPLACE}`))
     return
   }
@@ -176,9 +196,33 @@ function install(flags) {
   }
 }
 
+// Claude Code's own registry of plugin-system installs. Read, never written:
+// removing one of those is `claude plugin uninstall`'s job, and this only says so.
+function installedThroughPlugin() {
+  const p = join(CLAUDE_DIR, 'plugins', 'installed_plugins.json')
+  if (!existsSync(p)) return null
+  try {
+    const entries = JSON.parse(readFileSync(p, 'utf8')).plugins?.[`${PLUGIN}@${MARKETPLACE}`]
+    return Array.isArray(entries) && entries.length ? entries : null
+  } catch {
+    return null
+  }
+}
+
 function uninstall(flags) {
   const dryRun = flags.has('--dry-run')
   const force = flags.has('--force')
+  const bin = findClaude()
+  // Lead with the install that exists. After a plugin-system install there is
+  // nothing copied, and "nothing to remove" read as "nothing installed" at the
+  // one moment a user is least inclined to read on.
+  const plugin = installedThroughPlugin()
+  if (plugin) {
+    const versions = [...new Set(plugin.map((e) => e.version).filter(Boolean))].join(', ')
+    say(`${PLUGIN} is installed through the plugin system${versions ? ` (${versions})` : ''}. This command leaves that alone; to remove it:`)
+    say(c.dim(`  $ ${bin ?? 'claude'} plugin uninstall ${PLUGIN}`))
+    say(c.dim(`  $ ${bin ?? 'claude'} plugin marketplace remove ${MARKETPLACE}\n`))
+  }
   let found = false
   for (const t of copyTargets()) {
     if (!existsSync(t)) continue
@@ -192,9 +236,8 @@ function uninstall(flags) {
     say(`  remove ${t}`)
     if (!dryRun) rmSync(t, { recursive: true, force: true })
   }
-  if (!found) say(c.dim(`Nothing of ours to remove under ${CLAUDE_DIR}.`))
-  const bin = findClaude()
-  if (bin) {
+  if (!found) say(c.dim(plugin ? 'No copied files to remove.' : `Nothing of ours to remove under ${CLAUDE_DIR}.`))
+  if (bin && !plugin) {
     say('\nIf you installed through the plugin system, also run:')
     say(c.dim(`  $ ${bin} plugin uninstall ${PLUGIN}`))
     say(c.dim(`  $ ${bin} plugin marketplace remove ${MARKETPLACE}`))
@@ -267,6 +310,9 @@ function check() {
     versions.add(json.version ?? json.metadata?.version)
   }
   if (versions.size > 1) problems.push(`version mismatch across manifests: ${[...versions].join(', ')}`)
+  if (!GITHUB) {
+    problems.push('package.json#repository does not name a GitHub repo — `npx qrspi install` registers the marketplace from it')
+  }
 
   for (const name of SKILLS) {
     const p = join(ROOT, 'skills', name, 'SKILL.md')

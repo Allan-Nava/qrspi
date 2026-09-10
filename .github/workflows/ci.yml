@@ -48,7 +48,7 @@ jobs:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
         with:
-          node-version: 22
+          node-version: 24
       - run: npm install --no-audit --no-fund
       # The site is generated from README.md — a broken README breaks the build.
       - run: npm run build:site

@@ -50,7 +50,7 @@ jobs:
       # npm answers 404 rather than 401 so as not to reveal whether the package
       # exists. Trusted publishing needs *no* credential in the environment;
       # registry.npmjs.org is already npm's default registry.
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
 

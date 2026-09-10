@@ -52,7 +52,7 @@ jobs:
       # registry.npmjs.org is already npm's default registry.
       - uses: actions/setup-node@v5
         with:
-          node-version: 22
+          node-version: 24
 
       # The tag is the source of truth for what is being released; package.json
       # must agree, and `npm test` checks the other two manifests against it.

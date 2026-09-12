@@ -93,21 +93,37 @@ cd <skill-creator dir> && python -m scripts.run_eval \
   --model claude-opus-5 --runs-per-query 3 --verbose
 ```
 
-Two things will otherwise produce a clean-looking zero and mean nothing:
+Three things will otherwise produce a clean-looking zero that means nothing — all three
+were hit on 2026-09-09 before the harness gave a real number on 2026-09-12:
 
-- **Disable the installed plugin first** (`claude plugin disable qrspi@allan-nava`, and
-  re-enable after). The harness injects a stub with a hashed name and counts a trigger
-  only when *that* stub is invoked; with the real plugin present the model invokes
-  `qrspi:handoff` instead, and every run is scored as a miss.
-- **The CLI has to be one the model accepts.** `claude -p` under an outdated Claude Code
-  answers a 400 for a model it does not know, and the harness scores the error as "did
-  not trigger". Check `claude --version` against the error text before believing 0/27.
+- **`--num-workers 1`, always.** The harness injects one stub command per worker, all
+  with the same description and names differing only by a hash. With N workers the
+  model invokes whichever stub it likes and only the worker whose hash matches counts
+  a hit — roughly 1/N of the real rate. The default is 10 workers, so the default
+  measures about a tenth of the truth. Detected runs end in seconds; serial is fine.
+- **Disable the installed plugin first** (`claude plugin disable qrspi@allan-nava`,
+  re-enable after). Otherwise the model invokes the real `qrspi:handoff` and the stub
+  is never seen.
+- **A current CLI.** An outdated `claude` answers 400 for a model it does not know,
+  and the harness scores the error as "did not trigger".
 
-Both bit on 2026-09-09. Even with the plugin disabled and a supported model, Claude
-Code 2.1.128 fired the stub 2 times in 81 positive runs across the three skills —
-including on "run ENG-4410 through qrspi", which is as explicit as a prompt gets — so on
-that CLI version the harness measures nothing. The sets are the deliverable; the number
-needs a current CLI.
+And one limit of the eval itself: `claude -p` starts from zero, so a positive that
+presupposes session history — "dump the state of this refactor", "what we found about
+the CI job" — measures whether the model loads the skill *before* going to look for
+the material. In a real session the material is in context; here it is not. The
+description tells it to load first, and that sentence moved three such prompts from
+0/2 to 2/2.
+
+Measured 2026-09-12, `claude-fable-5-1`, one worker, two runs per query:
+
+| Skill | Positives fired | Negatives fired | Notes |
+|---|---:|---:|---|
+| `handoff` | 17/18 | 0/22 | after the description rewrite; 12/18 before |
+| `token-efficiency` | 15/18 | 0/22 | the miss is "cache_read_input_tokens is 0", which is in the description verbatim — the model answers it directly rather than consulting a skill |
+| `qrspi` | 13/18 | 0/22 | two misses name `thoughts/…` files a command handles, not the skill |
+
+No false trigger in 66 negative runs, including the cost prompts in `handoff`'s set and
+the handoff prompts in `token-efficiency`'s — the two descriptions do not compete.
 
 ## Releasing
 

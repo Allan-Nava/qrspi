@@ -1,6 +1,6 @@
 ---
 name: handoff
-description: Write a handoff — the note a fresh session with zero context reads to continue this work — when asked to summarise a session before context runs out, compress research or a long investigation into a file, hand work to another agent or a later self, or write a plan step someone else executes without asking questions. Covers what survives a context reset, the load-bearing-fact test, compressing without losing the evidence trail, and the self-containment failures ("the file from before", "as discussed above") that make a handoff fail silently.
+description: Write a handoff — what a fresh session with zero context reads to continue this work. Use it whenever the ask is to summarise, dump or hand over the state of a session, an investigation or a refactor for someone who was not there, to compress research into a file, to brief a subagent or another agent on a task, or to rewrite a plan step so a stranger can execute it without questions. Load it before looking for the material — the material is usually this conversation. Covers what survives a reset, which facts are load-bearing, and the "as discussed above" failures.
 ---
 
 # Handoff

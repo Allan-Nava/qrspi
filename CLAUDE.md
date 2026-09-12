@@ -126,7 +126,8 @@ Do not weaken these when editing; they are the plugin's whole thesis.
   The bar for a skill is that it **triggers outside QRSPI** — `handoff` cleared it
   ("summarise this session before I lose it" needs no workflow); a phase never will.
   Keep `handoff`'s description on *writing* a handoff and `token-efficiency`'s on
-  *diagnosing cost*, or the two compete.
+  *diagnosing cost*, or the two compete — measured not to, 2026-09-12: 0 false triggers
+  in 66 negative runs (`evals/trigger/`, CONTRIBUTING has the numbers and the traps).
 - **Command frontmatter** carries `description`, `argument-hint`, and a tight
   `allowed-tools` list. Keep `allowed-tools` minimal; widen only with a reason.
 - **Plugin paths in commands use `${CLAUDE_PLUGIN_ROOT}`**, never a relative path.

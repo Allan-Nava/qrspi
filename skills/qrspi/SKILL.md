@@ -1,6 +1,6 @@
 ---
 name: qrspi
-description: Run a coding task through the QRSPI workflow — Questions, Research, Spec (Design + Structure), Plan, Implement — one self-contained artifact per phase on disk, each phase a fresh session reading only that artifact. Use when a single session would blow past 40% context, when asked to research-then-plan-then-implement, when asked to set up thoughts/ artifacts, or when a session is drifting and needs intentional compaction at a phase boundary.
+description: Run a coding task through the QRSPI workflow — Questions, Research, Spec (Design + Structure), Plan, Implement — one self-contained artifact per phase under thoughts/<task-id>/, each phase a fresh session reading only that artifact. Use it to run a ticket through qrspi, to research-then-plan-then-implement work too big for one session, to set up or advance thoughts/ artifacts, tell which phase one is in, or review one before moving on, and when a session drifts past 40% context and needs compacting at a phase boundary.
 ---
 
 # QRSPI

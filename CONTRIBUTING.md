@@ -120,7 +120,7 @@ Measured 2026-09-12, `claude-fable-5-1`, one worker, two runs per query:
 |---|---:|---:|---|
 | `handoff` | 17/18 | 0/22 | after the description rewrite; 12/18 before |
 | `token-efficiency` | 15/18 | 0/22 | the miss is "cache_read_input_tokens is 0", which is in the description verbatim — the model answers it directly rather than consulting a skill |
-| `qrspi` | 13/18 | 0/22 | two misses name `thoughts/…` files a command handles, not the skill |
+| `qrspi` | 18/18 | 0/22 | after the description rewrite; 13/18 before, when it did not name `thoughts/`, a ticket, or reviewing an artifact |
 
 No false trigger in 66 negative runs, including the cost prompts in `handoff`'s set and
 the handoff prompts in `token-efficiency`'s — the two descriptions do not compete.

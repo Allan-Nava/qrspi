@@ -216,7 +216,8 @@ release and the milestone closed.
 npm test                       # fails if they disagree
 npm pack --dry-run             # inspect what would ship
 
-# 2. commit the bump on main, then look before you leap
+# 2. land the bump on main through a pull request — main refuses direct pushes —
+#    then look before you leap
 claude plugin tag . --dry-run  # prints the tag it would create, changes nothing
 
 # 3. release
@@ -264,6 +265,15 @@ a version bump. Nothing else in the workflow is destructive, and the release is 
 created after npm confirms the version.
 
 ## Pull requests
+
+`main` is protected by a repository ruleset (Settings → Rules → "Protect main"): no
+direct pushes, no force-pushes, no deletion, and nobody bypasses it — not even the
+owner. Every change, the release bump included, lands through a pull request whose
+five CI jobs are green: `check (18)`, `check (20)`, `check (22)`, `check (24)` and
+`site`. No approving review is required, so a solo pull request merges as soon as CI
+passes. Tags are outside the rule, which is why `claude plugin tag . --push` still
+works. Renaming a CI job renames a required check: update the ruleset in the same
+change or the next pull request cannot merge.
 
 - Conventional Commits (`feat:`, `fix:`, `docs:`, `ci:`), imperative subject.
 - Keep `npm test` green; add a check to `bin/qrspi.mjs check` when you add an invariant.

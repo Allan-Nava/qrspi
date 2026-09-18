@@ -106,6 +106,14 @@ were hit on 2026-09-09 before the harness gave a real number on 2026-09-12:
   is never seen.
 - **A current CLI.** An outdated `claude` answers 400 for a model it does not know,
   and the harness scores the error as "did not trigger".
+- **A logged-in CLI.** An expired OAuth session makes every `claude -p` answer
+  "Failed to authenticate" — and the harness, which discards stderr, scores all forty
+  runs as "did not trigger". 0/18 positives *and* 0/22 negatives is that, not a
+  measurement: check `claude auth status` before believing a zero (hit 2026-09-18).
+- **A machine that stays awake.** Each run has a 30-second timeout and a timeout
+  counts as "did not trigger", so a laptop that sleeps mid-eval hands back a run that
+  took hours and a number that means nothing — 5/18 for a description measured at
+  17/18 a week earlier. Wrap the command in `caffeinate -i -s`.
 
 And one limit of the eval itself: `claude -p` starts from zero, so a positive that
 presupposes session history — "dump the state of this refactor", "what we found about

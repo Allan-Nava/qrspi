@@ -137,10 +137,19 @@ including the cost prompts in `handoff`'s set and the handoff prompts in
 `token-efficiency`'s — so the two bordering descriptions still do not compete.
 
 **Drift note.** The `handoff` description that measured 17/18 on 2026-09-12 measured
-10/18 on 2026-09-18, byte-for-byte unchanged: the model or the CLI moved, not the text.
-So a number from another day is not the comparison. Re-measure the baseline the same
-day, on the same CLI, before judging a rewrite, and read differences of one or two hits
-in eighteen as noise — two runs per query resolves to ±1 per prompt.
+10/18 on 2026-09-18, byte-for-byte unchanged. Not the model and not the CLI (2.1.268
+both days): the **skill roster**. On 2026-09-17 a synced skills folder added 24 skills
+to this machine — `docs`, `doc-coauthoring`, `recap`, `internal-comms` among them —
+and `claude -p` went from 59 to 83 visible skills. Measured the same day with that
+folder parked, the 2026-09-12 text scored 18/18; with it present, 10/18. The stub
+competes with every other description the model can see, so the number is a property
+of the text *and* the roster.
+
+Two rules follow. Re-measure the baseline the same day, in the same environment,
+before judging a rewrite, and record the roster size next to the number (the `init`
+event of `claude -p --output-format stream-json --verbose` lists `slash_commands`).
+And read differences of one or two hits in eighteen as noise — two runs per query
+resolves to ±1 per prompt. The 2026-09-18 table above was measured at 83 skills.
 
 ## Releasing
 

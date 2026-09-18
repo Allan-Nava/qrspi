@@ -261,8 +261,9 @@ gh workflow run Release -f tag=qrspi--v<version>
 ```
  The publish step itself is the exception: npm
 refuses to overwrite a version that already exists, so a rerun that got past it needs
-a version bump. Nothing else in the workflow is destructive, and the release is only
-created after npm confirms the version.
+a version bump. Nothing else in the workflow is destructive, the release is only
+created after npm confirms the version, and a rerun that finds the release already
+there leaves it alone rather than failing on it.
 
 ## Pull requests
 

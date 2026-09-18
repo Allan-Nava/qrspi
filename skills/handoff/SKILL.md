@@ -1,6 +1,6 @@
 ---
 name: handoff
-description: Write a handoff — what a fresh session with zero context reads to continue this work. Use it whenever the ask is to summarise, dump or hand over the state of a session, an investigation or a refactor for someone who was not there, to compress research into a file, to brief a subagent or another agent on a task, or to rewrite a plan step so a stranger can execute it without questions. Load it before looking for the material — the material is usually this conversation. Covers what survives a reset, which facts are load-bearing, and the "as discussed above" failures.
+description: Handoff — the note a fresh session with zero context reads to continue this work. Load it first, before any other tool call, whenever the ask is to summarise or dump what we found or the state of a session, an investigation, a refactor or a feature into a file — HANDOFF.md, a note before /clear, a handover doc for a teammate — to compress research for a new agent, to brief a subagent or another agent on a task, or to rewrite a plan step so a stranger can execute it without questions. The material is this conversation, not the repo. Covers what survives a reset, which facts are load-bearing, and the "as discussed above" failures.
 ---
 
 # Handoff

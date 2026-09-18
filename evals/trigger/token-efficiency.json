@@ -5,7 +5,8 @@
   },
   {
     "query": "cache_read_input_tokens is 0 on every request even though the system prompt is byte-identical. python sdk, opus 5",
-    "should_trigger": true
+    "should_trigger": true,
+    "note": "Known structural miss, 0/2 on 2026-09-12 and 2026-09-18 across three descriptions that name it verbatim: the model answers this directly rather than consulting a skill. Kept as a positive so the number stays honest; do not spend permanent bytes chasing it."
   },
   {
     "query": "the agent keeps re-reading the same three files every turn like it forgot them. is this the context rot thing? what do I actually do about it",

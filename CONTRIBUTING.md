@@ -122,16 +122,25 @@ the material. In a real session the material is in context; here it is not. The
 description tells it to load first, and that sentence moved three such prompts from
 0/2 to 2/2.
 
-Measured 2026-09-12, `claude-fable-5-1`, one worker, two runs per query:
+Measured 2026-09-18, `claude-fable-5-1`, CLI 2.1.268, one worker, two runs per query,
+awake and logged in. "Baseline" is the description as it stood that morning, measured
+the same day — see the drift note below for why that column exists.
 
-| Skill | Positives fired | Negatives fired | Notes |
-|---|---:|---:|---|
-| `handoff` | 17/18 | 0/22 | after the description rewrite; 12/18 before |
-| `token-efficiency` | 15/18 | 0/22 | the miss is "cache_read_input_tokens is 0", which is in the description verbatim — the model answers it directly rather than consulting a skill |
-| `qrspi` | 18/18 | 0/22 | after the description rewrite; 13/18 before, when it did not name `thoughts/`, a ticket, or reviewing an artifact |
+| Skill | Baseline | Rewritten | Negatives fired | Notes |
+|---|---:|---:|---:|---|
+| `handoff` | 10/18 | **14/18** | 0/22 | +27 permanent bytes: leads with the load order, names the targets (`HANDOFF.md`, a note before `/clear`, a handover doc for a teammate). The remaining 0/2 is *"dump the state of this refactor into HANDOFF.md"* — the model goes to look for the refactor first. Four variants tried: 12, 10, 14 and 13 of 18 |
+| `token-efficiency` | 14/18 | **16/18** | 0/22 | +82 bytes: names MCP tool schemas in `/context`, the sixth lever from #31, which the description never mentioned. The remaining 0/2 is *"cache_read_input_tokens is 0"*, in every variant verbatim — the model answers it directly. Annotated in the eval set and kept as a positive, so the number stays honest |
+| `qrspi` | 17/18 | not rewritten | 0/22 | 18/18 on 2026-09-12; one hit in eighteen is inside the noise |
 
-No false trigger in 66 negative runs, including the cost prompts in `handoff`'s set and
-the handoff prompts in `token-efficiency`'s — the two descriptions do not compete.
+No false trigger in 198 negative runs that day — the three baselines and six variants,
+including the cost prompts in `handoff`'s set and the handoff prompts in
+`token-efficiency`'s — so the two bordering descriptions still do not compete.
+
+**Drift note.** The `handoff` description that measured 17/18 on 2026-09-12 measured
+10/18 on 2026-09-18, byte-for-byte unchanged: the model or the CLI moved, not the text.
+So a number from another day is not the comparison. Re-measure the baseline the same
+day, on the same CLI, before judging a rewrite, and read differences of one or two hits
+in eighteen as noise — two runs per query resolves to ±1 per prompt.
 
 ## Releasing
 

@@ -108,14 +108,17 @@ jobs:
           unset NODE_AUTH_TOKEN
           npm publish --access public
 
-      # The registry takes a moment to serve a freshly published version.
+      # The registry takes a moment to serve a freshly published version — over a
+      # minute on 2026-09-18 (0.3.2), which the previous six 10-second tries did not
+      # cover. Twenty tries at 15 seconds: five minutes, and a rerun is cheap if the
+      # registry is slower still.
       - name: Verify the published version
         run: |
-          for i in 1 2 3 4 5 6; do
+          for i in $(seq 1 20); do
             if [ "$(npm view "qrspi@${{ steps.v.outputs.version }}" version 2>/dev/null)" = "${{ steps.v.outputs.version }}" ]; then
-              echo "qrspi@${{ steps.v.outputs.version }} is live"; exit 0
+              echo "qrspi@${{ steps.v.outputs.version }} is live after $i tries"; exit 0
             fi
-            echo "not visible yet, retrying…"; sleep 10
+            echo "not visible yet, retrying…"; sleep 15
           done
           echo "::error::qrspi@${{ steps.v.outputs.version }} did not appear on the registry"
           exit 1

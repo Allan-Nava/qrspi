@@ -39,7 +39,7 @@ Re-measure on the **same tasks** as week 1. It is the only valid comparison.
 
 # Reference numbers
 
-## Models (cached: 2026-09-09)
+## Models (cached: 2026-09-18)
 
 | Model | ID | Context | Input $/1M | Output $/1M |
 |---|---|---|---|---|
@@ -57,7 +57,8 @@ looks.
 
 - **Batch API**: 50% discount, asynchronous. Perfect for audits, mass migrations,
   backfills — anything non-interactive.
-- **Cache read**: 0.1×. The biggest multiplier available, if the prefix is stable.
+- **Cache read**: 0.1× — 0.025× on Fable 5.1 and Mythos 5.1. The biggest multiplier
+  available, if the prefix is stable.
 - **Fast mode** (`speed: "fast"`, Opus 5 / 4.8): ~2.5× output throughput, premium
   price ($10/$50). It is a *latency* lever, not a cost lever — and changing `speed`
   invalidates the cache.
@@ -71,6 +72,8 @@ looks.
 | Task budgets | `task-budgets-2026-03-13` |
 | Cache diagnostics | `cache-diagnosis-2026-04-07` |
 | Mid-conversation tool changes | `mid-conversation-tool-changes-2026-07-01` |
+| Per-message effort (`role: "system"`, empty content) | `mid-conversation-output-config-2026-07-01` |
+| Turn-scoped system messages (`clear_at`) | `mid-conversation-system-clear-at-2026-08-21` |
 
 Mid-conversation operating instructions (`role: "system"` inside `messages[]`) do
 **not** require a beta header.

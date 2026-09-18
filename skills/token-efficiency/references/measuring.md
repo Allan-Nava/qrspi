@@ -28,7 +28,7 @@ def count(text: str, model: str = "claude-opus-5") -> int:
 | Field | Meaning | Relative price |
 |---|---|---|
 | `input_tokens` | **only** the uncached remainder | 1× |
-| `cache_read_input_tokens` | served from cache | ~0.1× |
+| `cache_read_input_tokens` | served from cache | 0.1× (0.025× on Fable 5.1) |
 | `cache_creation_input_tokens` | written to cache | 1.25× (5min TTL) / 2× (1h TTL) |
 | `output_tokens` | generation | 5× input on Opus 5 |
 

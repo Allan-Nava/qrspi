@@ -156,7 +156,8 @@ Do not weaken these when editing; they are the plugin's whole thesis.
   They are the likeliest thing here to be quietly wrong. Re-verify them against the
   current API reference rather than from memory, keep the `(cached: YYYY-MM-DD)` date
   on the model table honest, and treat a stale price as a bug: the whole skill argues
-  from those numbers. Last audited 2026-09-09 — five claims were wrong.
+  from those numbers. Last audited 2026-09-18 — three claims were wrong, two incomplete
+  (the Claude Code sections drift fastest: the harness ships weekly).
 
 - **Versions must match** across [package.json](package.json),
   [.claude-plugin/plugin.json](.claude-plugin/plugin.json) and

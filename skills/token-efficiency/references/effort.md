@@ -41,9 +41,10 @@ across the whole implementation; a Research error gets caught by the Design revi
 
 On every current model except Haiku 4.5 use `thinking: {type: "adaptive"}` — Claude
 decides how much to think. Haiku 4.5 still takes `{type: "enabled", budget_tokens: N}`
-(minimum 1024, and less than `max_tokens`). `budget_tokens` is **removed** on Opus 5 / 4.8 / 4.7, Sonnet 5 and Fable 5
-(returns 400). On Opus 5 thinking is **on by default**: omit the parameter and it
-still runs adaptive.
+(minimum 1024, and less than `max_tokens`). `budget_tokens` is **removed** on Opus 5 /
+4.8 / 4.7, Sonnet 5, Fable 5 and Fable 5.1 (returns 400). On Opus 5 and the Fable
+models thinking is **on by default**: omit the parameter and it still runs adaptive.
+On Fable 5.1 it cannot be turned off at all — `{type: "disabled"}` is a 400.
 
 Do not disable thinking to save tokens: on Opus 5 with `thinking: {type: "disabled"}`
 the model can write a tool call in **visible text** instead of a `tool_use` block —
@@ -86,8 +87,12 @@ means it is set once at the boundary:
 | everywhere, overriding the file | `CLAUDE_CODE_EFFORT_LEVEL=xhigh` |
 | per subagent | `effort:` in the agent's frontmatter |
 
-`max` is session-only unless set through the environment variable. Models that do not
-support effort — Haiku 4.5 among them — ignore the setting; for those the lever is
-`MAX_THINKING_TOKENS`, which adaptive-reasoning models in turn ignore. The phase
+`max` is session-only unless set through the environment variable — the settings keys
+accept `low` to `xhigh`. On a model without a level you asked for, the harness falls
+back to the highest one it supports (`xhigh` runs as `high` on Opus 4.6); Haiku 4.5
+supports none, and there the lever is `MAX_THINKING_TOKENS`, which adaptive-reasoning
+models in turn ignore. `maxEffortLevel` caps it from any scope, including managed
+settings. On Fable 5.1 a mid-session `/effort` keeps the prompt cache (see
+`caching.md`); on every other model it starts one over. The phase
 prompts state their recommended effort; `claude --effort <level>` when opening the
 phase session is the cheapest way to honour it.

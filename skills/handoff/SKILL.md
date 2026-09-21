@@ -5,14 +5,11 @@ description: Handoff — the note a fresh session with zero context reads to con
 
 # Handoff
 
-A handoff is a document written for a reader who has **none of your context**: a fresh
-session, another agent, yourself after `/clear`. It is the one artifact whose quality is
-measured only after the writer is gone — which is why it is usually written badly, and
-why the cost lands on someone else.
-
-The compaction ratios and operating rules are in the `token-efficiency` skill; the
-phase skeletons are in `qrspi`. This skill is the **craft**: which facts to keep, how to
-state them so they survive, and how to know before sending whether it will work.
+A handoff is written for a reader with **none of your context**: a fresh session,
+another agent, yourself after `/clear`. Its quality is measured only after the writer
+is gone, which is why it is usually written badly and the cost lands on someone else.
+This skill is the **craft**: which facts to keep, how to state them so they survive,
+and how to know before sending whether it will work.
 
 ## The one test
 
@@ -67,9 +64,5 @@ executable step needs, and the self-test that catches a guess before it is made.
 - **The unstated default** — a choice made silently that the reader will make
   differently.
 
-## Related
-
-- `qrspi` — the workflow whose every phase boundary is a handoff; its templates are
-  the skeletons this skill fills well.
-- `token-efficiency` — why compaction pays (`references/compaction.md`), and the
-  compression-ratio KPI a good handoff moves.
+Every QRSPI phase boundary is a handoff (`qrspi` skill, the skeletons); why it pays,
+and the compression-ratio KPI it moves, is `token-efficiency`.

@@ -64,12 +64,11 @@ Load **only** `references/0N-<phase>.md` for the phase you are in: each holds th
 phase's prompt and the artifact skeleton to fill. `05-implement.md` is a prompt
 only — its output is code — and Implement keeps state in `99-progress.md`.
 
-Bootstrap with `/qrspi:new <TASK-ID> <ticket>`, then `/qrspi:next` at each boundary
-for the next phase prompt. When Implement finds an upstream artifact wrong, the path
-back is `references/recovery.md` — one phase re-entered narrowly, not a restart.
-The last compaction, artifacts into a reviewable PR, is `references/landing.md`.
-`/qrspi:review <file>` reads one artifact against `references/reviewing.md` — the
-weaknesses the gates cannot see: finished, plausible, and wrong.
+`/qrspi:new <TASK-ID> <ticket>` bootstraps; `/qrspi:next` prints the next phase prompt
+at each boundary; `/qrspi:review <file>` reads one artifact for the weaknesses the
+gates cannot see (`references/reviewing.md`). Implement finding an upstream artifact
+wrong → `references/recovery.md`, one phase re-entered narrowly. Artifacts into a
+reviewable PR → `references/landing.md`.
 
 ## The test that matters
 
@@ -79,9 +78,5 @@ weaknesses the gates cannot see: finished, plausible, and wrong.
 If it cannot, the plan is incomplete — and you are about to pay a rework round that
 costs as much as the entire Research phase.
 
-## Related
-
-For the *why* — measurement, compaction ratios, subagent firewalls, effort
-allocation, prompt caching — see the `token-efficiency` skill. For the *craft* of
-filling these templates so they survive the reset — which facts, stated how — the
-`handoff` skill.
+The *why* (measurement, ratios, caching) is the `token-efficiency` skill; the *craft*
+of filling a template so it survives the reset is the `handoff` skill.

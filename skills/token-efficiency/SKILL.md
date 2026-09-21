@@ -35,7 +35,7 @@ intentional compaction saves 90%. Do not invert them. Before any of them:
 | 1 | Intentional compaction — artifacts on disk between phases | 10-20× | `references/compaction.md` |
 | 2 | Subagents as context firewalls, programmatic tool calling | 5-10× on research | `references/subagents.md` |
 | 3 | Effort calibrated per phase, model choice, task budgets | 2-3× on output tokens | `references/effort.md` |
-| 4 | Prompt caching — the invariant, invalidation, gotchas | ~10× on repeated prefixes | `references/caching.md` |
+| 4 | Prompt caching — the invariant, invalidation, gotchas | ~10× on repeated prefixes | `references/caching.md` (+ `caching-api.md` for your own loop) |
 | 5 | Tool definitions and output, context editing, memory | 10-30k per avoided read | `references/tool-hygiene.md` |
 
 ## The five KPIs
@@ -57,13 +57,7 @@ If you track only three, track the first three.
 - **KPI 2 under 10×** means the artifact carries material that should have stayed in
   the previous phase.
 
-## Further references
-
-Beyond the five above, load only what the question needs:
-`references/anti-patterns.md` (the anti-pattern table) and
-`references/playbook.md` (4-week rollout, model prices, beta headers).
-
-## Related
-
-The workflow that operationalises lever #1 is the `qrspi` skill. The craft of writing the artifact
-lever #1 depends on — what to keep, how to state it — is the `handoff` skill.
+Beyond the five, load only what the question needs: `references/anti-patterns.md`
+(the table) and `references/playbook.md` (4-week rollout, prices, beta headers).
+Lever #1 as a workflow is the `qrspi` skill; the craft of the artifact it depends on
+is `handoff`.

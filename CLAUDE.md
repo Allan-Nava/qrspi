@@ -82,8 +82,9 @@ skills/
                        over-specified Design, a step that hides a decision
   token-efficiency/
     SKILL.md           index of the five levers and five KPIs
-    references/        measuring, compaction, subagents, effort, caching,
-                       tool-hygiene, anti-patterns, playbook
+    references/        measuring, compaction, subagents, effort, caching (+ caching-api
+                       for people writing their own loop), tool-hygiene, anti-patterns,
+                       playbook
   handoff/
     SKILL.md           the one test, what survives a reset, the failure modes by name
     references/        what-survives, load-bearing, zero-context-step

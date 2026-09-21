@@ -35,33 +35,19 @@ would start from 250k tokens of Research residue and end past 50%.
 
 ## Operating rules
 
-1. **One artifact per phase, on disk, in git.** A task worktree is exactly the right
-   place: the artifact lives on the task branch.
-2. **Never continue the same session across two phases.** Fresh session, clean
-   context, and as input only the previous phase's artifact (plus, if needed, one
-   from further upstream — but explicitly, not "everything").
-3. **The artifact must be self-contained.** Repo-root-relative paths, explicit symbol
-   names, line numbers. Never "the file we looked at earlier", never "as discussed
-   above".
-4. **The plan quality test:** an agent with **zero context** must be able to execute
-   it. If it needs to ask for clarification, the plan is incomplete and you are about
-   to pay a rework round.
-5. **Intra-phase compaction.** This also applies *inside* Implement on long tasks: at
-   ~40%, stop, have it write a `99-progress.md` (done / todo / unexpected discoveries
-   / decisions taken), close the session, reopen from there.
+The six rules — fresh session per phase, the artifact as the only channel,
+self-contained artifacts, the ticket kept out of Research, the 40% alarm, the human
+checkpoint — are the `qrspi` skill's `SKILL.md`, with the zero-context plan test that
+makes them checkable. Two of them carry the compression:
+
+- **The 40% alarm applies *inside* a phase too.** Long Implement runs stop at ~40%,
+  write `99-progress.md` (done / todo / unexpected / decisions), close, reopen from it.
+- **The ticket does not enter Research.** Hand the agent "add a field to the users
+  table" and it hunts for evidence that the field is needed instead of mapping the
+  problem. Research returns facts; the ticket returns in Design.
 
 Which facts survive the compression, and how to state them so a zero-context reader
-can act — the craft these rules assume — is the `handoff` skill.
-
-## Ticket context isolation
-
-A subtle but important QRSPI detail: **the original ticket text is not passed to
-Research.** The reason is to avoid *solution-first thinking* — if the Linear ticket
-says "add a field to the users table", the agent goes looking for evidence supporting
-that solution instead of mapping the problem.
-
-Research must produce objective facts about the codebase. The ticket comes back in
-Design, once the facts are on the table.
+can act, is the `handoff` skill.
 
 ## Why not one giant prompt
 

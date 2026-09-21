@@ -157,8 +157,9 @@ Do not weaken these when editing; they are the plugin's whole thesis.
   They are the likeliest thing here to be quietly wrong. Re-verify them against the
   current API reference rather than from memory, keep the `(cached: YYYY-MM-DD)` date
   on the model table honest, and treat a stale price as a bug: the whole skill argues
-  from those numbers. Last audited 2026-09-18 — three claims were wrong, two incomplete
-  (the Claude Code sections drift fastest: the harness ships weekly).
+  from those numbers. Last audited 2026-09-21, nothing wrong; the 2026-09-18 pass found
+  three wrong and two incomplete (the Claude Code sections drift fastest: the harness
+  ships weekly). Audit before every tag — #87 is the template.
 
 - **Versions must match** across [package.json](package.json),
   [.claude-plugin/plugin.json](.claude-plugin/plugin.json) and

@@ -39,7 +39,7 @@ Re-measure on the **same tasks** as week 1. It is the only valid comparison.
 
 # Reference numbers
 
-## Models (cached: 2026-09-18)
+## Models (cached: 2026-09-21)
 
 | Model | ID | Context | Input $/1M | Output $/1M |
 |---|---|---|---|---|

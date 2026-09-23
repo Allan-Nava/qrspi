@@ -157,7 +157,9 @@ Do not weaken these when editing; they are the plugin's whole thesis.
   They are the likeliest thing here to be quietly wrong. Re-verify them against the
   current API reference rather than from memory, keep the `(cached: YYYY-MM-DD)` date
   on the model table honest, and treat a stale price as a bug: the whole skill argues
-  from those numbers. Last audited 2026-09-21, nothing wrong; the 2026-09-18 pass found
+  from those numbers. Last audited 2026-09-23 (#92): one model arrived (Opus 5.5 — $4/$20,
+  cache read 0.05×, default effort `medium`, Claude Code's default since v2.1.280) and
+  two wordings were tightened; the 2026-09-21 pass found nothing, the 2026-09-18 pass
   three wrong and two incomplete (the Claude Code sections drift fastest: the harness
   ships weekly). Audit before every tag — #87 is the template.
 

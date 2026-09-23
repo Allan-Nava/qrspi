@@ -1,0 +1,7 @@
+interface:
+  display_name: "QRSPI: new task"
+  short_description: "Bootstrap thoughts/<task-id>/ and run the Questions phase"
+policy:
+  # Explicit `$qrspi-new` only. A phase command is user-driven and sequential; it
+  # must never be picked up because a prompt resembled it (README, "Two design notes").
+  allow_implicit_invocation: false

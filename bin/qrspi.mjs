@@ -18,6 +18,10 @@ const MARKETPLACE = 'allan-nava'
 const PLUGIN = 'qrspi'
 const SKILLS = ['qrspi', 'token-efficiency', 'handoff']
 const COMMANDS = ['new', 'next', 'review']
+// The same three, as Codex CLI skills under skills/qrspi-<name>/ — invoked there as
+// `$qrspi-<name>`, hidden in Claude Code by their frontmatter. `check` holds each to
+// its command's step list.
+const CODEX_SKILLS = COMMANDS
 
 const ESC = String.fromCharCode(27)
 const tty = process.stdout.isTTY && !process.env.NO_COLOR
@@ -294,7 +298,7 @@ const efforts = (set) => [...(set ?? [])].sort().join('+') || '\u2014'
 function check() {
   const problems = []
   const versions = new Set()
-  for (const f of ['package.json', '.claude-plugin/plugin.json', '.claude-plugin/marketplace.json']) {
+  for (const f of ['package.json', '.claude-plugin/plugin.json', '.claude-plugin/marketplace.json', '.codex-plugin/plugin.json']) {
     const p = join(ROOT, f)
     if (!existsSync(p)) {
       problems.push(`missing ${f}`)
@@ -386,6 +390,40 @@ function check() {
     }
   }
 
+  // Codex CLI reads skills only from skills/ at the plugin root and has no slash
+  // commands, so the three commands exist a second time as skills/qrspi-<name>/. In
+  // Claude Code they must be inert — the plugin's design note refuses one skill per
+  // phase — which two frontmatter flags guarantee; in Codex they must be explicit-only.
+  // The two copies share their step list, or a fix lands in one and not the other.
+  const stepTitles = (text) => [...text.matchAll(/^(?:\d+\.\s+\*\*(.+?)\*\*|## \d+\.\s+(.+)$)/gm)].map((m) => (m[1] ?? m[2]).replace(/[.:]\s*$/, '').trim())
+  for (const name of CODEX_SKILLS) {
+    const dir = join(ROOT, 'skills', `qrspi-${name}`)
+    const p = join(dir, 'SKILL.md')
+    if (!existsSync(p)) {
+      problems.push(`missing skills/qrspi-${name}/SKILL.md — the Codex CLI form of /qrspi:${name}`)
+      continue
+    }
+    const body = readFileSync(p, 'utf8')
+    const fm = body.split('---')[1] ?? ''
+    if (!new RegExp(`^name:\\s*qrspi-${name}\\s*$`, 'm').test(fm)) problems.push(`skills/qrspi-${name}/SKILL.md: frontmatter name must be qrspi-${name} — that is what \`$qrspi-${name}\` resolves`)
+    for (const flag of ['disable-model-invocation: true', 'user-invocable: false']) {
+      if (!fm.includes(flag)) problems.push(`skills/qrspi-${name}/SKILL.md: frontmatter lacks \`${flag}\` — without it Claude Code would load a per-phase skill beside /qrspi:${name}`)
+    }
+    if (body.includes('${CLAUDE_PLUGIN_ROOT}')) problems.push(`skills/qrspi-${name}/SKILL.md: uses \${CLAUDE_PLUGIN_ROOT}, which Codex does not set — paths are relative to the skill directory`)
+    const yaml = join(dir, 'agents', 'openai.yaml')
+    if (!existsSync(yaml) || !/allow_implicit_invocation:\s*false/.test(readFileSync(yaml, 'utf8'))) {
+      problems.push(`skills/qrspi-${name}/agents/openai.yaml must set policy.allow_implicit_invocation: false — a phase command is explicit-only`)
+    }
+    const cmd = join(ROOT, 'commands', `${name}.md`)
+    if (existsSync(cmd)) {
+      const a = stepTitles(readFileSync(cmd, 'utf8'))
+      const b = stepTitles(body)
+      if (a.join('\n') !== b.join('\n')) {
+        problems.push(`commands/${name}.md and skills/qrspi-${name}/SKILL.md disagree on their steps\n      command: ${a.join(' · ') || '(none)'}\n      skill:   ${b.join(' · ') || '(none)'}`)
+      }
+    }
+  }
+
   const refDir = join(ROOT, 'skills', 'qrspi', 'references')
   const refs = existsSync(refDir) ? readdirSync(refDir).filter(isPhase) : []
   if (!refs.length) problems.push('skills/qrspi/references/ is empty — /qrspi:new has nothing to copy')
@@ -439,7 +477,7 @@ function check() {
     for (const p of problems) console.error(`${c.red('x')} ${p}`)
     process.exit(1)
   }
-  say(`${c.green('ok')} — ${SKILLS.length} skills, ${COMMANDS.length} commands, ${refs.length} references, manifests in sync`)
+  say(`${c.green('ok')} — ${SKILLS.length} skills, ${COMMANDS.length} commands (+${CODEX_SKILLS.length} Codex forms), ${refs.length} references, manifests in sync`)
 }
 
 function help() {

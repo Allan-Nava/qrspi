@@ -1,6 +1,6 @@
 ---
 name: qrspi-next
-description: Codex CLI: detect which QRSPI phase a task is in and emit the exact prompt for the next one. Invoke explicitly as $qrspi-next; in Claude Code use /qrspi:next instead.
+description: Codex CLI: detect which QRSPI phase a task is in and emit the exact prompt for the next one. Use only when the user invokes it by name — `$qrspi:qrspi-next` — never because a prompt resembles it; in Claude Code the same command is /qrspi:next.
 argument-hint: [thoughts/<dir> — omitted if there is only one task]
 disable-model-invocation: true
 user-invocable: false
@@ -8,7 +8,7 @@ user-invocable: false
 
 # Advance a QRSPI task
 
-> **Codex CLI form of `/qrspi:next`.** Same steps, same gates. Paths below are
+> **Codex CLI form of `/qrspi:next`, invoked as `$qrspi:qrspi-next`.** Same steps, same gates. Paths below are
 > relative to the directory holding this `SKILL.md` (Codex tells you where the skill
 > lives); in shell snippets `$SKILL_DIR` stands for that directory — substitute the
 > absolute path. The phase references are the sibling skill's, `../qrspi/references/`.
@@ -62,7 +62,7 @@ For Implement, read `99-progress.md` to find the next unblocked step in the
 
 These gates are mechanical: they catch an artifact that is *unfinished*. For one that
 is finished and wrong — plausible, self-contained, resting on a false fact or a hidden
-decision — the judgement-level rubric is `$qrspi-review <file>`, backed by
+decision — the judgement-level rubric is `$qrspi:qrspi-review <file>`, backed by
 `../qrspi/references/reviewing.md`. Suggest it at the
 Design and Plan boundaries; do not run it here.
 

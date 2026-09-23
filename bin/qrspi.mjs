@@ -19,7 +19,7 @@ const PLUGIN = 'qrspi'
 const SKILLS = ['qrspi', 'token-efficiency', 'handoff']
 const COMMANDS = ['new', 'next', 'review']
 // The same three, as Codex CLI skills under skills/qrspi-<name>/ — invoked there as
-// `$qrspi-<name>`, hidden in Claude Code by their frontmatter. `check` holds each to
+// `$qrspi:qrspi-<name>` (Codex prefixes plugin skills), hidden in Claude Code by their frontmatter. `check` holds each to
 // its command's step list.
 const CODEX_SKILLS = COMMANDS
 
@@ -411,9 +411,16 @@ function check() {
     }
     if (body.includes('${CLAUDE_PLUGIN_ROOT}')) problems.push(`skills/qrspi-${name}/SKILL.md: uses \${CLAUDE_PLUGIN_ROOT}, which Codex does not set — paths are relative to the skill directory`)
     const yaml = join(dir, 'agents', 'openai.yaml')
-    if (!existsSync(yaml) || !/allow_implicit_invocation:\s*false/.test(readFileSync(yaml, 'utf8'))) {
-      problems.push(`skills/qrspi-${name}/agents/openai.yaml must set policy.allow_implicit_invocation: false — a phase command is explicit-only`)
+    if (!existsSync(yaml) || !/display_name:/.test(readFileSync(yaml, 'utf8'))) {
+      problems.push(`skills/qrspi-${name}/agents/openai.yaml with an interface.display_name is missing`)
     }
+    // Not `policy.allow_implicit_invocation: false`: Codex then drops the skill from the
+    // list the model sees, and `codex exec` never expands \`$name\`, so the skill would
+    // be unreachable outside the TUI's mention popup (measured 2026-09-23, 0.155.1).
+    if (existsSync(yaml) && /allow_implicit_invocation:\s*false/.test(readFileSync(yaml, 'utf8'))) {
+      problems.push(`skills/qrspi-${name}/agents/openai.yaml: allow_implicit_invocation: false hides the skill from the model in Codex — steer with the description instead`)
+    }
+    if (!/Use only when the user invokes it by name/.test(fm)) problems.push(`skills/qrspi-${name}/SKILL.md: the description must tell Codex to run it only on an explicit \`$qrspi:qrspi-${name}\` — that is what stands in for a slash command there`)
     const cmd = join(ROOT, 'commands', `${name}.md`)
     if (existsSync(cmd)) {
       const a = stepTitles(readFileSync(cmd, 'utf8'))

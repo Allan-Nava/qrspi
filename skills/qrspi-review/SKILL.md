@@ -1,6 +1,6 @@
 ---
 name: qrspi-review
-description: Codex CLI: review one QRSPI artifact for judgement-level weaknesses — finished-but-wrong, not unfinished — and report; edits nothing. Invoke explicitly as $qrspi-review; in Claude Code use /qrspi:review instead.
+description: Codex CLI: review one QRSPI artifact for judgement-level weaknesses — finished-but-wrong, not unfinished — and report; edits nothing. Use only when the user invokes it by name — `$qrspi:qrspi-review` — never because a prompt resembles it; in Claude Code the same command is /qrspi:review.
 argument-hint: thoughts/<dir>/<NN-artifact>.md
 disable-model-invocation: true
 user-invocable: false
@@ -8,7 +8,7 @@ user-invocable: false
 
 # Review a QRSPI artifact
 
-> **Codex CLI form of `/qrspi:review`.** Same steps, same gates. Paths below are
+> **Codex CLI form of `/qrspi:review`, invoked as `$qrspi:qrspi-review`.** Same steps, same gates. Paths below are
 > relative to the directory holding this `SKILL.md` (Codex tells you where the skill
 > lives); in shell snippets `$SKILL_DIR` stands for that directory — substitute the
 > absolute path. The phase references are the sibling skill's, `../qrspi/references/`.

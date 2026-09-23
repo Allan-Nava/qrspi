@@ -1,7 +1,7 @@
 interface:
   display_name: "QRSPI: next phase"
   short_description: "Detect the phase, gate on quality, emit the next prompt"
-policy:
-  # Explicit `$qrspi-next` only. A phase command is user-driven and sequential; it
-  # must never be picked up because a prompt resembled it (README, "Two design notes").
-  allow_implicit_invocation: false
+# No `policy.allow_implicit_invocation: false` here, deliberately: Codex drops such a
+# skill from the list the model sees, and `codex exec` does not expand `$name`, so the
+# skill would be unreachable outside the TUI's mention popup (measured 2026-09-23).
+# The description carries the "explicit only" instruction instead.

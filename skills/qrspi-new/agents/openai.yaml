@@ -1,0 +1,7 @@
+interface:
+  display_name: "QRSPI: new task"
+  short_description: "Bootstrap thoughts/<task-id>/ and run the Questions phase"
+# No explicit-only policy here, deliberately: Codex drops such a
+# skill from the list the model sees, and `codex exec` does not expand `$name`, so the
+# skill would be unreachable outside the TUI's mention popup (measured 2026-09-23).
+# The description carries the "explicit only" instruction instead.

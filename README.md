@@ -59,6 +59,24 @@ npx qrspi path                # print the plugin root
 npx qrspi check               # validate the package
 ```
 
+**Codex CLI** reads the same repository as a plugin — its marketplace file is the
+Claude Code one, which Codex accepts as a legacy marketplace, and the manifest is
+`.codex-plugin/plugin.json` beside `.claude-plugin/plugin.json`:
+
+```
+codex plugin marketplace add Allan-Nava/qrspi
+codex plugin add qrspi@allan-nava
+```
+
+Codex prefixes plugin skills with the plugin name: the three skills arrive as
+`$qrspi:qrspi`, `$qrspi:handoff`, `$qrspi:token-efficiency`; the three commands,
+which Codex has no slash-command form for, arrive as skills too — `$qrspi:qrspi-new`,
+`$qrspi:qrspi-next`, `$qrspi:qrspi-review` — whose descriptions tell Codex to run
+them only when named. Verified on Codex CLI 0.155.1, 2026-09-23. Two differences: Codex skills carry no tool allowlist, so Codex's own
+approval mode and sandbox govern what a phase may run; and rule 1 means a **new
+`codex` session** per phase — `codex exec` is one-shot by nature, the TUI needs a
+fresh start, and `codex resume` is the thing not to do.
+
 Pin a version with `npx qrspi@0.1.0 install`; `npm i -g qrspi` then `qrspi install`
 works too. Which route updates itself: the plugin route does, through `/plugin` —
 `npx` registers the marketplace from GitHub, because the npx cache it runs from is
@@ -71,6 +89,10 @@ is a snapshot — re-run `npx qrspi install` to update.
 /qrspi:new ENG-1234 <ticket text or URL>   # bootstrap thoughts/ + run the Questions phase
 /qrspi:next thoughts/ENG-1234-refund-flow  # detect the phase, emit the next prompt, gate on quality
 ```
+
+In Codex CLI the same two are `$qrspi:qrspi-new ENG-1234 <ticket>` and
+`$qrspi:qrspi-next thoughts/ENG-1234-refund-flow`, and `/qrspi:review <file>` is
+`$qrspi:qrspi-review <file>`.
 
 `/qrspi:next` refuses to advance when the upstream artifact is not ready — unresolved
 placeholders, a design with open review comments, a structure step with no

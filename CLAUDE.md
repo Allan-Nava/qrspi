@@ -58,7 +58,11 @@ evals/
 package.json           npm distribution; `bin` → bin/qrspi.mjs, `test` → qrspi check
 .claude-plugin/
   plugin.json          plugin manifest (name, version, author, keywords)
-  marketplace.json     single-plugin marketplace manifest for `/plugin marketplace add`
+  marketplace.json     single-plugin marketplace manifest for `/plugin marketplace add` —
+                       Codex CLI reads it too, as a legacy marketplace
+.codex-plugin/
+  plugin.json          the Codex CLI manifest: same name, version and description,
+                       `skills: ./skills/`; `npm test` holds the version to the others
 commands/
   new.md               /qrspi:new  — bootstrap thoughts/<dir> and run phase 0
   next.md              /qrspi:next — detect current phase, gate, emit the next prompt
@@ -88,6 +92,14 @@ skills/
   handoff/
     SKILL.md           the one test, what survives a reset, the failure modes by name
     references/        what-survives, load-bearing, zero-context-step
+  qrspi-new/ qrspi-next/ qrspi-review/
+    SKILL.md           the three commands in Codex CLI form (`$qrspi:qrspi-new`…): Codex
+                       has no slash commands and reads skills only from skills/, so they
+                       live here — inert in Claude Code (`disable-model-invocation`,
+                       `user-invocable: false`), steered to explicit use in Codex by
+                       their description. `npm test` holds each to its command's step
+                       list; paths are relative to the skill dir, never
+                       ${CLAUDE_PLUGIN_ROOT}
 README.md              user-facing pitch; overlaps SKILL.md numbers — keep in sync
 ```
 
@@ -131,6 +143,21 @@ Do not weaken these when editing; they are the plugin's whole thesis.
   in 198 negative runs (`evals/trigger/`, CONTRIBUTING has the numbers and the traps).
 - **Command frontmatter** carries `description`, `argument-hint`, and a tight
   `allowed-tools` list. Keep `allowed-tools` minimal; widen only with a reason.
+- **Each command has a Codex twin** in `skills/qrspi-<name>/SKILL.md`, because Codex
+  CLI has no slash commands, discovers skills only under `skills/`, and has deprecated
+  its custom prompts (learn.chatgpt.com/docs/custom-prompts, read 2026-09-23). The
+  twin is not a per-phase skill in the sense the design note refuses: its frontmatter
+  carries `disable-model-invocation: true` and `user-invocable: false`, so Claude Code
+  neither lists it nor spends a description on it. In Codex it is listed — under the
+  plugin-prefixed name `$qrspi:qrspi-<name>` — with a description that says to run it
+  only when named; **not** `policy.allow_implicit_invocation: false`, which drops the
+  skill from the list the model sees while `codex exec` never expands `$name`, so the
+  skill was unreachable outside the TUI's popup (measured 2026-09-23). Edit the
+  command, then mirror the change: `npm test` compares the two step lists and fails
+  when they drift. The twin addresses the phase references as
+  `../qrspi/references/` — relative to its own directory — never `${CLAUDE_PLUGIN_ROOT}`,
+  which Codex does not set; `npx qrspi install --copy` does not copy the twins, they
+  are for Codex.
 - **Plugin paths in commands use `${CLAUDE_PLUGIN_ROOT}`**, never a relative path.
 - **Template placeholders** are `<...>` and `_(to be filled …)_`, and every artifact
   ends with a `## Status` checkbox block. `/qrspi:next` greps for exactly these to
@@ -229,7 +256,11 @@ End-to-end check: install locally with `/plugin marketplace add .` then
 `/plugin install qrspi`, and run `/qrspi:new TEST-1 <some ticket>` in a scratch repo —
 it must create `thoughts/TEST-1-<slug>/` with six files (no `05-implement.md`), each
 with its H1 renamed and its `> **PROMPT` blockquote deleted, then **stop** without
-entering Research.
+entering Research. The same check under Codex CLI: `codex plugin marketplace add .`
+(the checkout is copied, uncommitted files included), `codex plugin add qrspi@allan-nava`,
+then in a scratch repo `codex exec --approve-for-me '$qrspi:qrspi-new TEST-1 <ticket>' < /dev/null`
+— same six files, same stop. After editing, `codex plugin remove qrspi@allan-nava` and add
+it again: the copy does not track the checkout.
 
 ## The site
 

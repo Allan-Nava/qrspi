@@ -13,8 +13,10 @@ client.messages.create(
 )
 ```
 
-Default: `high`. Lower effort means fewer preambles, more consolidated tool calls,
-terser confirmations, less thinking.
+Default: `high` on every model that takes `effort` — except Opus 5.5, which starts at
+`medium`, so a request that omits it runs one level lower there than on Opus 5. Lower
+effort means fewer preambles, more consolidated tool calls, terser confirmations, less
+thinking.
 
 ## Allocation per QRSPI phase
 
@@ -88,11 +90,13 @@ means it is set once at the boundary:
 | per subagent | `effort:` in the agent's frontmatter |
 
 `max` is session-only unless set through the environment variable — the settings keys
-accept `low` to `xhigh`. On a model without a level you asked for, the harness falls
+accept `low` to `xhigh`. Levels are saved per model under `modelSettings`, and a
+top-level `effortLevel` in *user* settings does not reach Opus 5.5 or anything newer:
+set it per model, or in project or managed settings, which apply to every model. On a model without a level you asked for, the harness falls
 back to the highest one it supports (`xhigh` runs as `high` on Opus 4.6); Haiku 4.5
 supports none, and there the lever is `MAX_THINKING_TOKENS`, which adaptive-reasoning
 models in turn ignore. `maxEffortLevel` caps it from any scope, including managed
-settings. On Fable 5.1 a mid-session `/effort` keeps the prompt cache (see
-`caching.md`); on every other model it starts one over. The phase
+settings. On Fable 5.1 and Opus 5.5 a mid-session `/effort` keeps the prompt cache
+(see `caching.md`); on every other model it starts one over. The phase
 prompts state their recommended effort; `claude --effort <level>` when opening the
 phase session is the cheapest way to honour it.

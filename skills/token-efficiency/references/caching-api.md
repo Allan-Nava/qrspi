@@ -22,8 +22,8 @@ It sits **after** the history, so the cached prefix stays intact. It is also the
 unforgeable operator channel (unlike a `<system-reminder>` inside a user turn, which
 anyone writing to user input can forge).
 
-Available on Opus 5, Opus 4.8, Fable 5, Fable 5.1, Mythos 5, Mythos 5.1. **Not on
-Sonnet 5** — there it returns 400 (`role 'system' is not supported on this model`);
+Available on Opus 5.5, Opus 5, Opus 4.8, Fable 5, Fable 5.1, Mythos 5, Mythos 5.1.
+**Not on Sonnet 5** — there it returns 400 (`role 'system' is not supported on this model`);
 catch it and fall back to a text block in the user turn.
 
 Constraints: it must follow a `user` message, cannot be `messages[0]`, and must be
@@ -64,7 +64,7 @@ Useful implication: `tool_choice` and images survive the tools+system cache, and
 tool changes and model changes force a full rebuild. **Thinking and effort do not
 belong in that sentence:** whether toggling them invalidates the upper tiers is
 model-specific, so do not assume a free per-request switch — measure it on the model
-you are on. On Opus 5, Fable 5.1 and Mythos 5.1 a `role: "system"` message carrying
+you are on. On Opus 5.5, Opus 5, Fable 5.1 and Mythos 5.1 a `role: "system"` message carrying
 `output_config: {effort: …}` and an empty `content` changes effort from that point
 without the messages-cache invalidation a top-level change causes (beta
 `mid-conversation-output-config-2026-07-01`).
@@ -86,6 +86,8 @@ response.diagnostics
 Pass `previous_message_id: None` on the first turn and the previous response's `id`
 on each one after — and send the beta header on **every** request, not just the one
 you are diagnosing: fingerprints are only stored for requests that carried it, so
-retrofitting it to a single call fails with `previous_message_not_found`. When the
+retrofitting it to a single call comes back with `cache_miss_reason.type:
+"previous_message_not_found"` — a diagnostic, not an error, and not evidence that the
+request changed. When the
 diagnostic is not available to you, fall back to diffing the rendered prompt bytes
 between two requests — the suspects table in `caching.md`.

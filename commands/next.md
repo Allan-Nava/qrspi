@@ -1,7 +1,7 @@
 ---
 description: Detect which QRSPI phase a task is in and emit the exact prompt for the next one
 argument-hint: [thoughts/<dir> — omitted if there is only one task]
-allowed-tools: Bash(ls *), Bash(grep *), Bash(head *), Bash(wc *), Bash(awk *), Read
+allowed-tools: Bash(ls *), Bash(grep *), Bash(head *), Bash(wc *), Bash(awk *), Bash(git log *), Read
 ---
 
 # Advance a QRSPI task
@@ -63,6 +63,12 @@ is finished and wrong — plausible, self-contained, resting on a false fact or 
 decision — the judgement-level rubric is `/qrspi:review <file>`, backed by
 `${CLAUDE_PLUGIN_ROOT}/skills/qrspi/references/reviewing.md`. Suggest it at the
 Design and Plan boundaries; do not run it here.
+
+Before the gates, check the previous artifact's **Written against:** commit. Run
+`git log --oneline <commit>..HEAD -- <the paths it cites>`, taking the paths from its
+tables; when that prints anything, list the commits and suggest `/qrspi:review` on the
+artifact — the code moved under it after it was written. This is a warning, not a
+refusal: the human decides whether the artifact still holds.
 
 Refuse to advance, and say which artifact needs work, if:
 

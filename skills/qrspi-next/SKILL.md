@@ -73,6 +73,12 @@ decision — the judgement-level rubric is `$qrspi:qrspi-review <file>`, backed 
 `../qrspi/references/reviewing.md`. Suggest it at the
 Design and Plan boundaries; do not run it here.
 
+Before the gates, check the previous artifact's **Written against:** commit. Run
+`git log --oneline <commit>..HEAD -- <the paths it cites>`, taking the paths from its
+tables; when that prints anything, list the commits and suggest `/qrspi:review` on the
+artifact — the code moved under it after it was written. This is a warning, not a
+refusal: the human decides whether the artifact still holds.
+
 Refuse to advance, and say which artifact needs work, if:
 
 - the previous artifact still has unresolved placeholders or unticked Status boxes;

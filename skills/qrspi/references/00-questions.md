@@ -1,5 +1,7 @@
 # 00 · Questions — <TASK-ID> <title>
 
+**Written against:** `<commit — git rev-parse --short HEAD when this phase ran>`
+
 > **PROMPT (fresh session, clean context)**
 >
 > You are in the **Questions** phase of the QRSPI workflow.

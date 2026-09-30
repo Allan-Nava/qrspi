@@ -41,7 +41,8 @@ checkpoint; this is what to look for.
 - Tests listed without a run command, or a run command nobody ran.
 - Blind spots empty, or "Facts that contradict the assumptions" empty. Real research
   contradicts something.
-- Line numbers from a stale checkout. Check the commit the research was done against.
+- Line numbers from a stale checkout. Check the commit the research was done against
+  (**Written against:**) and `git log --oneline <commit>..HEAD -- <cited paths>`.
 
 ### `02-design.md`
 
@@ -55,6 +56,10 @@ checkpoint; this is what to look for.
   belongs in "More research needed".
 - Impact rows left blank instead of saying "none, because…". Blank is unexamined.
 - Reversibility unanswered. The irreversible decisions are the ones to argue about.
+- **Overtaken by the code.** `git log --oneline <Written against>..HEAD -- <cited paths>`
+  lists what landed since. A decision already implemented, superseded by a shipped
+  change, or contradicted by "What we are NOT doing" is a comment, even when the
+  artifact reads clean.
 
 ### `03-structure.md`
 
@@ -75,6 +80,8 @@ checkpoint; this is what to look for.
   input.
 - "Do NOT touch" absent where the research showed shared code. Somebody will touch it.
 - Rollback missing or "revert the commit" for a change with a migration.
+- Line numbers and signatures from before the steps planned earlier land: every edit
+  should also be anchored by quoted text, or the executor will patch the wrong place.
 - The zero-context test, taken seriously: pick a step and ask whether a session with
   **only this file** could execute it. If you had to remember something, it is not in
   the file.

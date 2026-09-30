@@ -1,5 +1,7 @@
 # 01 · Research — <TASK-ID> <title>
 
+**Written against:** `<commit — git rev-parse --short HEAD when this phase ran>`
+
 > **PROMPT (fresh session, clean context)**
 >
 > You are in the **Research** phase of the QRSPI workflow.

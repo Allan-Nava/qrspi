@@ -18,11 +18,11 @@ npm test             # == node bin/qrspi.mjs check
 npm run build:site   # writes site/dist/index.html, gitignored
 ```
 
-`npm test` validates what the plugin runtime and the installer both depend on: the
-three manifests agree on a version, skill frontmatter is present, each `SKILL.md`
-stays index-sized, every `${CLAUDE_PLUGIN_ROOT}` reference is one copy mode can
-rewrite, and each phase reference still carries the checkboxes `/qrspi:next` greps
-for. CI runs it, the site build and `npm pack --dry-run` on every pull request.
+`npm test` validates what the plugin runtime and the installer both depend on — the
+four manifests agree on a version, skill frontmatter, index-sized `SKILL.md` files,
+rewritable `${CLAUDE_PLUGIN_ROOT}` references, the phase gates' markers — and the
+content rules the repo states; CLAUDE.md, "Verifying a change", has the full list. CI
+runs it, the site build and `npm pack --dry-run` on every pull request.
 
 ### Measuring what the plugin costs
 
@@ -237,8 +237,9 @@ release and the milestone closed.
 **Per release:**
 
 ```bash
-# 1. bump the version in all three manifests — they must agree
-#    package.json · .claude-plugin/plugin.json · .claude-plugin/marketplace.json
+# 1. bump the version in all four manifests — they must agree — and the lockfile
+#    package.json · .claude-plugin/plugin.json · .claude-plugin/marketplace.json ·
+#    .codex-plugin/plugin.json; then  npm install --package-lock-only
 npm test                       # fails if they disagree
 npm pack --dry-run             # inspect what would ship
 

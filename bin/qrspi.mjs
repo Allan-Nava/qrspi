@@ -465,6 +465,8 @@ function check() {
     const rows = table.split('\n').filter((l) => /^\| /.test(l) && !/^\| Step \|/.test(l) && !/^\|---/.test(l))
     for (const r of rows) if (!/^\| <[^>]+> \|/.test(r)) problems.push(`skills/qrspi/references/99-progress.md: a Step status row is example state, not a placeholder: ${r.slice(0, 60)} (#98)`)
     if (/\*\*Current step:\*\* (?!<)/.test(pr)) problems.push('skills/qrspi/references/99-progress.md: "Current step" names a real step; it must be a placeholder (#98)')
+  }
+
   // #99: nothing public carries a local machine's layout. A file URL or an absolute home
   // path in a tracked text file names the maintainer's disk (the social card did).
   const scanDirs = ['README.md', 'CLAUDE.md', 'AGENTS.md', 'CONTRIBUTING.md', 'assets', 'commands', 'skills', 'evals', 'scripts', 'site/build.mjs', 'bin', '.github']

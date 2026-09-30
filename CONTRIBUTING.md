@@ -33,7 +33,7 @@ doing any work — can be settled without running a task:
 ANTHROPIC_API_KEY=sk-ant-… node scripts/measure-context-cost.mjs
 ```
 
-It reports the permanent cost (the two `description` lines, in context every session
+It reports the permanent cost (the three `description` lines, in context every session
 whether a skill fires or not), the cost of each `SKILL.md` on trigger, each reference
 on demand, and the artifact templates. Counts come from `count_tokens` and are
 model-specific — pass `--model` to compare. No dependencies, and it is excluded from

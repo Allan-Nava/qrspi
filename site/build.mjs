@@ -137,6 +137,9 @@ ${linkifyPaths(dropEmptyHead(marked.parse(s.body)))}
 function renderInventory() {
   const groups = []
   for (const skill of readdirSync(join(ROOT, 'skills'))) {
+    // The Codex twins (skills/qrspi-*) are commands in skill form, hidden from Claude Code
+    // by `user-invocable: false`; the page lists the skills a reader installs (#100).
+    if (/^user-invocable:\s*false\s*$/m.test(readFileSync(join(ROOT, 'skills', skill, 'SKILL.md'), 'utf8'))) continue
     const refDir = join(ROOT, 'skills', skill, 'references')
     const refs = existsSync(refDir) ? readdirSync(refDir).filter((f) => f.endsWith('.md')) : []
     const desc = (readFileSync(join(ROOT, 'skills', skill, 'SKILL.md'), 'utf8').match(/^description:\s*([\s\S]*?)\n(?=\w+:|---)/m)?.[1] ?? '')

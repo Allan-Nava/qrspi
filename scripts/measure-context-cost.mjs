@@ -19,7 +19,12 @@ import { join, dirname, basename } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
-const SKILLS = ['qrspi', 'token-efficiency']
+// Every skill whose description sits in context — not the Codex twins, which Claude
+// Code hides with `user-invocable: false` (#101: handoff had been left out).
+const SKILLS = readdirSync(join(ROOT, 'skills')).filter((s) => {
+  const f = join(ROOT, 'skills', s, 'SKILL.md')
+  return existsSync(f) && !/^user-invocable:\s*false\s*$/m.test(readFileSync(f, 'utf8'))
+})
 const ENDPOINT = 'https://api.anthropic.com/v1/messages/count_tokens'
 
 const argv = process.argv.slice(2)

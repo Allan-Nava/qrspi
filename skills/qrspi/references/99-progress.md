@@ -12,10 +12,8 @@
 
 | Step | Status | Session | Commit | Note |
 |---|---|---|---|---|
-| S1 | ✅ done | 1 | `abc1234` | |
-| S2 | 🔄 in progress | 2 | — | stopped at 42% context |
-| S3 | ⏸️ blocked | — | — | see Deviations D1 |
-| S4 | ⬜ todo | — | — | |
+| <S1> | ⬜ todo | — | — | |
+| <S2> | ⬜ todo | — | — | |
 
 Legend: ⬜ todo · 🔄 in progress · ✅ done · ⏸️ blocked · ❌ failed
 
@@ -23,7 +21,7 @@ Legend: ⬜ todo · 🔄 in progress · ✅ done · ⏸️ blocked · ❌ failed
 
 ## Where I left off
 
-**Current step:** S2
+**Current step:** <S1>
 
 **Done so far:**
 - <what has been written, with paths>
@@ -32,7 +30,7 @@ Legend: ⬜ todo · 🔄 in progress · ✅ done · ⏸️ blocked · ❌ failed
 - <the exact next executable step>
 
 **Modified but uncommitted files:**
-- `src/...` — <what>
+- `<path>` — <what>
 
 ---
 
@@ -52,15 +50,15 @@ go to a follow-up or a replanning round.
 Points where the plan was wrong or incomplete. Every line here signals an upstream
 artifact that needs correcting.
 
-### D1 · <title>
+### D<n> · <title>
 
 - **The plan said:** <...>
 - **Reality is:** <...> (`path:line`)
 - **What I did:** stopped / deviated with approval / <...>
-- **Artifact to fix:** `04-plan.md` § S3
+- **Artifact to fix:** <`04-plan.md` § Sn, or the upstream artifact>
 - **Re-enter:** none / Structure / Design / Research / Questions — see `recovery.md`
-- **Landed steps:** S1 keep · S2 adapt (new step) · S3 revert (`<sha>`)
-- **Status:** open / resolved — <corrected artifact § entry, commit>
+- **Landed steps:** <per landed step: keep / adapt / revert (`<sha>`)>
+- **Status:** <open / resolved> — <corrected artifact § entry, commit>
 
 ---
 
@@ -68,8 +66,7 @@ artifact that needs correcting.
 
 | Command | When | Result |
 |---|---|---|
-| `pytest tests/services/test_x.py -q` | S1 | ✅ 12 passed |
-| `make test` | S1 | ✅ |
+| `<command>` | <step> | <result> |
 
 ---
 
@@ -77,5 +74,4 @@ artifact that needs correcting.
 
 | Session | Step | Peak context | Note |
 |---|---|---|---|
-| 1 | S1 | 28% | |
-| 2 | S2 | 42% | stopped at threshold |
+| <session> | <step> | <peak context> | |

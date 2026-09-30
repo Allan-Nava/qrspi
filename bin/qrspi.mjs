@@ -446,6 +446,27 @@ function check() {
     }
   }
 
+  // #97: /qrspi:next counts only the boxes under '## Status'. A Plan's per-step acceptance
+  // criteria stay open until Implement, so a whole-file count never lets a finished Plan
+  // pass. Both the command and its Codex twin must keep the Status-scoped count.
+  for (const f of ['commands/next.md', 'skills/qrspi-next/SKILL.md']) {
+    if (!existsSync(join(ROOT, f))) continue
+    const t = readFileSync(join(ROOT, f), 'utf8')
+    if (t.includes("grep -c '\\[ \\]' thoughts/")) problems.push(`${f}: counts every unticked box in the file — a finished 04-plan.md keeps its acceptance criteria open, so count only under '## Status' (#97)`)
+    if (!t.includes('/^## Status/{s=1}')) problems.push(`${f}: the phase-detection count must be scoped to the '## Status' block (#97)`)
+  }
+
+  // #98: the progress template is copied into every task and read by /qrspi:next for the
+  // next unblocked step, so its step table may hold placeholders only — a made-up row
+  // there reads as state.
+  if (existsSync(join(refDir, '99-progress.md'))) {
+    const pr = readFileSync(join(refDir, '99-progress.md'), 'utf8')
+    const table = pr.split(/^## /m).find((sec) => sec.startsWith('Step status')) ?? ''
+    const rows = table.split('\n').filter((l) => /^\| /.test(l) && !/^\| Step \|/.test(l) && !/^\|---/.test(l))
+    for (const r of rows) if (!/^\| <[^>]+> \|/.test(r)) problems.push(`skills/qrspi/references/99-progress.md: a Step status row is example state, not a placeholder: ${r.slice(0, 60)} (#98)`)
+    if (/\*\*Current step:\*\* (?!<)/.test(pr)) problems.push('skills/qrspi/references/99-progress.md: "Current step" names a real step; it must be a placeholder (#98)')
+  }
+
   // The pipeline diagram, duplicated in three files.
   const drawn = ['README.md', 'skills/qrspi/SKILL.md', 'skills/token-efficiency/references/compaction.md'].map(
     (f) => ({ f, rows: existsSync(join(ROOT, f)) ? pipelineRows(readFileSync(join(ROOT, f), 'utf8')) : null }),

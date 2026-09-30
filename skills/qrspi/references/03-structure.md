@@ -63,19 +63,18 @@ Design: [`02-design.md`](./02-design.md)
 ## Dependency graph
 
 ```
-S1 ──┬── S2 ──── S4
-     └── S3 ──────┘
+<the steps above and their edges, e.g.  S1 ──┬── S2
+                                              └── S3>
 ```
 
-**Parallelisable:** S2 and S3 (separate worktrees, no shared files).
+**Parallelisable:** <steps that can run on separate worktrees, and why — no shared files>.
 
 ---
 
 ## Recommended execution order
 
-1. S1
-2. S2 ‖ S3
-3. S4
+1. <S1>
+2. <S2 ‖ S3 — parallel steps on one line>
 
 ---
 

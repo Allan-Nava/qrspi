@@ -15,12 +15,13 @@ the only one; if there are several, ask which.
 ls -la thoughts/<dir>/
 ```
 
-A file counts as **complete** when its `## Status` checkboxes are ticked and its
+A file counts as **complete** when the checkboxes under its `## Status` heading are ticked —
+not the others: a Plan's per-step acceptance criteria stay open until Implement — and its
 placeholders (`<...>`, `_(to be filled`) are gone. A file that is still the untouched
 template counts as **not started**. Check with:
 
 ```bash
-grep -c '\[ \]' thoughts/<dir>/0*.md
+awk 'FNR==1{s=0; n[FILENAME]+=0} /^## Status/{s=1} s && /\[ \]/{n[FILENAME]++} END{for (f in n) print n[f], f}' thoughts/<dir>/0*.md
 grep -l '_(to be filled' thoughts/<dir>/*.md
 ```
 

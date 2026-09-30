@@ -21,6 +21,14 @@ The test: **would the same author, with the same inputs, have made the same mist
 If yes, the mistake is upstream of the author — go there. If no, it is a slip in the
 plan and stays local.
 
+## When a phase session stalls
+
+A phase session that is killed — a stall, a watchdog, a crash — has not failed the
+task: if it wrote as it went, as every phase prompt asks, the partial artifact is on
+disk. Start a fresh session on the same phase with the partial artifact as extra input
+and one instruction: continue it, section by section, and do not redo what is written.
+Only a session that wrote nothing starts over.
+
 ## Stop, record, close
 
 In the Implement session that found it, before anything else:

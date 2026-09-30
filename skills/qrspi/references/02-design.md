@@ -18,6 +18,11 @@
 > Recommended effort: `xhigh`.
 >
 > Target: under 250 lines.
+>
+> **Write as you go.** Create the artifact with its section headings first, then fill
+> each section as soon as it is settled — never compose it all at the end. A session
+> that stalls or is cut off then leaves a partial artifact the next session continues,
+> not nothing.
 
 This is the main human checkpoint. Correcting 200 lines of markdown costs
 infinitely less than correcting 2000 lines of wrong code.

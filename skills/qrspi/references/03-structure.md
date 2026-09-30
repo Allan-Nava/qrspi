@@ -23,6 +23,11 @@
 > Do NOT write the detailed plan: that is the Plan phase. Decomposition only.
 >
 > Recommended effort: `high`.
+>
+> **Write as you go.** Create the artifact with its section headings first, then fill
+> each section as soon as it is settled — never compose it all at the end. A session
+> that stalls or is cut off then leaves a partial artifact the next session continues,
+> not nothing.
 
 ---
 

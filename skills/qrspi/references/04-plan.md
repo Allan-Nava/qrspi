@@ -26,6 +26,11 @@
 >
 > **Do not paste existing code.** Cite `path:line`. Write new code only for
 > signatures and for cases where the exact shape *is* the decision.
+>
+> **Write as you go.** Create the artifact with its section headings first, then fill
+> each section as soon as it is settled — never compose it all at the end. A session
+> that stalls or is cut off then leaves a partial artifact the next session continues,
+> not nothing.
 
 ---
 

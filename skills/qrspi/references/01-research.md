@@ -25,6 +25,11 @@
 > has to understand it. Never "the file from before", never "as seen above".
 >
 > Target: under 300 lines. If you overflow, you are pasting code.
+>
+> **Write as you go.** Create the artifact with its section headings first, then fill
+> each section as soon as it is settled — never compose it all at the end. A session
+> that stalls or is cut off then leaves a partial artifact the next session continues,
+> not nothing.
 
 This is the most expensive phase and the one with the highest compression ratio
 (~30-50×). It is also the one that most needs subagents.

@@ -63,7 +63,9 @@ whose `## Interfaces the later steps rely on` sections it reads. The last group'
 prompt also assembles the parts into `04-plan.md` (the rule is in `04-plan.md`).
 
 For Implement, read `99-progress.md` to find the next unblocked step in the
-`03-structure.md` dependency order, and name that specific step in the prompt.
+`03-structure.md` dependency order whose **Who** is `agent`, and name that specific
+step in the prompt. List the unblocked `human` and `live` steps separately, for the
+user: they are not a prompt for an agent.
 
 ## 3. Gate before emitting
 

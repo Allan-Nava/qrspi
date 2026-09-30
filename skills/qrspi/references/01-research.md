@@ -121,7 +121,7 @@ letters. It is the most valuable output of the phase.
 - [ ] Research complete
 - [ ] Self-contained (explicit paths, no reference to session context)
 - [ ] Zero solution proposals
-- [ ] Reviewed
+- [ ] Reviewed (<date>, <who>)
 
 > **Compression ratio:** <tokens burned> → <artifact tokens> = <N>×
 > Next phase: **Design**. It receives: this file + `00-questions.md` + the ticket.

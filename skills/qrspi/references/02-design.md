@@ -116,8 +116,8 @@ Facts the design assumes but `01-research.md` did not verify:
 - [ ] Design written
 - [ ] Anchored to research facts (every claim has a path)
 - [ ] Alternatives documented
-- [ ] Reviewed by the team
+- [ ] Reviewed by the team (<date>, <who>, <how: read in full / summary / automated review>)
 - [ ] Comments resolved
-- [ ] Approved
+- [ ] Approved (<date>, <who>, <how: in writing / in chat / in review>)
 
 > Next phase: **Structure**. It receives: this file only.

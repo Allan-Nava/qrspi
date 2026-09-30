@@ -1,7 +1,7 @@
 ---
 description: Review one QRSPI artifact for judgement-level weaknesses — finished-but-wrong, not unfinished — and report; edits nothing
 argument-hint: thoughts/<dir>/<NN-artifact>.md
-allowed-tools: Bash(ls *), Bash(grep *), Read
+allowed-tools: Bash(ls *), Bash(grep *), Bash(git log *), Read
 ---
 
 # Review a QRSPI artifact

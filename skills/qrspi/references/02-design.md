@@ -1,5 +1,7 @@
 # 02 · Design — <TASK-ID> <title>
 
+**Written against:** `<commit — git rev-parse --short HEAD when this phase ran>`
+
 > **PROMPT (fresh session, clean context)**
 >
 > You are in the **Design** phase of the QRSPI workflow.
@@ -18,6 +20,11 @@
 > Recommended effort: `xhigh`.
 >
 > Target: under 250 lines.
+>
+> **Write as you go.** Create the artifact with its section headings first, then fill
+> each section as soon as it is settled — never compose it all at the end. A session
+> that stalls or is cut off then leaves a partial artifact the next session continues,
+> not nothing.
 
 This is the main human checkpoint. Correcting 200 lines of markdown costs
 infinitely less than correcting 2000 lines of wrong code.
@@ -109,8 +116,8 @@ Facts the design assumes but `01-research.md` did not verify:
 - [ ] Design written
 - [ ] Anchored to research facts (every claim has a path)
 - [ ] Alternatives documented
-- [ ] Reviewed by the team
+- [ ] Reviewed by the team (<date>, <who>, <how: read in full / summary / automated review>)
 - [ ] Comments resolved
-- [ ] Approved
+- [ ] Approved (<date>, <who>, <how: in writing / in chat / in review>)
 
 > Next phase: **Structure**. It receives: this file only.

@@ -1,5 +1,7 @@
 # 04 · Plan — <TASK-ID> <title>
 
+**Written against:** `<commit — git rev-parse --short HEAD when this phase ran>`
+
 > **PROMPT (fresh session, clean context)**
 >
 > You are in the **Plan** phase of the QRSPI workflow.
@@ -26,6 +28,21 @@
 >
 > **Do not paste existing code.** Cite `path:line`. Write new code only for
 > signatures and for cases where the exact shape *is* the decision.
+>
+> **When the Structure is too big for one session** — as a rule of thumb more than
+> eight steps, or a plan you can see running past ~1,500 lines — plan it in groups, in
+> dependency order, one fresh session per group. Each group writes
+> `04-plan.part-<first>-<last>.md` (e.g. `04-plan.part-S1-S5.md`) and ends it with
+> `## Interfaces the later steps rely on`: every signature, config key, log field and
+> output line a later step builds on, stated exactly. A later group reads the earlier
+> parts' interfaces sections, not their step sections. When the last group is done,
+> assemble the parts into `04-plan.md` — one Minimum context, the steps in order, one
+> Rollback, the interfaces kept as an appendix, one Status — and delete the parts.
+>
+> **Write as you go.** Create the artifact with its section headings first, then fill
+> each section as soon as it is settled — never compose it all at the end. A session
+> that stalls or is cut off then leaves a partial artifact the next session continues,
+> not nothing.
 
 ---
 

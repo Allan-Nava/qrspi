@@ -56,8 +56,16 @@ awk 'f && !/^>/ {exit} /^> \*\*PROMPT/ {f=1} f' \
 | …`03` | Plan | `02` + `03` | `xhigh` / `max` |
 | …`04` | Implement | `04` § next step + `99` | `high` / `xhigh` |
 
+For Plan, count the steps in `03-structure.md`. More than eight: emit one Plan prompt
+per group instead — steps in dependency order, about five to a group — each naming its
+steps, the part file it writes (`04-plan.part-<first>-<last>.md`) and the earlier parts
+whose `## Interfaces the later steps rely on` sections it reads. The last group's
+prompt also assembles the parts into `04-plan.md` (the rule is in `04-plan.md`).
+
 For Implement, read `99-progress.md` to find the next unblocked step in the
-`03-structure.md` dependency order, and name that specific step in the prompt.
+`03-structure.md` dependency order whose **Who** is `agent`, and name that specific
+step in the prompt. List the unblocked `human` and `live` steps separately, for the
+user: they are not a prompt for an agent.
 
 ## 3. Gate before emitting
 
@@ -67,6 +75,12 @@ decision — the judgement-level rubric is `$qrspi:qrspi-review <file>`, backed 
 `../qrspi/references/reviewing.md`. Suggest it at the
 Design and Plan boundaries; do not run it here.
 
+Before the gates, check the previous artifact's **Written against:** commit. Run
+`git log --oneline <commit>..HEAD -- <the paths it cites>`, taking the paths from its
+tables; when that prints anything, list the commits and suggest `/qrspi:review` on the
+artifact — the code moved under it after it was written. This is a warning, not a
+refusal: the human decides whether the artifact still holds.
+
 Refuse to advance, and say which artifact needs work, if:
 
 - the previous artifact still has unresolved placeholders or unticked Status boxes;
@@ -75,7 +89,8 @@ Refuse to advance, and say which artifact needs work, if:
 - **Structure → Plan** and any step lacks a verification command — that is an
   intention, not a step;
 - **Plan → Implement** and `04-plan.md` fails the zero-context test: missing exact
-  paths, missing function signatures, or test cases without expected outputs;
+  paths, missing function signatures, or test cases without expected outputs — or it
+  does not exist yet while `04-plan.part-*.md` files do: assemble them first;
 - `99-progress.md` has an open deviation pointing at an upstream artifact — that
   artifact gets fixed first, not worked around. Emit the prompt for the phase its
   **Re-enter** field names, scoped to the deviation, per

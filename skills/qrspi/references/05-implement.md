@@ -45,7 +45,13 @@ for each step S in topological order:
     └── close the session
 ```
 
-Parallelisable steps → separate worktrees, one session each.
+Parallelisable steps → separate worktrees, one session each. With sessions running in
+parallel, **one owner** keeps `99-progress.md` — the session that merges; step sessions
+do not edit it, or every merge conflicts on the one file meant to carry state. Each
+step session ends by reporting instead: its commit, the verification output, the test
+counts, and any deviation in the form `99-progress.md` uses (plan said / reality is /
+artifact to fix). The owner records it and merges one branch at a time, rebasing in
+between.
 
 ---
 

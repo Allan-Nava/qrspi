@@ -1,5 +1,7 @@
 # 03 · Structure — <TASK-ID> <title>
 
+**Written against:** `<commit — git rev-parse --short HEAD when this phase ran>`
+
 > **PROMPT (fresh session, clean context)**
 >
 > You are in the **Structure** phase of the QRSPI workflow.
@@ -18,11 +20,19 @@
 > **The test:** if you cannot say *how a step is verified*, it is not a step — it is
 > an intention. Rewrite it.
 >
-> Mark which steps can run in parallel on separate worktrees.
+> Mark which steps can run in parallel on separate worktrees, and **who** runs each:
+> `agent`, `human`, or `live` (needs a real harness or real time — a live run, a week
+> of use). A human or live step is verified by a written observation; say where it is
+> recorded and give the grep that proves it was.
 >
 > Do NOT write the detailed plan: that is the Plan phase. Decomposition only.
 >
 > Recommended effort: `high`.
+>
+> **Write as you go.** Create the artifact with its section headings first, then fill
+> each section as soon as it is settled — never compose it all at the end. A session
+> that stalls or is cut off then leaves a partial artifact the next session continues,
+> not nothing.
 
 ---
 
@@ -39,6 +49,8 @@ Design: [`02-design.md`](./02-design.md)
 - **Goal:** <one line>
 - **Touches:** `src/...`, `tests/...`
 - **Depends on:** — (none)
+- **Who:** agent — or `human` / `live` (a real harness, or real time); such a step is
+  verified by a written observation: say where it is recorded and the grep that checks it
 - **Verify:** `pytest tests/test_x.py -q` passes
 - **Repo state after:** working, feature not yet exposed
 
@@ -47,6 +59,7 @@ Design: [`02-design.md`](./02-design.md)
 - **Goal:**
 - **Touches:**
 - **Depends on:** S1
+- **Who:**
 - **Verify:**
 - **Repo state after:**
 
@@ -55,6 +68,7 @@ Design: [`02-design.md`](./02-design.md)
 - **Goal:**
 - **Touches:**
 - **Depends on:** S1
+- **Who:**
 - **Verify:**
 - **Repo state after:**
 

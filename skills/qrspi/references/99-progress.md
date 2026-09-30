@@ -1,6 +1,7 @@
 # 99 · Progress — <TASK-ID> <title>
 
-> Shared state across Implement sessions. **Update it before closing every session.**
+> Shared state across Implement sessions. **Update it before closing every session** —
+> or, with sessions in parallel, report to the one owner who does (`05-implement.md`).
 > This is the intra-phase compaction artifact: when context passes 40%, this file is
 > all that carries over to the next session.
 >

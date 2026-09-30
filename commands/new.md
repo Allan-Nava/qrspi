@@ -1,7 +1,7 @@
 ---
 description: Bootstrap a QRSPI task — create thoughts/<task-id>/ from the phase templates and run the Questions phase
 argument-hint: <TASK-ID> [ticket text, URL, or nothing]
-allowed-tools: Bash(mkdir *), Bash(cp *), Bash(ls *), Bash(rm *), Read, Write, Edit
+allowed-tools: Bash(mkdir *), Bash(cp *), Bash(ls *), Read, Write, Edit
 ---
 
 # Bootstrap a QRSPI task

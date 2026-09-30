@@ -310,7 +310,8 @@ passes. Tags are outside the rule, which is why `claude plugin tag . --push` sti
 works. Renaming a CI job renames a required check: update the ruleset in the same
 change or the next pull request cannot merge.
 
-- Conventional Commits (`feat:`, `fix:`, `docs:`, `ci:`), imperative subject.
+- A plain imperative subject that says what changed ("Scope the phase gate to the Status
+  block"), the issue number in the pull request; squash merges keep one commit per PR.
 - Keep `npm test` green; add a check to `bin/qrspi.mjs check` when you add an invariant.
 - If you change `README.md`, run `npm run build:site` and look at the result — the
   site is generated from it, and the hero reads the first prose paragraph.

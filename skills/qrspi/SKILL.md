@@ -19,7 +19,7 @@ become a reviewable, diffable record of the decision.
 Questions   ~15k burned    →  00-questions.md   (~1k)
 Research    150-250k       →  01-research.md    (~5k)
 Design      starts at 6k   →  02-design.md      (~4k)
-Structure   starts at 9k   →  03-structure.md   (~3k)
+Structure   starts at 4k   →  03-structure.md   (~3k)
 Plan        starts at 12k  →  04-plan.md        (~6k)
 Implement   starts at 7k   →  code + PR
 ```

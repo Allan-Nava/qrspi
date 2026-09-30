@@ -15,7 +15,8 @@
 //
 // The phase is read off the session itself: /qrspi:next prints a prompt that opens
 // "You are in the **Research** phase", and that text is the first user message of
-// the fresh session. Sessions that did not start that way show "—".
+// the fresh session; a scoped re-entry ("You are re-entering the **Design** phase",
+// recovery.md) shows as "Design (re)". Sessions that did not start either way show "—".
 //
 //   node scripts/measure-run.mjs ~/.claude/projects/<slug>/          every session there
 //   node scripts/measure-run.mjs a.jsonl b.jsonl                     just these
@@ -35,11 +36,18 @@ if (!paths.length) {
   process.exit(1)
 }
 
-const files = paths.flatMap((p) =>
-  statSync(p).isDirectory()
-    ? readdirSync(p).filter((f) => f.endsWith('.jsonl')).map((f) => join(p, f))
-    : [p],
-)
+// #114: a path that is not there ends in one line, not a stack. The likeliest cause is a
+// shell that did not split a variable into words (zsh), passing many paths as one.
+const files = paths.flatMap((p) => {
+  let st
+  try {
+    st = statSync(p)
+  } catch {
+    console.error(`measure-run: cannot read ${p}${/\s/.test(p) ? ' — several paths in one argument? pass each separately' : ''}`)
+    process.exit(1)
+  }
+  return st.isDirectory() ? readdirSync(p).filter((f) => f.endsWith('.jsonl')).map((f) => join(p, f)) : [p]
+})
 
 const text = (content) =>
   typeof content === 'string' ? content : (content ?? []).map((b) => b.text ?? '').join('\n')
@@ -51,8 +59,10 @@ function measure(file) {
     let e
     try { e = JSON.parse(line) } catch { continue }
     if (e.type === 'user' && s.phase === '—') {
-      const m = text(e.message?.content).match(/You are in the \*\*(\w+)\*\* phase|\/qrspi:(new)\b/)
-      if (m) s.phase = m[1] ?? 'Questions'
+      // A scoped re-entry (recovery.md) opens "You are re-entering the **Design** phase"
+      // and is shown with "(re)", so its cost is not mistaken for the first pass (#114).
+      const m = text(e.message?.content).match(/You are (in|re-entering) the \*\*(\w+)\*\* phase|\/qrspi:(new)\b/)
+      if (m) s.phase = m[2] ? `${m[2]}${m[1] === 're-entering' ? ' (re)' : ''}` : 'Questions'
     }
     const u = e.message?.usage
     if (e.type !== 'assistant' || !u) continue
@@ -79,7 +89,7 @@ const n = (x) => x.toLocaleString('en-GB')
 const pct = (a, b) => (b ? `${((100 * a) / b).toFixed(1)}%` : '—')
 const cols = ['phase', 'session', 'turns', 'peak ctx', 'of window', 'output', 'uncached in', 'cache write', 'cache read', 'hit']
 const data = rows.map((s) => [
-  s.phase, basename(s.file).slice(0, 8), n(s.turns), n(s.peak), pct(s.peak, WINDOW),
+  s.phase, basename(s.file, '.jsonl'), n(s.turns), n(s.peak), pct(s.peak, WINDOW),
   n(s.output), n(s.input), n(s.write), n(s.read), pct(s.read, s.read + s.input),
 ])
 const total = rows.reduce((t, s) => ({ output: t.output + s.output, input: t.input + s.input, write: t.write + s.write, read: t.read + s.read }), { output: 0, input: 0, write: 0, read: 0 })

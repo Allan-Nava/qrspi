@@ -104,7 +104,8 @@ render of `assets/social-preview.html` (CLAUDE.md has the exact command).
   `npm test` compares the two step lists. The twins address the phase references as
   `../qrspi/references/`, never `${CLAUDE_PLUGIN_ROOT}`, which Codex does not set.
 - Commands reference plugin files via `${CLAUDE_PLUGIN_ROOT}`, never relative paths, and
-  keep `allowed-tools` minimal.
+  keep `allowed-tools` minimal (`next` and `review` may run `git log`, read-only, for the
+  **Written against:** check).
 - Artifact templates use `<...>` / `_(to be filled …)_` placeholders and end in a
   `## Status` checkbox block; `/qrspi:next` reads those to detect phase completion, and
   counts only the boxes under `## Status`. Do not change the markers in isolation.

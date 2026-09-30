@@ -144,7 +144,9 @@ Do not weaken these when editing; they are the plugin's whole thesis.
   *diagnosing cost*, or the two compete — measured not to, 2026-09-18: 0 false triggers
   in 198 negative runs (`evals/trigger/`, CONTRIBUTING has the numbers and the traps).
 - **Command frontmatter** carries `description`, `argument-hint`, and a tight
-  `allowed-tools` list. Keep `allowed-tools` minimal; widen only with a reason.
+  `allowed-tools` list. Keep `allowed-tools` minimal; widen only with a reason. The one
+  widening so far: `/qrspi:next` and `/qrspi:review` may run `git log` (read-only) to
+  compare an artifact's **Written against:** commit with what landed since (#111).
 - **Each command has a Codex twin** in `skills/qrspi-<name>/SKILL.md`, because Codex
   CLI has no slash commands, discovers skills only under `skills/`, and has deprecated
   its custom prompts (learn.chatgpt.com/docs/custom-prompts, read 2026-09-23). The

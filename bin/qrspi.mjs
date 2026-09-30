@@ -467,6 +467,20 @@ function check() {
     if (/\*\*Current step:\*\* (?!<)/.test(pr)) problems.push('skills/qrspi/references/99-progress.md: "Current step" names a real step; it must be a placeholder (#98)')
   }
 
+  // #111, #112: an artifact records the commit it was written against, so /qrspi:next can
+  // warn when the cited code moved; every Structure step says who runs it, so Implement
+  // routing can skip the human and live ones.
+  for (const f of ['00-questions.md', '01-research.md', '02-design.md', '03-structure.md', '04-plan.md']) {
+    if (existsSync(join(refDir, f)) && !readFileSync(join(refDir, f), 'utf8').includes('**Written against:**')) problems.push(`skills/qrspi/references/${f}: no '**Written against:**' line — /qrspi:next checks it for code that moved under the artifact (#111)`)
+  }
+  if (existsSync(join(refDir, '03-structure.md'))) {
+    const st = readFileSync(join(refDir, '03-structure.md'), 'utf8')
+    for (const block of st.split(/^### /m).slice(1).filter((b) => /^S\d+ /.test(b))) if (!/^- \*\*Who:\*\*/m.test(block)) problems.push(`skills/qrspi/references/03-structure.md: step ${block.split(' ')[0]} has no '- **Who:**' line (#112)`)
+  }
+  for (const f of ['commands/next.md', 'skills/qrspi-next/SKILL.md']) {
+    if (existsSync(join(ROOT, f)) && !readFileSync(join(ROOT, f), 'utf8').includes('**Written against:**')) problems.push(`${f}: the gate no longer checks the previous artifact's Written against commit (#111)`)
+  }
+
   // #99: nothing public carries a local machine's layout. A file URL or an absolute home
   // path in a tracked text file names the maintainer's disk (the social card did).
   const scanDirs = ['README.md', 'CLAUDE.md', 'AGENTS.md', 'CONTRIBUTING.md', 'assets', 'commands', 'skills', 'evals', 'scripts', 'site/build.mjs', 'bin', '.github']

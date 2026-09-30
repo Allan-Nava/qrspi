@@ -131,8 +131,10 @@ Do not weaken these when editing; they are the plugin's whole thesis.
   `references/` and is loaded on demand. A skill that preaches context economy while
   spending 9k tokens on every trigger refutes itself.
 - **Skill frontmatter** is only `name` + `description`. The `description` sits in
-  context permanently for every installed skill, so it must be one dense sentence of
-  trigger conditions — not a summary.
+  context permanently for every installed skill, so it names what the skill covers in
+  one clause and then its trigger conditions (`Use when…`), no longer than triggering
+  needs. It is judged by measurement, not by sentence count: any change to a description
+  is re-run against `evals/trigger/` and its false-trigger rate dated in CONTRIBUTING.
 - **Do not add one skill per phase.** This was decided deliberately (README, "Two
   design notes"): six near-identical descriptions would burn the permanent budget and
   compete to trigger. Phases are sequential and user-driven, so they are *commands*.

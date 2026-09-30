@@ -95,8 +95,9 @@ render of `assets/social-preview.html` (CLAUDE.md has the exact command).
 - `SKILL.md` is an **index** (~100 lines); detail belongs in `references/`, loaded on
   demand. The skills must practise the context economy they document.
 - Skill frontmatter is `name` + `description` (the twins add `disable-model-invocation`
-  and `user-invocable`). The description is permanently in context, so write trigger
-  conditions, not a summary.
+  and `user-invocable`). The description is permanently in context: one clause on what
+  the skill covers, then its trigger conditions, and any change re-measured against
+  `evals/trigger/`.
 - Do not split the phases into one skill each — a deliberate decision; the phases are
   commands precisely to keep their descriptions out of permanent context.
 - **Edit a command, then mirror it into its twin** in `skills/qrspi-<name>/SKILL.md`;

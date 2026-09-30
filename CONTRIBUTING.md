@@ -77,13 +77,20 @@ artifact's token count from `scripts/measure-context-cost.mjs`.
 
 ## Trigger evals for the skills
 
-`evals/trigger/<skill>.json` holds twenty realistic prompts per skill — nine that should
-trigger it, eleven that should not — in the format the `skill-creator` skill's
-`run_eval.py` consumes: `[{"query", "should_trigger"}]`. The negatives are near-misses
-on purpose: the `handoff` set's negatives include the cost-diagnosis prompts that belong
-to `token-efficiency`, and vice versa, because the two descriptions border each other
-and the README's bar for a third skill was that they must not compete. This is the
-executable form of #25's done-when.
+`evals/trigger/<skill>.json` holds realistic prompts per skill — nine that should
+trigger it and eleven to thirteen that should not — in the format the `skill-creator`
+skill's `run_eval.py` consumes: `[{"query", "should_trigger"}]`. The negatives are
+near-misses on purpose: the `handoff` set's negatives include the cost-diagnosis
+prompts that belong to `token-efficiency`, and vice versa, because the two descriptions
+border each other and the README's bar for a third skill was that they must not
+compete. This is the executable form of #25's done-when.
+
+The same border runs between `qrspi` and `token-efficiency` — both speak of the 40%
+rule and compaction — and on 2026-09-30 it gained cross-negatives in both directions
+(#106): the 40% rule and auto-compact asked as questions belong to `token-efficiency`;
+closing a phase session at 42% and asking for the next prompt belongs to `qrspi`. That
+border has **not been measured yet**: the 198-run result below covers `handoff` against
+`token-efficiency` only.
 
 To run one:
 

@@ -21,7 +21,7 @@ because the second saves a tenth of what the first does.
 
 - [ ] Move all research into subagents with an imposed output format.
 - [ ] Apply the per-phase effort table (`effort.md`).
-- [ ] Put Haiku 4.5 on the reading subagents.
+- [ ] Put the reading subagents on Sonnet 5 at `low` effort — Haiku 4.5 rejects `effort` (`effort.md`).
 
 ## Week 4 — Caching and hygiene
 
@@ -39,7 +39,7 @@ Re-measure on the **same tasks** as week 1. It is the only valid comparison.
 
 # Reference numbers
 
-## Models (cached: 2026-09-23)
+## Models (cached: 2026-09-30)
 
 | Model | ID | Context | Input $/1M | Output $/1M |
 |---|---|---|---|---|
@@ -52,8 +52,10 @@ Re-measure on the **same tasks** as week 1. It is the only valid comparison.
 | Claude Haiku 4.5 | `claude-haiku-4-5` | 200K | $1.00 | $5.00 |
 
 Output = 5× input across the board. This is why `effort` is a bigger lever than it
-looks. Opus 5.5 is Claude Code's default model since v2.1.280 and defaults to `medium`
-effort; every other model defaults to `high`.
+looks. Opus 5.5 is Claude Code's default model since v2.1.280 (unless the account's best
+model is Fable and available) and defaults to `medium` effort on the API; every other
+model defaults to `high` there. Claude Code may set its own per-model default above that
+(`xhigh` for some tiers) — check `/effort` rather than assume.
 
 ## Other cost levers
 
@@ -74,7 +76,8 @@ effort; every other model defaults to `high`.
 | Task budgets | `task-budgets-2026-03-13` |
 | Cache diagnostics | `cache-diagnosis-2026-04-07` |
 | Mid-conversation tool changes (by reference) | `mid-conversation-tool-changes-2026-07-01` |
-| Mid-conversation tool changes (full definition inline) | `inline-tools-2026-09-15` |
+| Mid-conversation tool changes (full definition inline) | `inline-tools-2026-09-15` — sent by Claude Code; not in the API reference as of 2026-09-30 |
+| Fast mode (`speed: "fast"`, Claude API only) | `fast-mode-2026-02-01` |
 | Per-message effort (`role: "system"`, empty content) | `mid-conversation-output-config-2026-07-01` |
 | Turn-scoped system messages (`clear_at`) | `mid-conversation-system-clear-at-2026-08-21` |
 

@@ -77,8 +77,11 @@ def log_usage(phase: str, turn: int, resp) -> None:
         "total_input": total_in,
         # 1_000_000 = Opus 5 context window
         "ctx_pct": round(100 * total_in / 1_000_000, 1),
+        # KPI 4 as SKILL.md defines it: reads over reads plus uncached input —
+        # cache writes are left out, as scripts/measure-run.mjs does.
         "cache_hit_pct": round(
-            100 * (u.cache_read_input_tokens or 0) / max(total_in, 1), 1),
+            100 * (u.cache_read_input_tokens or 0)
+            / max((u.cache_read_input_tokens or 0) + u.input_tokens, 1), 1),
     }) + "\n")
 ```
 

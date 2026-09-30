@@ -20,7 +20,8 @@ itself. Get it wrong and no amount of `cache_control` markers saves you.
 - **Do not change the tool set mid-session.** Tools render at position 0. If you need
   a "mode", pass it as message content, not by swapping tools. The one sanctioned way
   to add a tool without a rebuild is the mid-conversation tool changes beta
-  (`mid-conversation-tool-changes-2026-07-01`, Opus 5 onward): the tool is declared
+  (`mid-conversation-tool-changes-2026-07-01` — Opus 5.5, Opus 5, Opus 4.8, Fable 5,
+  Fable 5.1, Mythos 5 and 5.1; not Sonnet 5, not on Microsoft Foundry): the tool is declared
   up front with `defer_loading: true` and enabled later by a `tool_addition` block, so
   the prefix never moves; with `inline-tools-2026-09-15` as well, the block may carry
   the full definition instead of a reference.
@@ -116,5 +117,8 @@ messages, so they are cache-safe too.
 
 None of these are reasons not to do the thing — they are reasons to do it at a phase
 boundary, where the cache is being rebuilt anyway. Subagents have their own entry and
-their own bucket: five minutes even on a subscription, unless `subagentPromptCacheTtl`
-or `cacheTtl` under `experimental` in the agent's frontmatter says `1h`.
+their own bucket: five minutes even on a subscription, unless something sets `1h` —
+the `subagentPromptCacheTtl` settings key (overridden by the
+`CLAUDE_CODE_SUBAGENT_PROMPT_CACHE_TTL` environment variable), `ENABLE_PROMPT_CACHING_1H=1`,
+or `experimental.cacheTtl` in the agent's frontmatter, which is ignored while a
+subscription is in overage (read off the Claude Code 2.1.281 binary, 2026-09-30).

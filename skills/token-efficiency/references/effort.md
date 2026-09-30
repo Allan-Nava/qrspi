@@ -43,10 +43,13 @@ across the whole implementation; a Research error gets caught by the Design revi
 
 On every current model except Haiku 4.5 use `thinking: {type: "adaptive"}` — Claude
 decides how much to think. Haiku 4.5 still takes `{type: "enabled", budget_tokens: N}`
-(minimum 1024, and less than `max_tokens`). `budget_tokens` is **removed** on Opus 5 /
-4.8 / 4.7, Sonnet 5, Fable 5 and Fable 5.1 (returns 400). On Opus 5 and the Fable
-models thinking is **on by default**: omit the parameter and it still runs adaptive.
-On Fable 5.1 it cannot be turned off at all — `{type: "disabled"}` is a 400.
+(minimum 1024, and less than `max_tokens`). `budget_tokens` is **removed** on Opus 5.5 /
+5 / 4.8 / 4.7, Sonnet 5, Fable 5 and Fable 5.1 (returns 400). On Opus 5.5, Opus 5,
+Sonnet 5 and the Fable models thinking is **on by default**: omit the parameter and it
+still runs adaptive. On **Opus 5.5** — Claude Code's default — and Fable 5.1 it cannot be
+turned off at all: `{type: "disabled"}` and `budget_tokens` are both a 400 at every
+effort level, so effort is the only control over how much it thinks. (Opus 5 still
+accepts `disabled` at effort `high` or below; that does not carry over to 5.5.)
 
 Do not disable thinking to save tokens: on Opus 5 with `thinking: {type: "disabled"}`
 the model can write a tool call in **visible text** instead of a `tool_use` block —

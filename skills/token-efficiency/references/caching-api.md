@@ -26,8 +26,9 @@ Available on Opus 5.5, Opus 5, Opus 4.8, Fable 5, Fable 5.1, Mythos 5, Mythos 5.
 **Not on Sonnet 5** — there it returns 400 (`role 'system' is not supported on this model`);
 catch it and fall back to a text block in the user turn.
 
-Constraints: it must follow a `user` message, cannot be `messages[0]`, and must be
-the last element or be followed by an `assistant` turn.
+Constraints: it must follow a `user` message (or an `assistant` turn that ends in
+server-tool use), carry text content only, cannot be `messages[0]`, and must be the last
+element or be followed by an `assistant` turn.
 
 ## Two agent-loop-specific gotchas
 
@@ -67,7 +68,7 @@ model-specific, so do not assume a free per-request switch — measure it on the
 you are on. On Opus 5.5, Opus 5, Fable 5.1 and Mythos 5.1 a `role: "system"` message carrying
 `output_config: {effort: …}` and an empty `content` changes effort from that point
 without the messages-cache invalidation a top-level change causes (beta
-`mid-conversation-output-config-2026-07-01`).
+`mid-conversation-output-config-2026-07-01`; Claude API only).
 
 ## Cache diagnostics
 

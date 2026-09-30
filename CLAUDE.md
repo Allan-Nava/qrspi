@@ -131,8 +131,10 @@ Do not weaken these when editing; they are the plugin's whole thesis.
   `references/` and is loaded on demand. A skill that preaches context economy while
   spending 9k tokens on every trigger refutes itself.
 - **Skill frontmatter** is only `name` + `description`. The `description` sits in
-  context permanently for every installed skill, so it must be one dense sentence of
-  trigger conditions — not a summary.
+  context permanently for every installed skill, so it names what the skill covers in
+  one clause and then its trigger conditions (`Use when…`), no longer than triggering
+  needs. It is judged by measurement, not by sentence count: any change to a description
+  is re-run against `evals/trigger/` and its false-trigger rate dated in CONTRIBUTING.
 - **Do not add one skill per phase.** This was decided deliberately (README, "Two
   design notes"): six near-identical descriptions would burn the permanent budget and
   compete to trigger. Phases are sequential and user-driven, so they are *commands*.
@@ -172,11 +174,12 @@ Do not weaken these when editing; they are the plugin's whole thesis.
   leaves them alone. The extraction stops at the first line that does not start with
   `>`, so the block must be **contiguous**: a blank line inside it must be a bare `>`,
   never empty, or everything after it is silently dropped from the printed prompt.
-- **Numbers appear in three places** — [README.md](README.md), the budget/phase
-  tables in [skills/qrspi/SKILL.md](skills/qrspi/SKILL.md), and the routing table in
-  [commands/next.md](commands/next.md). Change one, change all three. `npm test`
-  compares the pipeline diagram and the effort tables for you; the context budgets
-  are still on your honour.
+- **Numbers are duplicated, and `npm test` compares them.** The pipeline diagram is in
+  [README.md](README.md), [skills/qrspi/SKILL.md](skills/qrspi/SKILL.md) and
+  [compaction.md](skills/token-efficiency/references/compaction.md); the per-phase effort
+  table is in SKILL.md, [commands/next.md](commands/next.md) and
+  [effort.md](skills/token-efficiency/references/effort.md). Change a row, change it in
+  all three of its files. The context budgets live in SKILL.md alone.
 - **The API claims in `token-efficiency/references/` are dated.** `caching.md`,
   `effort.md`, `measuring.md` and `playbook.md` assert model IDs, prices, minimum
   cacheable prefixes, an invalidation matrix, effort and thinking parameters, and beta
@@ -184,16 +187,20 @@ Do not weaken these when editing; they are the plugin's whole thesis.
   They are the likeliest thing here to be quietly wrong. Re-verify them against the
   current API reference rather than from memory, keep the `(cached: YYYY-MM-DD)` date
   on the model table honest, and treat a stale price as a bug: the whole skill argues
-  from those numbers. Last audited 2026-09-30 (#108): no price or model row changed; Opus 5.5 was missing from the thinking rules in `effort.md` (it cannot disable thinking), and six claims were tightened or marked unverified. Before that, 2026-09-23 (#92): one model arrived (Opus 5.5 — $4/$20,
-  cache read 0.05×, default effort `medium`, Claude Code's default since v2.1.280) and
-  two wordings were tightened; the 2026-09-21 pass found nothing, the 2026-09-18 pass
-  three wrong and two incomplete (the Claude Code sections drift fastest: the harness
-  ships weekly). Audit before every tag — #87 is the template.
+  from those numbers. Last audited 2026-09-30 (#108): no price or model row changed;
+  Opus 5.5 was missing from the thinking rules in `effort.md` (it cannot disable
+  thinking), and six claims were tightened or marked unverified. Before that, 2026-09-23
+  (#92): one model arrived (Opus 5.5 — $4/$20, cache read 0.05×, default effort
+  `medium`, Claude Code's default since v2.1.280) and two wordings were tightened; the
+  2026-09-21 pass found nothing, the 2026-09-18 pass three wrong and two incomplete (the
+  Claude Code sections drift fastest: the harness ships weekly). Audit before every tag
+  — #87 is the template.
 
-- **Versions must match** across [package.json](package.json),
-  [.claude-plugin/plugin.json](.claude-plugin/plugin.json) and
-  [.claude-plugin/marketplace.json](.claude-plugin/marketplace.json). `npm test`
-  fails if they drift.
+- **Versions must match** across the four manifests — [package.json](package.json),
+  [.claude-plugin/plugin.json](.claude-plugin/plugin.json),
+  [.claude-plugin/marketplace.json](.claude-plugin/marketplace.json) and
+  [.codex-plugin/plugin.json](.codex-plugin/plugin.json) — and the lockfile follows.
+  `npm test` fails if the manifests drift.
 - **Copy mode never deletes what it did not write.** It drops a
   `.qrspi-installed` marker in each directory it creates and refuses an unmarked
   target without `--force` — see `unmanaged()` in [bin/qrspi.mjs](bin/qrspi.mjs).
@@ -230,7 +237,7 @@ There is nothing to build. The one automated check is the installer's own:
 npm test                  # == node bin/qrspi.mjs check
 ```
 
-It validates the three manifests and their versions, skill frontmatter, SKILL.md
+It validates the four manifests and their versions, skill frontmatter, SKILL.md
 length, every `${CLAUDE_PLUGIN_ROOT}` reference, the `> **PROMPT` blockquote that
 `/qrspi:next` prints and `/qrspi:new` strips, and the checkbox markers that
 `/qrspi:next` greps for. It also enforces the content rules this file states and
@@ -323,7 +330,7 @@ Regenerate it whenever the card's text goes stale. `assets/` is deliberately **n
 ## Releasing
 
 The runbook lives in [CONTRIBUTING.md](CONTRIBUTING.md#releasing) — one home, so it
-cannot drift. In short: bump the version in all three manifests, `npm test`, then
+cannot drift. In short: bump the version in all four manifests, `npm test`, then
 `claude plugin tag . --push`. The tag triggers
 [.github/workflows/release.yml](.github/workflows/release.yml), which publishes to npm
 with provenance, cuts the GitHub release and closes the matching milestone. It authenticates to npm over OIDC (Trusted Publishing) — there is no npm token in

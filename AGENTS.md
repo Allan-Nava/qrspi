@@ -1,63 +1,75 @@
 # AGENTS.md
 
-Instructions for any coding agent working in this repository.
-Claude Code users: see [CLAUDE.md](CLAUDE.md) for the longer version — this file is
-the vendor-neutral subset and the two must agree.
+Instructions for any coding agent working in this repository — Codex CLI reads this
+file. Claude Code users: see [CLAUDE.md](CLAUDE.md) for the longer version; this file
+is the vendor-neutral subset and the two must agree.
 
 ## Project
 
-`qrspi` is a **Claude Code plugin** distributed as Markdown and JSON. No build step,
-no dependencies. The deliverable is prompt text; the only executable file is
-`bin/qrspi.mjs`, the `npx qrspi` installer that puts that text where Claude Code
-finds it.
+`qrspi` is a **Claude Code and Codex CLI plugin** distributed as Markdown and JSON. No
+build step, no dependencies. The deliverable is prompt text; the only executable file
+the package ships is `bin/qrspi.mjs`, the `npx qrspi` installer.
 
 It implements QRSPI — Questions → Research → Spec (Design + Structure) → Plan →
-Implement — a phase-gated workflow where each phase writes one self-contained
-artifact to disk and the next phase starts from a fresh session reading only that
-artifact ("intentional compaction"). A second skill, `token-efficiency`, documents
-the reasoning: measurement, compaction ratios, subagents as context firewalls, effort
-allocation, prompt caching, tool hygiene, KPIs.
+Implement — a phase-gated workflow where each phase writes one self-contained artifact
+to disk and the next phase starts from a fresh session reading only that artifact
+("intentional compaction"). It ships three skills and three commands:
+
+- `skills/qrspi/` — the workflow index and the phase references.
+- `skills/token-efficiency/` — the reasoning: measurement, compaction ratios, subagents
+  as context firewalls, effort allocation, prompt caching, tool hygiene, KPIs.
+- `skills/handoff/` — how to write an artifact that survives a context reset; it
+  triggers outside QRSPI too.
+- `commands/new.md`, `next.md`, `review.md` — `/qrspi:new`, `/qrspi:next`,
+  `/qrspi:review` in Claude Code. Codex has no slash commands, so each has a twin skill
+  in `skills/qrspi-new/`, `qrspi-next/`, `qrspi-review/`, invoked by name
+  (`$qrspi:qrspi-new`) and hidden from Claude Code (`user-invocable: false`).
 
 ## Layout
 
 | Path | Role |
 |---|---|
 | `package.json` | npm distribution: `bin` → `bin/qrspi.mjs`, `test` → `qrspi check` |
-| `assets/logo.svg` | the mark — single source for favicon, site, README |
-| `assets/social-preview.*` | OG card: `.html` is the source, `.png` is rendered from it |
-| `site/build.mjs` | generates the GitHub Pages site from `README.md`, plus `sitemap.xml` and JSON-LD |
-| `scripts/measure-context-cost.mjs` | `count_tokens` over the plugin's own text; not shipped to npm |
-| `.github/workflows/ci.yml` | `npm test` + site build + `npm pack` on PRs and `main` |
-| `.github/workflows/release.yml` | on tag `qrspi--v*`: npm publish, GitHub release, close milestone |
-| `.github/workflows/pages.yml` | builds and deploys that site on push to `main` |
 | `bin/qrspi.mjs` | installer CLI: `install` / `uninstall` / `path` / `check`; copy mode guards unmarked directories |
-| `.claude-plugin/plugin.json` | plugin manifest |
-| `.claude-plugin/marketplace.json` | marketplace manifest (`source: "./"`) |
-| `commands/new.md` | `/qrspi:new` — bootstrap `thoughts/<dir>`, run phase 0, stop |
-| `commands/next.md` | `/qrspi:next` — detect phase, gate on quality, emit next prompt |
-| `skills/qrspi/SKILL.md` | workflow index: 6 rules, phase table, context budgets |
-| `skills/qrspi/references/0*.md` | per-phase prompt **and** artifact template |
-| `skills/qrspi/references/99-progress.md` | implement-phase state file template |
-| `skills/token-efficiency/` | reference skill, index + 8 reference files |
-| `README.md` | user-facing pitch; shares numbers with `skills/qrspi/SKILL.md` |
+| `.claude-plugin/plugin.json` | Claude Code plugin manifest |
+| `.claude-plugin/marketplace.json` | marketplace manifest (`source: "./"`); Codex reads it as a legacy marketplace |
+| `.codex-plugin/plugin.json` | Codex CLI plugin manifest (`skills: ./skills/`) |
+| `commands/*.md` | the three Claude Code commands; each command emits a prompt or a report and stops |
+| `skills/qrspi/SKILL.md` | workflow index: rules, phase table, context budgets |
+| `skills/qrspi/references/0*.md` | per-phase prompt **and** artifact template (05 is a prompt only) |
+| `skills/qrspi/references/99-progress.md` | Implement-phase state file template |
+| `skills/qrspi/references/{recovery,reviewing,landing}.md` | guides: re-entry, the review rubric, landing a PR |
+| `skills/token-efficiency/` | reference skill: index + 9 reference files |
+| `skills/handoff/` | craft skill: index + 3 reference files |
+| `skills/qrspi-{new,next,review}/SKILL.md` | the commands in Codex skill form; paths relative to their own directory |
+| `evals/trigger/` | should/should-not-trigger prompts per skill; not shipped |
+| `scripts/measure-context-cost.mjs` | `count_tokens` over the plugin's own text (needs a key); not shipped |
+| `scripts/measure-run.mjs` | KPIs 1, 3, 4 of a real run from session transcripts; not shipped |
+| `site/build.mjs` | generates the GitHub Pages site from `README.md`, plus `sitemap.xml` and JSON-LD |
+| `assets/` | the logo (single source) and the social card (`.html` source, `.png` render); not shipped |
+| `.github/workflows/ci.yml` | `npm test` on Node 18/20/22/24, a copy-mode round trip, site build, `npm pack` |
+| `.github/workflows/release.yml` | on tag `qrspi--v*`: npm publish over OIDC, GitHub release, close milestone |
+| `.github/workflows/release-drift.yml` | fails when `main` carries a version with no tag for two hours |
+| `.github/workflows/pages.yml` | builds and deploys the site on push to `main` |
 
-`skills/qrspi/references/*.md` serve double duty: `/qrspi:new` copies them into the
-user's `thoughts/<task-id>-<slug>/` as artifact skeletons, and their top `> PROMPT`
-blockquote is the prompt for that phase.
+`skills/qrspi/references/0*.md` serve double duty: their top `> **PROMPT` blockquote is
+the prompt for that phase, and `/qrspi:new` copies the rest into the user's
+`thoughts/<task-id>-<slug>/` as the artifact skeleton, prompt block deleted.
 
 ## Build, test, run
 
-No build. One automated check — CI runs it on every pull request, run it locally
-before every commit:
+No build. One automated check — CI runs it on every pull request; run it locally
+before every commit, and read its exit code rather than the tail of its output:
 
 ```bash
 npm test        # == node bin/qrspi.mjs check
 ```
 
-It validates the three manifests and their versions, skill frontmatter and length,
-every `${CLAUDE_PLUGIN_ROOT}` reference, the checkbox markers `/qrspi:next` greps
-for, the `## Status` block in every artifact template, and the two tables that are
-duplicated across files — the pipeline diagram and the per-phase effort allocation. Manual end-to-end, safe because it writes to a throwaway config dir:
+It validates the four manifests and their versions, skill frontmatter and length,
+every `${CLAUDE_PLUGIN_ROOT}` reference, the prompt blocks and the markers the phase
+gates read, the command/twin step parity, and the content rules the repository states
+(CLAUDE.md, "Verifying a change", has the full list). Manual end-to-end, safe because
+it writes to a throwaway config dir:
 
 ```bash
 npm pack --dry-run
@@ -67,41 +79,48 @@ CLAUDE_CONFIG_DIR=/tmp/fake node bin/qrspi.mjs install --copy
 ## The site
 
 `npm run build:site` writes `site/dist/index.html` (gitignored) from `README.md` plus
-the skills read off disk. The page carries no prose of its own: to change its text,
-edit the README. `marked` is a devDependency used only by the generator — the
-published package stays dependency-free.
+the skills read off disk (the Codex twins left out). The page carries no prose of its
+own: to change its text, edit the README. `marked` is a devDependency used only by the
+generator — the published package stays dependency-free.
 
 ## Brand
 
 `assets/logo.svg` is the only copy of the mark: the site inlines it as favicon and
-draws it in header and hero, the README links the raw GitHub URL. Terracotta
-`#b7552f`, 64×64 grid, must stay readable at 16px. `assets/social-preview.png` is a
-headless-Chrome render of `assets/social-preview.html` (see CLAUDE.md for the exact
-command); `assets/` is not shipped in the npm tarball.
+draws it in header and hero, the README links the raw GitHub URL. Terracotta `#b7552f`,
+64×64 grid, must stay readable at 16px. `assets/social-preview.png` is a headless-Chrome
+render of `assets/social-preview.html` (CLAUDE.md has the exact command).
 
 ## Editing rules
 
 - `SKILL.md` is an **index** (~100 lines); detail belongs in `references/`, loaded on
   demand. The skills must practise the context economy they document.
-- Skill frontmatter is `name` + `description` only. The description is permanently in
-  context, so write trigger conditions, not a summary.
-- Do not split the phases into one skill each — this was a deliberate decision; the
-  phases are slash commands precisely to keep descriptions out of permanent context.
-- Commands reference plugin files via `${CLAUDE_PLUGIN_ROOT}`, never relative paths.
-- Keep `allowed-tools` in command frontmatter minimal.
+- Skill frontmatter is `name` + `description` (the twins add `disable-model-invocation`
+  and `user-invocable`). The description is permanently in context: one clause on what
+  the skill covers, then its trigger conditions, and any change re-measured against
+  `evals/trigger/`.
+- Do not split the phases into one skill each — a deliberate decision; the phases are
+  commands precisely to keep their descriptions out of permanent context.
+- **Edit a command, then mirror it into its twin** in `skills/qrspi-<name>/SKILL.md`;
+  `npm test` compares the two step lists. The twins address the phase references as
+  `../qrspi/references/`, never `${CLAUDE_PLUGIN_ROOT}`, which Codex does not set.
+- Commands reference plugin files via `${CLAUDE_PLUGIN_ROOT}`, never relative paths, and
+  keep `allowed-tools` minimal.
 - Artifact templates use `<...>` / `_(to be filled …)_` placeholders and end in a
-  `## Status` checkbox block; `commands/next.md` greps for these markers to detect
-  phase completion. Do not change the markers in isolation.
-- Numbers (context budgets, phase/effort table) appear in `README.md`,
-  `skills/qrspi/SKILL.md` and `commands/next.md` — update all three together.
-- Keep the version in sync across `package.json` and the two `.claude-plugin/*.json`
-  manifests (`npm test` enforces it).
+  `## Status` checkbox block; `/qrspi:next` reads those to detect phase completion, and
+  counts only the boxes under `## Status`. Do not change the markers in isolation.
+- The duplicated numbers: the pipeline diagram (README, `skills/qrspi/SKILL.md`,
+  `compaction.md`) and the effort table (SKILL.md, `commands/next.md`, `effort.md`).
+  Change a row in all three of its files; `npm test` compares them.
+- Keep the version in sync across the four manifests (`npm test` enforces it).
 - Copy mode rewrites `${CLAUDE_PLUGIN_ROOT}/skills` to `~/.claude/skills`
   (`rewritePluginRoot()` in `bin/qrspi.mjs`); a `${CLAUDE_PLUGIN_ROOT}` reference to
   anything else breaks it and is rejected by `npx qrspi check`.
 - The installer stays dependency-free, Node >= 18, and has no `postinstall`: nothing
   touches `~/.claude` unless the user runs `qrspi install`.
-- Style: no emoji, no marketing filler, British-leaning spelling, em-dashes.
+- Nothing public names a machine: no file URL, no absolute home path (`npm test`).
+- Style: British-leaning spelling, em-dashes, no marketing filler, no decorative emoji —
+  the status glyphs in `99-progress.md` and the ❌ / ✅ above do/don't examples are the
+  functional exceptions.
 
 ## Invariants — do not break
 
@@ -114,15 +133,17 @@ command); `assets/` is not shipped in the npm tarball.
 
 `/qrspi:next` must keep refusing to advance on unresolved placeholders, an open
 "More research needed" list, a structure step without a verification command, or a
-plan that fails the zero-context test.
+plan that fails the zero-context test. `/qrspi:review` reports and stops.
 
 ## Releasing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md#releasing). Bump the version in all three
-manifests, `npm test`, `claude plugin tag . --push`; the tag triggers the release
-workflow, which publishes to npm over OIDC (Trusted Publishing — no token in this
-repo), creates the release and closes the milestone.
+See [CONTRIBUTING.md](CONTRIBUTING.md#releasing). Bump the version in all four
+manifests and the lockfile, `npm test`, `claude plugin tag . --push`; the tag triggers
+the release workflow, which publishes to npm over OIDC (Trusted Publishing — no token
+in this repository), creates the release and closes the milestone.
 
 ## Commit conventions
 
-Conventional Commits (`feat:`, `fix:`, `docs:`), imperative subject, scope optional.
+A plain imperative subject that says what changed and, where it helps, why — "Scope the
+phase gate to the Status block" — with the issue number in the pull request title or
+body. Squash merges keep one commit per pull request on `main`.

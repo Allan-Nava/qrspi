@@ -8,14 +8,14 @@ user-invocable: false
 
 # Bootstrap a QRSPI task
 
-> **Codex CLI form of `/qrspi:new`, invoked as `$qrspi:qrspi-new`.** Same steps, same gates. Paths below are
-> relative to the directory holding this `SKILL.md` (Codex tells you where the skill
-> lives); in shell snippets `$SKILL_DIR` stands for that directory — substitute the
-> absolute path. The phase references are the sibling skill's, `../qrspi/references/`.
+> **Codex CLI form of `/qrspi:new`, invoked as `$qrspi:qrspi-new`.** Same steps, same gates. Plugin paths below
+> — `../qrspi/references/…`, `$SKILL_DIR` in shell snippets — are relative to the
+> directory holding this `SKILL.md` (Codex tells you where the skill lives; substitute
+> the absolute path). `thoughts/…` is relative to the repository you are working in.
 > Codex skills carry no tool allowlist: Codex's own approval mode and sandbox govern
 > what runs.
 
-Arguments: `$ARGUMENTS`
+Arguments: whatever follows `$qrspi:qrspi-new` in the user's message.
 
 The first token is the task ID (e.g. `ENG-1234`). Everything after it, if present, is
 the ticket text or a ticket URL.

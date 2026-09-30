@@ -18,11 +18,11 @@ npm test             # == node bin/qrspi.mjs check
 npm run build:site   # writes site/dist/index.html, gitignored
 ```
 
-`npm test` validates what the plugin runtime and the installer both depend on: the
-three manifests agree on a version, skill frontmatter is present, each `SKILL.md`
-stays index-sized, every `${CLAUDE_PLUGIN_ROOT}` reference is one copy mode can
-rewrite, and each phase reference still carries the checkboxes `/qrspi:next` greps
-for. CI runs it, the site build and `npm pack --dry-run` on every pull request.
+`npm test` validates what the plugin runtime and the installer both depend on — the
+four manifests agree on a version, skill frontmatter, index-sized `SKILL.md` files,
+rewritable `${CLAUDE_PLUGIN_ROOT}` references, the phase gates' markers — and the
+content rules the repo states; CLAUDE.md, "Verifying a change", has the full list. CI
+runs it, the site build and `npm pack --dry-run` on every pull request.
 
 ### Measuring what the plugin costs
 
@@ -77,13 +77,20 @@ artifact's token count from `scripts/measure-context-cost.mjs`.
 
 ## Trigger evals for the skills
 
-`evals/trigger/<skill>.json` holds twenty realistic prompts per skill — nine that should
-trigger it, eleven that should not — in the format the `skill-creator` skill's
-`run_eval.py` consumes: `[{"query", "should_trigger"}]`. The negatives are near-misses
-on purpose: the `handoff` set's negatives include the cost-diagnosis prompts that belong
-to `token-efficiency`, and vice versa, because the two descriptions border each other
-and the README's bar for a third skill was that they must not compete. This is the
-executable form of #25's done-when.
+`evals/trigger/<skill>.json` holds realistic prompts per skill — nine that should
+trigger it and eleven to thirteen that should not — in the format the `skill-creator`
+skill's `run_eval.py` consumes: `[{"query", "should_trigger"}]`. The negatives are
+near-misses on purpose: the `handoff` set's negatives include the cost-diagnosis
+prompts that belong to `token-efficiency`, and vice versa, because the two descriptions
+border each other and the README's bar for a third skill was that they must not
+compete. This is the executable form of #25's done-when.
+
+The same border runs between `qrspi` and `token-efficiency` — both speak of the 40%
+rule and compaction — and on 2026-09-30 it gained cross-negatives in both directions
+(#106): the 40% rule and auto-compact asked as questions belong to `token-efficiency`;
+closing a phase session at 42% and asking for the next prompt belongs to `qrspi`. That
+border has **not been measured yet**: the 198-run result below covers `handoff` against
+`token-efficiency` only.
 
 To run one:
 
@@ -237,8 +244,9 @@ release and the milestone closed.
 **Per release:**
 
 ```bash
-# 1. bump the version in all three manifests — they must agree
-#    package.json · .claude-plugin/plugin.json · .claude-plugin/marketplace.json
+# 1. bump the version in all four manifests — they must agree — and the lockfile
+#    package.json · .claude-plugin/plugin.json · .claude-plugin/marketplace.json ·
+#    .codex-plugin/plugin.json; then  npm install --package-lock-only
 npm test                       # fails if they disagree
 npm pack --dry-run             # inspect what would ship
 
@@ -302,7 +310,8 @@ passes. Tags are outside the rule, which is why `claude plugin tag . --push` sti
 works. Renaming a CI job renames a required check: update the ruleset in the same
 change or the next pull request cannot merge.
 
-- Conventional Commits (`feat:`, `fix:`, `docs:`, `ci:`), imperative subject.
+- A plain imperative subject that says what changed ("Scope the phase gate to the Status
+  block"), the issue number in the pull request; squash merges keep one commit per PR.
 - Keep `npm test` green; add a check to `bin/qrspi.mjs check` when you add an invariant.
 - If you change `README.md`, run `npm run build:site` and look at the result — the
   site is generated from it, and the hero reads the first prose paragraph.

@@ -8,14 +8,14 @@ user-invocable: false
 
 # Advance a QRSPI task
 
-> **Codex CLI form of `/qrspi:next`, invoked as `$qrspi:qrspi-next`.** Same steps, same gates. Paths below are
-> relative to the directory holding this `SKILL.md` (Codex tells you where the skill
-> lives); in shell snippets `$SKILL_DIR` stands for that directory — substitute the
-> absolute path. The phase references are the sibling skill's, `../qrspi/references/`.
+> **Codex CLI form of `/qrspi:next`, invoked as `$qrspi:qrspi-next`.** Same steps, same gates. Plugin paths below
+> — `../qrspi/references/…`, `$SKILL_DIR` in shell snippets — are relative to the
+> directory holding this `SKILL.md` (Codex tells you where the skill lives; substitute
+> the absolute path). `thoughts/…` is relative to the repository you are working in.
 > Codex skills carry no tool allowlist: Codex's own approval mode and sandbox govern
-> what runs.
+> what runs. The read-only promise of this form rests on these instructions alone.
 
-Target: `$ARGUMENTS` — a `thoughts/<dir>` path. If empty, list `thoughts/*/` and pick
+Target: whatever follows `$qrspi:qrspi-next` in the user's message — a `thoughts/<dir>` path. If empty, list `thoughts/*/` and pick
 the only one; if there are several, ask which.
 
 ## 1. Detect the current phase

@@ -20,7 +20,7 @@ the next phase starts from a fresh session and reads only that artifact.
 Questions   ~15k burned    →  00-questions.md   (~1k)
 Research    150-250k       →  01-research.md    (~5k)
 Design      starts at 6k   →  02-design.md      (~4k)
-Structure   starts at 9k   →  03-structure.md   (~3k)
+Structure   starts at 4k   →  03-structure.md   (~3k)
 Plan        starts at 12k  →  04-plan.md        (~6k)
 Implement   starts at 7k   →  code + PR
 ```
@@ -49,7 +49,7 @@ Claude Code has no npm plugin source, so `npx qrspi install` is a wrapper: it sh
 the plugin files in the package and registers them for you — through
 `claude plugin marketplace add` when the `claude` CLI is on `PATH`, otherwise by
 copying the skills and commands into `~/.claude/` (`--copy` forces that mode).
-Either way you end up with the same `/qrspi:new` and `/qrspi:next`.
+Either way you end up with the same `/qrspi:new`, `/qrspi:next` and `/qrspi:review`.
 
 ```
 npx qrspi install --dry-run   # show what it would do, change nothing
@@ -77,7 +77,7 @@ approval mode and sandbox govern what a phase may run; and rule 1 means a **new
 `codex` session** per phase — `codex exec` is one-shot by nature, the TUI needs a
 fresh start, and `codex resume` is the thing not to do.
 
-Pin a version with `npx qrspi@0.1.0 install`; `npm i -g qrspi` then `qrspi install`
+Pin a version with `npx qrspi@<version> install` (e.g. `qrspi@0.5.0`); `npm i -g qrspi` then `qrspi install`
 works too. Which route updates itself: the plugin route does, through `/plugin` —
 `npx` registers the marketplace from GitHub, because the npx cache it runs from is
 pruned; `npm i -g` registers the installed package directory, which is not. Copy mode
@@ -103,12 +103,14 @@ feature: the whole workflow is worthless if you rubber-stamp your way through it
 
 | | |
 |---|---|
-| `skills/qrspi/` | the workflow: six rules, per-phase context budgets, and the seven phase templates as on-demand references |
+| `skills/qrspi/` | the workflow: six rules, per-phase context budgets, the six artifact templates and the Implement prompt, and three guides — re-entering a phase, reviewing an artifact, landing the PR — as on-demand references |
 | `skills/token-efficiency/` | the reference behind it: measurement, compaction, subagent firewalls, effort allocation, prompt-caching invalidation, tool definitions and output, KPIs |
 | `skills/handoff/` | the craft the other two assume: what survives a context reset, the load-bearing-fact test, compressing research without losing its evidence trail, writing a step a zero-context agent can execute |
 | `commands/new.md` | bootstrap a task and run phase 0 |
 | `commands/next.md` | advance a task across a phase boundary |
 | `commands/review.md` | review one artifact for what the gates cannot see — finished, plausible, and wrong |
+| `skills/qrspi-{new,next,review}/` | the three commands in Codex CLI form (`$qrspi:qrspi-new` …) — Codex has no slash commands; hidden from Claude Code |
+| `.codex-plugin/plugin.json` | the Codex CLI plugin manifest, beside `.claude-plugin/` |
 | `bin/qrspi.mjs` | the `npx qrspi` installer — zero dependencies, no build |
 
 ## Six non-negotiable rules
@@ -131,7 +133,9 @@ are sequential and user-driven, so they are slash commands. A skill has to earn 
 permanent line by triggering **outside** QRSPI: `token-efficiency` does, on any question
 about cost; `handoff` does, on "summarise this session before I lose it" from anyone
 running any agent. Knowledge that only matters mid-workflow is a reference, loaded on
-demand.
+demand. Codex is the one exception, and a bounded one: it has no slash commands, so it
+lists the three commands' skill forms too — three more descriptions, each saying to run
+it only when named, and none of them in Claude Code's context.
 
 **The skills practise what they document.** Each `SKILL.md` is an index of ~100
 lines; the detail lives in `references/` and is loaded only when the question needs

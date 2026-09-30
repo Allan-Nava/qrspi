@@ -78,5 +78,13 @@
   {
     "query": "plan my week around the two deploys on tuesday and thursday",
     "should_trigger": false
+  },
+  {
+    "query": "is the 40% context rule real or folklore? my sessions run to 70% all the time",
+    "should_trigger": false
+  },
+  {
+    "query": "is auto-compact good enough or should I be compacting on purpose? sessions get noticeably dumber after a few hours",
+    "should_trigger": false
   }
 ]

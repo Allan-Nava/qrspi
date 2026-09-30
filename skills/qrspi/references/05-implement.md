@@ -19,7 +19,9 @@
 > 1. Execute **only** the assigned step. If you notice something else to fix, note it
 >    in `99-progress.md` under "Discoveries" — do not do it.
 > 2. Follow the plan literally. If the plan is wrong or incomplete, **stop** and
->    write it in `99-progress.md` under "Deviations" — do not improvise.
+>    write it in `99-progress.md` under "Deviations" — do not improvise. The one
+>    exception is a transcription slip — a path or line number that is off while the
+>    intent is intact: fix the plan line, note it, and carry on (`recovery.md`).
 > 3. Before reading a file, use `grep -n` to find the spot. Never `cat` whole files.
 > 4. Run the plan's verification commands. Report the real output, not an optimistic
 >    summary.

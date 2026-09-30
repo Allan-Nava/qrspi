@@ -79,5 +79,9 @@
   {
     "query": "what's the cheapest model that can run a customer support chatbot decently",
     "should_trigger": false
+  },
+  {
+    "query": "my plan session for ENG-42 is at 42% context — close it out and give me the prompt for the implement phase",
+    "should_trigger": false
   }
 ]

@@ -8,14 +8,14 @@ user-invocable: false
 
 # Review a QRSPI artifact
 
-> **Codex CLI form of `/qrspi:review`, invoked as `$qrspi:qrspi-review`.** Same steps, same gates. Paths below are
-> relative to the directory holding this `SKILL.md` (Codex tells you where the skill
-> lives); in shell snippets `$SKILL_DIR` stands for that directory — substitute the
-> absolute path. The phase references are the sibling skill's, `../qrspi/references/`.
+> **Codex CLI form of `/qrspi:review`, invoked as `$qrspi:qrspi-review`.** Same steps, same gates. Plugin paths below
+> — `../qrspi/references/…`, `$SKILL_DIR` in shell snippets — are relative to the
+> directory holding this `SKILL.md` (Codex tells you where the skill lives; substitute
+> the absolute path). `thoughts/…` is relative to the repository you are working in.
 > Codex skills carry no tool allowlist: Codex's own approval mode and sandbox govern
-> what runs.
+> what runs. The read-only promise of this form rests on these instructions alone.
 
-Target: `$ARGUMENTS` — one artifact file. If a directory is given, list it and ask
+Target: whatever follows `$qrspi:qrspi-review` in the user's message — one artifact file. If a directory is given, list it and ask
 which file; do not review all of them at once — a review covers one artifact.
 
 ## 1. Load the rubric for this artifact type

@@ -7,7 +7,7 @@
 // into ~/.claude/ (fallback, and for setups without the plugin system).
 
 import { spawnSync } from 'node:child_process'
-import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -465,6 +465,21 @@ function check() {
     const rows = table.split('\n').filter((l) => /^\| /.test(l) && !/^\| Step \|/.test(l) && !/^\|---/.test(l))
     for (const r of rows) if (!/^\| <[^>]+> \|/.test(r)) problems.push(`skills/qrspi/references/99-progress.md: a Step status row is example state, not a placeholder: ${r.slice(0, 60)} (#98)`)
     if (/\*\*Current step:\*\* (?!<)/.test(pr)) problems.push('skills/qrspi/references/99-progress.md: "Current step" names a real step; it must be a placeholder (#98)')
+  }
+
+  // #99: nothing public carries a local machine's layout. A file URL or an absolute home
+  // path in a tracked text file names the maintainer's disk (the social card did).
+  const scanDirs = ['README.md', 'CLAUDE.md', 'AGENTS.md', 'CONTRIBUTING.md', 'assets', 'commands', 'skills', 'evals', 'scripts', 'site/build.mjs', 'bin', '.github']
+  const walk = (p) => (statSync(p).isDirectory() ? readdirSync(p).flatMap((c) => walk(join(p, c))) : [p])
+  for (const d of scanDirs) {
+    const abs = join(ROOT, d)
+    if (!existsSync(abs)) continue
+    for (const file of walk(abs)) {
+      if (!/\.(md|json|mjs|js|html|yml|yaml|txt)$/.test(file)) continue
+      const text = readFileSync(file, 'utf8')
+      const hit = text.match(/file:\/\/\/|\/Users\/[A-Za-z]|\/home\/[a-z]+\//)
+      if (hit && !file.endsWith('bin/qrspi.mjs')) problems.push(`${file.slice(ROOT.length + 1)}: carries a local path or file URL ("${hit[0]}…") — nothing public names a machine's disk (#99)`)
+    }
   }
 
   // The pipeline diagram, duplicated in three files.

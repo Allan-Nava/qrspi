@@ -1,6 +1,6 @@
 [
   {
-    "query": "my claude code sessions on the hiway-api repo are costing about $40 a day. where is that going and what do I change first",
+    "query": "my claude code sessions on our api repo are costing about $40 a day. where is that going and what do I change first",
     "should_trigger": true
   },
   {

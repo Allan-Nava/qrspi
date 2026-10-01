@@ -65,7 +65,8 @@ phase's prompt and the artifact skeleton to fill. `05-implement.md` is a prompt
 only — its output is code — and Implement keeps state in `99-progress.md`.
 
 `/qrspi:new <TASK-ID> <ticket>` bootstraps; `/qrspi:next` prints the next phase prompt
-at each boundary; `/qrspi:review <file>` reads one artifact for the weaknesses the
+at each boundary — or, when several Implement steps can run in parallel, an execution
+plan of worktrees, prompts and merge order; `/qrspi:review <file>` reads one artifact for the weaknesses the
 gates cannot see (`references/reviewing.md`). Implement finding an upstream artifact
 wrong → `references/recovery.md`, one phase re-entered narrowly. Artifacts into a
 reviewable PR → `references/landing.md`.

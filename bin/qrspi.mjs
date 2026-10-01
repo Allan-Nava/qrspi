@@ -467,6 +467,12 @@ function check() {
     if (/\*\*Current step:\*\* (?!<)/.test(pr)) problems.push('skills/qrspi/references/99-progress.md: "Current step" names a real step; it must be a placeholder (#98)')
   }
 
+  // #122: parallel Implement steps get an execution plan, in the command and its twin
+  // alike — printed, never run.
+  for (const f of ['commands/next.md', 'skills/qrspi-next/SKILL.md']) {
+    if (existsSync(join(ROOT, f)) && !readFileSync(join(ROOT, f), 'utf8').includes('emit an **execution plan**')) problems.push(`${f}: no execution plan for parallel Implement steps (#122)`)
+  }
+
   // #111, #112: an artifact records the commit it was written against, so /qrspi:next can
   // warn when the cited code moved; every Structure step says who runs it, so Implement
   // routing can skip the human and live ones.

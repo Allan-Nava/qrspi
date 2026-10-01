@@ -94,6 +94,11 @@ In Codex CLI the same two are `$qrspi:qrspi-new ENG-1234 <ticket>` and
 `$qrspi:qrspi-next thoughts/ENG-1234-refund-flow`, and `/qrspi:review <file>` is
 `$qrspi:qrspi-review <file>`.
 
+When several Implement steps can run in parallel, `/qrspi:next` prints an execution
+plan instead of one prompt: a worktree and a prompt per step, the merge order with a
+rebase between merges, the files more than one step touches, and who keeps
+`99-progress.md`. It still runs nothing — you, or the sessions you start, do.
+
 `/qrspi:next` refuses to advance when the upstream artifact is not ready — unresolved
 placeholders, a design with open review comments, a structure step with no
 verification command, a plan that fails the zero-context test. That gate is the

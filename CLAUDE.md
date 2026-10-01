@@ -247,7 +247,7 @@ nothing else used to check: the `## Status` block in every artifact template, th
 pipeline diagram across the three files that draw it, the per-phase effort
 allocation across the three that tabulate it, and what `/qrspi:new` would leave in
 `thoughts/` — each template with its prompt block removed is still gateable (Status,
-checkboxes, placeholders) and the block itself was contiguous. Two more since the 2026-09-30 audit: the phase-detection count in `/qrspi:next` and its twin is scoped to the `## Status` block (a Plan's acceptance criteria stay open until Implement, #97), and the progress template's step table holds placeholders only (#98). It also fails on a file URL or an absolute home path in a tracked text file (#99). Run it before every commit and extend
+checkboxes, placeholders) and the block itself was contiguous. Two more since the 2026-09-30 audit: the phase-detection count in `/qrspi:next` and its twin is scoped to the `## Status` block (a Plan's acceptance criteria stay open until Implement, #97), and the progress template's step table holds placeholders only (#98). It also fails on a file URL or an absolute home path in a tracked text file (#99). And it keeps the parallel-Implement execution plan in `/qrspi:next` and its twin (#122). Run it before every commit and extend
 it whenever you add
 an invariant — [.github/workflows/ci.yml](.github/workflows/ci.yml) runs it, the site
 build and `npm pack --dry-run` on every pull request.

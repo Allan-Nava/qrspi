@@ -67,6 +67,27 @@ For Implement, read `99-progress.md` to find the next unblocked step in the
 step in the prompt. List the unblocked `human` and `live` steps separately, for the
 user: they are not a prompt for an agent.
 
+When **more than one** unblocked `agent` step can start now — the Structure marks them
+parallel and their **Touches** lines share no file — emit an **execution plan** instead
+of a single prompt. It is still output, not action: nothing below is run here.
+
+1. **One block per step**, in dependency order:
+   - the worktree to create — `git worktree add -b <TASK-ID>-<step> ../<repo>-<TASK-ID>-<step> <base branch>`;
+   - the Implement prompt (the `05-implement.md` block) naming that step, plus two lines:
+     *do not edit `99-progress.md`*, and *end with a report — the commit, the
+     verification output, the test counts, and any deviation as plan said / reality is
+     / artifact to fix*.
+2. **The merge order** — dependency order, one branch at a time: rebase it on the
+   freshly merged base, re-run its verification there, then merge; never two at once.
+3. **The files more than one step touches** (from the Touches lines and the docs every
+   step updates — a changelog, a backlog, a README), and the rule for them: keep both
+   sides' entries, then re-run the check before continuing the rebase.
+4. **The owner of `99-progress.md`** — the session that merges, which records each
+   report as it lands. Step sessions never write it (`05-implement.md`).
+
+A single unblocked step, or steps whose Touches overlap, get the ordinary one-step
+prompt: overlapping steps run one after the other.
+
 ## 3. Gate before emitting
 
 These gates are mechanical: they catch an artifact that is *unfinished*. For one that

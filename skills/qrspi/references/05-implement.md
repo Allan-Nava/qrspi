@@ -51,7 +51,9 @@ do not edit it, or every merge conflicts on the one file meant to carry state. E
 step session ends by reporting instead: its commit, the verification output, the test
 counts, and any deviation in the form `99-progress.md` uses (plan said / reality is /
 artifact to fix). The owner records it and merges one branch at a time, rebasing in
-between.
+between. `/qrspi:next` prints this as an **execution plan** — the worktrees, the
+per-step prompts, the merge order, the shared files — whenever several steps can start
+at once; it prints it and stops, like every command.
 
 ---
 

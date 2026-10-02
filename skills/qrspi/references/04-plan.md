@@ -29,6 +29,9 @@
 > **Do not paste existing code.** Cite `path:line`. Write new code only for
 > signatures and for cases where the exact shape *is* the decision.
 >
+> Leave the **Approved** box in `## Status` to the human: ticking it is the checkpoint,
+> and `/qrspi:next` will not print an Implement prompt while it is open.
+>
 > **When the Structure is too big for one session** — as a rule of thumb more than
 > eight steps, or a plan you can see running past ~1,500 lines — plan it in groups, in
 > dependency order, one fresh session per group. Each group writes
@@ -143,6 +146,7 @@ How to back out if something goes wrong in production:
 - [ ] Every verification command is copy-pasteable
 - [ ] **Zero-context test:** an agent reading only this file can execute it
 - [ ] Rollback plan present
+- [ ] Approved (<date>, <who>, <how: in writing / in chat / in review>)
 
 > Next phase: **Implement**. It receives: this file + `99-progress.md`.
 > One session per step.

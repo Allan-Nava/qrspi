@@ -444,6 +444,12 @@ function check() {
     if (!/^## Status$/m.test(body)) {
       problems.push(`skills/qrspi/references/${f}: no '## Status' section — CLAUDE.md requires every artifact to end with one, and commands/next.md describes phase detection in those terms`)
     }
+    // #126: rule 6 — every phase is a human checkpoint. The Status block must carry a box
+    // only a person can tick (it names <who>), or /qrspi:next advances on self-checks alone.
+    const status = body.split(/^## Status$/m)[1] ?? ''
+    if (!/^- \[ \] .*<who>/m.test(status)) {
+      problems.push(`skills/qrspi/references/${f}: no human box under '## Status' (one naming <who>) — /qrspi:next would advance on the session's own ticks (#126)`)
+    }
   }
 
   // #97: /qrspi:next counts only the boxes under '## Status'. A Plan's per-step acceptance
@@ -465,6 +471,11 @@ function check() {
     const rows = table.split('\n').filter((l) => /^\| /.test(l) && !/^\| Step \|/.test(l) && !/^\|---/.test(l))
     for (const r of rows) if (!/^\| <[^>]+> \|/.test(r)) problems.push(`skills/qrspi/references/99-progress.md: a Step status row is example state, not a placeholder: ${r.slice(0, 60)} (#98)`)
     if (/\*\*Current step:\*\* (?!<)/.test(pr)) problems.push('skills/qrspi/references/99-progress.md: "Current step" names a real step; it must be a placeholder (#98)')
+  }
+
+  // #126: the command and its twin say the human's box closes every phase.
+  for (const f of ['commands/next.md', 'skills/qrspi-next/SKILL.md']) {
+    if (existsSync(join(ROOT, f)) && !readFileSync(join(ROOT, f), 'utf8').includes('a count of zero means a person signed the artifact')) problems.push(`${f}: does not say the human's box closes every phase (#126)`)
   }
 
   // #122: parallel Implement steps get an execution plan, in the command and its twin

@@ -27,6 +27,9 @@
 >
 > Do NOT write the detailed plan: that is the Plan phase. Decomposition only.
 >
+> Leave the **Approved** box in `## Status` to the human: ticking it is the checkpoint,
+> and `/qrspi:next` will not print the Plan prompt while it is open.
+>
 > Recommended effort: `high`.
 >
 > **Write as you go.** Create the artifact with its section headings first, then fill
@@ -106,5 +109,6 @@ Design: [`02-design.md`](./02-design.md)
 - [ ] Every step has a verification command
 - [ ] Every step leaves the repo working
 - [ ] Dependencies and parallelism mapped
+- [ ] Approved (<date>, <who>, <how: in writing / in chat / in review>)
 
 > Next phase: **Plan**. It receives: this file + `02-design.md`.

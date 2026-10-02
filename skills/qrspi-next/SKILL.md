@@ -27,7 +27,9 @@ ls -la thoughts/<dir>/
 A file counts as **complete** when the checkboxes under its `## Status` heading are ticked —
 not the others: a Plan's per-step acceptance criteria stay open until Implement — and its
 placeholders (`<...>`, `_(to be filled`) are gone. A file that is still the untouched
-template counts as **not started**. Check with:
+template counts as **not started**. Every artifact's Status ends with the human's box — *Reviewed* in
+Questions and Research, *Approved* in Design, Structure and Plan — which a phase session
+never ticks, so a count of zero means a person signed the artifact (#126). Check with:
 
 ```bash
 awk 'FNR==1{s=0; n[FILENAME]+=0} /^## Status/{s=1} s && /\[ \]/{n[FILENAME]++} END{for (f in n) print n[f], f}' thoughts/<dir>/0*.md

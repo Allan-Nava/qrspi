@@ -172,7 +172,9 @@ Do not weaken these when editing; they are the plugin's whole thesis.
 - **Template placeholders** are `<...>` and `_(to be filled …)_`, and every artifact
   ends with a `## Status` checkbox block. `/qrspi:next` greps for exactly these to
   decide whether a phase is complete — changing the markers breaks phase detection in
-  [commands/next.md](commands/next.md).
+  [commands/next.md](commands/next.md). The last box in every Status is the human's —
+  *Reviewed* in Questions and Research, *Approved* in Design, Structure and Plan — and a
+  phase session never ticks it (#126); `npm test` requires one naming `<who>` per template.
 - **Phase prompts live in a `> **PROMPT` blockquote** at the top of the reference
   file. `/qrspi:next` extracts that block with `awk` — not the whole file — and prints
   it with real paths substituted; `/qrspi:new` deletes the same block from the artifact

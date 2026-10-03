@@ -32,7 +32,7 @@ to disk and the next phase starts from a fresh session reading only that artifac
 | `package.json` | npm distribution: `bin` → `bin/qrspi.mjs`, `test` → `qrspi check` |
 | `bin/qrspi.mjs` | installer CLI: `install` / `uninstall` / `path` / `check`; copy mode guards unmarked directories |
 | `.claude-plugin/plugin.json` | Claude Code plugin manifest |
-| `.claude-plugin/marketplace.json` | marketplace manifest (`source: "./"`); Codex reads it as a legacy marketplace |
+| `.claude-plugin/marketplace.json` | marketplace manifest: `qrspi` (`source: "./"`) and `qrspi-pane` (`./plugins/qrspi-pane`); Codex reads it as a legacy marketplace |
 | `.codex-plugin/plugin.json` | Codex CLI plugin manifest (`skills: ./skills/`) |
 | `commands/*.md` | the three Claude Code commands; each command emits a prompt or a report and stops |
 | `skills/qrspi/SKILL.md` | workflow index: rules, phase table, context budgets |
@@ -42,6 +42,7 @@ to disk and the next phase starts from a fresh session reading only that artifac
 | `skills/token-efficiency/` | reference skill: index + 9 reference files |
 | `skills/handoff/` | craft skill: index + 3 reference files |
 | `skills/qrspi-{new,next,review}/SKILL.md` | the commands in Codex skill form; paths relative to their own directory |
+| `plugins/qrspi-pane/` | a second plugin: a Claude Code mod (function hooks, `hooks/register.tsx`) drawing `thoughts/` as a pane, `/qrspi-status`; read-only; not in the npm package — `claude plugin validate plugins/qrspi-pane` checks it |
 | `evals/trigger/` | should/should-not-trigger prompts per skill; not shipped |
 | `scripts/measure-context-cost.mjs` | `count_tokens` over the plugin's own text (needs a key); not shipped |
 | `scripts/measure-run.mjs` | KPIs 1, 3, 4 of a real run from session transcripts; not shipped |
@@ -108,7 +109,10 @@ render of `assets/social-preview.html` (CLAUDE.md has the exact command).
   **Written against:** check).
 - Artifact templates use `<...>` / `_(to be filled …)_` placeholders and end in a
   `## Status` checkbox block; `/qrspi:next` reads those to detect phase completion, and
-  counts only the boxes under `## Status`. Do not change the markers in isolation.
+  counts only the boxes under `## Status`. Every template's Status ends with a box only a
+  person ticks — *Reviewed* in Questions and Research, *Approved* in Design, Structure and
+  Plan — and `npm test` requires one naming `<who>` in each, so no phase closes on a
+  session's own ticks. Do not change the markers in isolation.
 - The duplicated numbers: the pipeline diagram (README, `skills/qrspi/SKILL.md`,
   `compaction.md`) and the effort table (SKILL.md, `commands/next.md`, `effort.md`).
   Change a row in all three of its files; `npm test` compares them.

@@ -108,7 +108,8 @@ Install it with `/plugin install qrspi-pane@allan-nava`; it needs a Claude Code 
 hooks, and the Markdown plugin works the same without it.
 
 `/qrspi:next` refuses to advance when the upstream artifact is not ready — unresolved
-placeholders, a design with open review comments, a structure step with no
+placeholders, an *Approved* box nobody has ticked (every phase ends on one only a person
+signs), a design with open review comments, a structure step with no
 verification command, a plan that fails the zero-context test. That gate is the
 feature: the whole workflow is worthless if you rubber-stamp your way through it.
 

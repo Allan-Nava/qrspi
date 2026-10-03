@@ -17,13 +17,17 @@ the next phase starts from a fresh session and reads only that artifact.
 **Q**uestions → **R**esearch → **S**pec (Design + Structure) → **P**lan → **I**mplement
 
 ```
-Questions   ~15k burned    →  00-questions.md   (~1k)
-Research    150-250k       →  01-research.md    (~5k)
-Design      starts at 6k   →  02-design.md      (~4k)
+Questions   ~20k burned    →  00-questions.md   (~3k)
+Research    150-250k       →  01-research.md    (~7k)
+Design      starts at 10k  →  02-design.md      (~4k)
 Structure   starts at 4k   →  03-structure.md   (~3k)
-Plan        starts at 12k  →  04-plan.md        (~6k)
+Plan        starts at 7k   →  04-plan.md        (~13k)
 Implement   starts at 7k   →  code + PR
 ```
+
+These are the phase's own context. The harness adds a floor on top of every phase —
+system prompt, tools, CLAUDE.md, installed skills and MCP servers — measured at ~56k on
+the one run behind these figures (WB-1 in whipbench, #91); it depends on your setup.
 
 The point is not only cost. Implement runs steadily under 20% context — the zone
 where models actually perform — instead of inheriting 250k tokens of Research

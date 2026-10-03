@@ -79,7 +79,7 @@ function parseIntro(raw) {
   return { lede: m[1].trim(), pipeline: m[2].replace(/\n$/, ''), after: m[3].trim() }
 }
 
-// `Questions   ~15k burned   →  00-questions.md   (~1k)`
+// `Questions   ~20k burned   →  00-questions.md   (~3k)`
 function parsePipeline(block) {
   if (!block) return null
   const rows = []

@@ -195,9 +195,18 @@ Do not weaken these when editing; they are the plugin's whole thesis.
   They are the likeliest thing here to be quietly wrong. Re-verify them against the
   current API reference rather than from memory, keep the `(cached: YYYY-MM-DD)` date
   on the model table honest, and treat a stale price as a bug: the whole skill argues
-  from those numbers. Last audited 2026-09-30 (#108): no price or model row changed;
-  Opus 5.5 was missing from the thinking rules in `effort.md` (it cannot disable
-  thinking), and six claims were tightened or marked unverified. Before that, 2026-09-23
+  from those numbers. Last audited 2026-10-03 (#131, findings in #130), against the
+  Claude Code 2.1.286 reference: 72 claims, 47 hold, 3 wrong, 10 incomplete, 12
+  unverifiable. One model arrived — Sonnet 5.5 ($2/$10, rejects `disabled` thinking, uses
+  `between_tools`), added to the model table and the thinking, caching and
+  mid-conversation lists; per-message effort now runs on Google Cloud too, not the Claude
+  API alone; `inline-tools-2026-09-15` is now in the reference; fast mode loses the
+  system and messages caches, not the tools one; `compact-2026-09-04` joined the
+  headers; three harness claims were marked unverified. No price changed. The effort
+  table still puts Sonnet 5 on the subagent row — its successor recalibrated the levels,
+  so moving the row is a decision, not a fix. Before that, 2026-09-30 (#108): no price or
+  model row changed; Opus 5.5 was missing from the thinking rules in `effort.md` (it
+  cannot disable thinking), and six claims were tightened or marked unverified. Before that, 2026-09-23
   (#92): one model arrived (Opus 5.5 — $4/$20, cache read 0.05×, default effort
   `medium`, Claude Code's default since v2.1.280) and two wordings were tightened; the
   2026-09-21 pass found nothing, the 2026-09-18 pass three wrong and two incomplete (the

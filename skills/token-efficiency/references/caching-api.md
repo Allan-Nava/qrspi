@@ -22,7 +22,7 @@ It sits **after** the history, so the cached prefix stays intact. It is also the
 unforgeable operator channel (unlike a `<system-reminder>` inside a user turn, which
 anyone writing to user input can forge).
 
-Available on Opus 5.5, Opus 5, Opus 4.8, Fable 5, Fable 5.1, Mythos 5, Mythos 5.1.
+Available on Opus 5.5, Opus 5, Opus 4.8, Sonnet 5.5, Fable 5, Fable 5.1, Mythos 5, Mythos 5.1.
 **Not on Sonnet 5** — there it returns 400 (`role 'system' is not supported on this model`);
 catch it and fall back to a text block in the user turn.
 
@@ -34,7 +34,8 @@ element or be followed by an `assistant` turn.
 
 **The 20-position lookback window.** Each breakpoint walks backwards **at most 20
 positions** to find a previous cache entry; past that the next breakpoint finds no
-cache and **silently misses**. Positions, not blocks: a run of consecutive `tool_use`
+cache and **silently misses**. Positions, not blocks: on the Claude API a run of
+consecutive `tool_use`
 blocks counts as one, and so does a run of consecutive `tool_result` blocks — so a
 turn with many *parallel* tool calls does **not** push the previous entry out. What
 does is a turn adding more than 20 positions of other content: long *sequential* tool
@@ -65,10 +66,13 @@ Useful implication: `tool_choice` and images survive the tools+system cache, and
 tool changes and model changes force a full rebuild. **Thinking and effort do not
 belong in that sentence:** whether toggling them invalidates the upper tiers is
 model-specific, so do not assume a free per-request switch — measure it on the model
-you are on. On Opus 5.5, Opus 5, Fable 5.1 and Mythos 5.1 a `role: "system"` message carrying
+you are on. On Opus 5.5, Opus 5, Fable 5.1, Mythos 5.1 and Sonnet 5.5 (with thinking on —
+a 400 under `between_tools`) a `role: "system"` message carrying
 `output_config: {effort: …}` and an empty `content` changes effort from that point
 without the messages-cache invalidation a top-level change causes (beta
-`mid-conversation-output-config-2026-07-01`; Claude API only).
+`mid-conversation-output-config-2026-07-01`; Claude API and Google Cloud). Unlike a
+text system message, the effort-only one is exempt from the placement rules above: it
+can sit anywhere in `messages`.
 
 ## Cache diagnostics
 

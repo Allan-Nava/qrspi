@@ -39,7 +39,7 @@ Re-measure on the **same tasks** as week 1. It is the only valid comparison.
 
 # Reference numbers
 
-## Models (cached: 2026-09-30)
+## Models (cached: 2026-10-03)
 
 | Model | ID | Context | Input $/1M | Output $/1M |
 |---|---|---|---|---|
@@ -48,6 +48,7 @@ Re-measure on the **same tasks** as week 1. It is the only valid comparison.
 | Claude Opus 5.5 | `claude-opus-5-5` | 1M | $4.00 | $20.00 |
 | Claude Opus 5 | `claude-opus-5` | 1M | $5.00 | $25.00 |
 | Claude Opus 4.8 | `claude-opus-4-8` | 1M | $5.00 | $25.00 |
+| Claude Sonnet 5.5 | `claude-sonnet-5-5` | 1M | $2.00 | $10.00 |
 | Claude Sonnet 5 | `claude-sonnet-5` | 1M | $2.00 | $10.00 |
 | Claude Haiku 4.5 | `claude-haiku-4-5` | 200K | $1.00 | $5.00 |
 
@@ -73,10 +74,11 @@ model defaults to `high` there. Claude Code may set its own per-model default ab
 |---|---|
 | Context editing | `context-management-2025-06-27` |
 | Server-side compaction | `compact-2026-01-12` |
+| On-demand compaction (`compaction` parameter; not on Amazon Bedrock) | `compact-2026-09-04` |
 | Task budgets | `task-budgets-2026-03-13` |
 | Cache diagnostics | `cache-diagnosis-2026-04-07` |
 | Mid-conversation tool changes (by reference) | `mid-conversation-tool-changes-2026-07-01` |
-| Mid-conversation tool changes (full definition inline) | `inline-tools-2026-09-15` — sent by Claude Code; not in the API reference as of 2026-09-30 |
+| Mid-conversation tool changes (full definition inline) | `inline-tools-2026-09-15` — Claude API; in the API reference since Claude Code 2.1.286 |
 | Fast mode (`speed: "fast"`, Claude API only) | `fast-mode-2026-02-01` |
 | Per-message effort (`role: "system"`, empty content) | `mid-conversation-output-config-2026-07-01` |
 | Turn-scoped system messages (`clear_at`) | `mid-conversation-system-clear-at-2026-08-21` |

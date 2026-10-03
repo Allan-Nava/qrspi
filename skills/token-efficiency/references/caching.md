@@ -20,8 +20,8 @@ itself. Get it wrong and no amount of `cache_control` markers saves you.
 - **Do not change the tool set mid-session.** Tools render at position 0. If you need
   a "mode", pass it as message content, not by swapping tools. The one sanctioned way
   to add a tool without a rebuild is the mid-conversation tool changes beta
-  (`mid-conversation-tool-changes-2026-07-01` — Opus 5.5, Opus 5, Opus 4.8, Fable 5,
-  Fable 5.1, Mythos 5 and 5.1; not Sonnet 5, not on Microsoft Foundry): the tool is declared
+  (`mid-conversation-tool-changes-2026-07-01` — Opus 5.5, Opus 5, Opus 4.8, Sonnet 5.5,
+  Fable 5, Fable 5.1, Mythos 5 and 5.1; not Sonnet 5, not on Microsoft Foundry): the tool is declared
   up front with `defer_loading: true` and enabled later by a `tool_addition` block, so
   the prefix never moves; with `inline-tools-2026-09-15` as well, the block may carry
   the full definition instead of a reference.
@@ -35,13 +35,15 @@ are in `caching-api.md`. This file is the part everyone needs.
 
 | Model | Minimum |
 |---|---:|
-| Opus 5.5, Opus 5, Fable 5, Fable 5.1, Mythos 5, Mythos 5.1 | **512** |
+| Opus 5.5, Opus 5, Sonnet 5.5, Fable 5, Fable 5.1, Mythos 5, Mythos 5.1 | **512** |
 | Opus 4.8, Sonnet 5, Sonnet 4.6, Sonnet 4.5 | 1024 |
 | Opus 4.7 | 2048 |
 | Opus 4.6, Opus 4.5, Haiku 4.5 | **4096** |
 
 A 3k-token prompt caches on Opus 5 and **silently does not cache** on Opus 4.6 or
-Haiku 4.5. No error — just `cache_creation_input_tokens: 0`.
+Haiku 4.5. No error — just `cache_creation_input_tokens: 0`. Sonnet 5.5's 512 is
+flagged in the API reference itself as one to check against the live prompt-caching
+docs before relying on it.
 
 ## Economics
 
@@ -96,9 +98,12 @@ What breaks the prefix from inside a session, in the harness's terms:
 - **`/effort`.** Each level has its own cache on most models; the harness asks before
   applying it while the cache is warm. On Fable 5.1 (v2.1.260+) and Opus 5.5 with an
   API key or a subscription the level changes in place and the cache survives — not
-  through Bedrock, Vertex or a Claude apps gateway.
-- **Fast mode.** Turning it on adds a header that is part of the cache key: one full
-  miss, billed at fast-mode rates, then cached again.
+  through Bedrock, Vertex or a Claude apps gateway. (Not re-verified against Claude Code
+  2.1.286: the API now also takes per-message effort on Sonnet 5.5 and on Google Cloud,
+  so the harness's list may have grown — check before relying on it.)
+- **Fast mode.** Turning it on changes `speed`, which the API counts against the system
+  and messages caches — only the tools tier survives (`caching-api.md`): a miss on
+  nearly the whole prompt, billed at fast-mode rates, then cached again.
 - **A long idle gap.** The TTL is one hour on a subscription within plan usage, five
   minutes on an API key or once usage credits are being drawn; the first message after
   that misses. `promptCacheTtl: "1h"` in settings (or `CLAUDE_CODE_PROMPT_CACHE_TTL`)

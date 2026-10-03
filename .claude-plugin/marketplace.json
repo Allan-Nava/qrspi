@@ -13,6 +13,11 @@
       "name": "qrspi",
       "source": "./",
       "description": "Phase-gated agent workflow (Questions → Research → Spec → Plan → Implement) with intentional compaction, plus a token-efficiency reference skill."
+    },
+    {
+      "name": "qrspi-pane",
+      "source": "./plugins/qrspi-pane",
+      "description": "A Claude Code pane showing each QRSPI task in thoughts/: the phase it is in, the Status boxes that block it, and the /qrspi:next command to run. Reads only."
     }
   ]
 }

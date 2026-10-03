@@ -1,0 +1,9 @@
+{
+  "name": "qrspi-pane",
+  "version": "0.1.0",
+  "description": "A pane showing each QRSPI task in thoughts/: which phase it is in, what blocks it, and the /qrspi:next command to run",
+  "types": "./types/index.d.ts",
+  "author": {
+    "name": "Allan Nava"
+  }
+}

@@ -100,6 +100,12 @@ skills/
                        their description. `npm test` holds each to its command's step
                        list; paths are relative to the skill dir, never
                        ${CLAUDE_PLUGIN_ROOT}
+plugins/
+  qrspi-pane/          a second plugin in the same marketplace: a Claude Code mod (a hooks
+                       module, `hooks/register.tsx`) drawing thoughts/ as a pane, opened with
+                       `/qrspi-status`; reads only. Not in package.json#files — installed
+                       through the marketplace alone. `claude plugin validate plugins/qrspi-pane`
+                       checks it; `tsconfig.json` points at the engine types `/plugin-types` writes
 README.md              user-facing pitch; overlaps SKILL.md numbers — keep in sync
 ```
 

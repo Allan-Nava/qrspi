@@ -99,6 +99,14 @@ plan instead of one prompt: a worktree and a prompt per step, the merge order wi
 rebase between merges, the files more than one step touches, and who keeps
 `99-progress.md`. It still runs nothing — you, or the sessions you start, do.
 
+**A pane, optionally.** `qrspi-pane` is a second plugin in the same marketplace: a Claude
+Code mod that draws each task in `thoughts/` as a pane — the phases done, the current one
+and the Status boxes still open in it (an *Approved* waiting on you, say), the Implement
+steps from `99-progress.md`, and the `/qrspi:next` line to run. It only reads, refreshes
+after every turn, and is opened with `/qrspi-status` (or `/qrspi-status <project path>`).
+Install it with `/plugin install qrspi-pane@allan-nava`; it needs a Claude Code with function
+hooks, and the Markdown plugin works the same without it.
+
 `/qrspi:next` refuses to advance when the upstream artifact is not ready — unresolved
 placeholders, a design with open review comments, a structure step with no
 verification command, a plan that fails the zero-context test. That gate is the
@@ -114,6 +122,7 @@ feature: the whole workflow is worthless if you rubber-stamp your way through it
 | `commands/new.md` | bootstrap a task and run phase 0 |
 | `commands/next.md` | advance a task across a phase boundary |
 | `commands/review.md` | review one artifact for what the gates cannot see — finished, plausible, and wrong |
+| `plugins/qrspi-pane/` | an optional second plugin: the QRSPI pane, a Claude Code mod (function hooks); not in the npm package |
 | `skills/qrspi-{new,next,review}/` | the three commands in Codex CLI form (`$qrspi:qrspi-new` …) — Codex has no slash commands; hidden from Claude Code |
 | `.codex-plugin/plugin.json` | the Codex CLI plugin manifest, beside `.claude-plugin/` |
 | `bin/qrspi.mjs` | the `npx qrspi` installer — zero dependencies, no build |

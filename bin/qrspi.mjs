@@ -314,6 +314,21 @@ function check() {
     versions.add(json.version ?? json.metadata?.version)
   }
   if (versions.size > 1) problems.push(`version mismatch across manifests: ${[...versions].join(', ')}`)
+  // Every plugin the marketplace lists exists, under its own name; a second plugin
+  // (plugins/qrspi-pane) stays out of the npm package, which ships qrspi alone.
+  try {
+    const mp = JSON.parse(readFileSync(join(ROOT, '.claude-plugin', 'marketplace.json'), 'utf8'))
+    for (const p of mp.plugins ?? []) {
+      const manifest = join(ROOT, p.source ?? '', '.claude-plugin', 'plugin.json')
+      if (!existsSync(manifest)) { problems.push(`marketplace.json: plugin ${p.name} has no .claude-plugin/plugin.json under ${p.source}`); continue }
+      const name = JSON.parse(readFileSync(manifest, 'utf8')).name
+      if (name !== p.name) problems.push(`marketplace.json: plugin ${p.name} points at a manifest named ${name}`)
+    }
+    const files = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')).files ?? []
+    if (files.some((f) => f === 'plugins' || f.startsWith('plugins/'))) problems.push('package.json#files ships plugins/ — the npm package is qrspi alone')
+  } catch {
+    // an unreadable manifest is already reported above
+  }
   if (!GITHUB) {
     problems.push('package.json#repository does not name a GitHub repo — `npx qrspi install` registers the marketplace from it')
   }

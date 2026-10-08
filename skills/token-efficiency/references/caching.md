@@ -35,15 +35,16 @@ are in `caching-api.md`. This file is the part everyone needs.
 
 | Model | Minimum |
 |---|---:|
-| Opus 5.5, Opus 5, Sonnet 5.5, Fable 5, Fable 5.1, Mythos 5, Mythos 5.1 | **512** |
+| Opus 5.5, Opus 5, Sonnet 5.5, Haiku 5.5, Fable 5, Fable 5.1, Mythos 5, Mythos 5.1 | **512** |
 | Opus 4.8, Sonnet 5, Sonnet 4.6, Sonnet 4.5 | 1024 |
 | Opus 4.7 | 2048 |
 | Opus 4.6, Opus 4.5, Haiku 4.5 | **4096** |
 
 A 3k-token prompt caches on Opus 5 and **silently does not cache** on Opus 4.6 or
-Haiku 4.5. No error — just `cache_creation_input_tokens: 0`. Sonnet 5.5's 512 is
-flagged in the API reference itself as one to check against the live prompt-caching
-docs before relying on it.
+Haiku 4.5. No error — just `cache_creation_input_tokens: 0`. Moving a reading subagent
+from Haiku 4.5 to Haiku 5.5 drops its minimum from 4096 to 512. The 512 for Sonnet 5.5
+and Haiku 5.5 is flagged in the API reference itself as one to check against the live
+prompt-caching docs before relying on it.
 
 ## Economics
 
@@ -96,11 +97,12 @@ What breaks the prefix from inside a session, in the harness's terms:
   them back in the prefix, and the line will say `tool definitions changed`.
 - **`/model`.** Caches are model-scoped. Switching mid-phase rebuilds everything.
 - **`/effort`.** Each level has its own cache on most models; the harness asks before
-  applying it while the cache is warm. On Fable 5.1 (v2.1.260+) and Opus 5.5 with an
-  API key or a subscription the level changes in place and the cache survives — not
-  through Bedrock, Vertex or a Claude apps gateway. (Not re-verified against Claude Code
-  2.1.286: the API now also takes per-message effort on Sonnet 5.5 and on Google Cloud,
-  so the harness's list may have grown — check before relying on it.)
+  applying it while the cache is warm. On Fable 5.1, Opus 5.5, Sonnet 5.5 and Haiku 5.5
+  the level changes in place and the cache survives; on Opus 5 and Sonnet 5 it does not,
+  although the API takes per-message effort on Opus 5 too. Read off the harness itself:
+  the `init` event of `claude -p --output-format stream-json --verbose` carries
+  `per_turn_effort_active` for the session's model (2.1.294, subscription, 2026-10-08).
+  Not checked through Bedrock, Vertex or a gateway, which the earlier list excluded.
 - **Fast mode.** Turning it on changes `speed`, which the API counts against the system
   and messages caches — only the tools tier survives (`caching-api.md`): a miss on
   nearly the whole prompt, billed at fast-mode rates, then cached again.

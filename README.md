@@ -81,7 +81,7 @@ approval mode and sandbox govern what a phase may run; and rule 1 means a **new
 `codex` session** per phase — `codex exec` is one-shot by nature, the TUI needs a
 fresh start, and `codex resume` is the thing not to do.
 
-Pin a version with `npx qrspi@<version> install` (e.g. `qrspi@0.7.1`); `npm i -g qrspi` then `qrspi install`
+Pin a version with `npx qrspi@<version> install` (e.g. `qrspi@0.8.0`); `npm i -g qrspi` then `qrspi install`
 works too. Which route updates itself: the plugin route does, through `/plugin` —
 `npx` registers the marketplace from GitHub, because the npx cache it runs from is
 pruned; `npm i -g` registers the installed package directory, which is not. Copy mode

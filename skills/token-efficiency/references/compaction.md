@@ -78,7 +78,7 @@ The harness's own compaction is the safety net, not the method — and it is tun
 |---|---|
 | `/compact <instructions>` | summarise now, keeping what the instructions name — `/compact Focus on the deviations and the failing test` |
 | `# Compact instructions` in `CLAUDE.md` | standing instructions for every compaction in that repo |
-| `/autocompact 400k` · `autoCompactWindow` · `CLAUDE_CODE_AUTO_COMPACT_WINDOW` · `--autocompact` | the context size at which auto-compact fires; default is the model's limit (Sonnet 5: ~967k — a harness figure the API reference does not state; unverified against 2.1.286) |
+| `/autocompact 400k` · `autoCompactWindow` · `CLAUDE_CODE_AUTO_COMPACT_WINDOW` · `--autocompact` | the context size at which auto-compact fires; default is the model's limit (Sonnet 5: ~967k — a harness figure the API reference does not state; the controls are in 2.1.294, the figure not re-measured) |
 
 Setting the window to 400k on a 1M model makes the harness enforce the 40% rule for
 you — but it enforces it *blindly*, which is the whole objection in the table above.

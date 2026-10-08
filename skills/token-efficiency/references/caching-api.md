@@ -23,6 +23,8 @@ unforgeable operator channel (unlike a `<system-reminder>` inside a user turn, w
 anyone writing to user input can forge).
 
 Available on Opus 5.5, Opus 5, Opus 4.8, Sonnet 5.5, Fable 5, Fable 5.1, Mythos 5, Mythos 5.1.
+Haiku 5.5 is listed in some pages of the API reference and left out of others (the
+prompt-caching page and the availability table omit it) — test before relying on it.
 **Not on Sonnet 5** — there it returns 400 (`role 'system' is not supported on this model`);
 catch it and fall back to a text block in the user turn.
 
@@ -66,8 +68,9 @@ Useful implication: `tool_choice` and images survive the tools+system cache, and
 tool changes and model changes force a full rebuild. **Thinking and effort do not
 belong in that sentence:** whether toggling them invalidates the upper tiers is
 model-specific, so do not assume a free per-request switch — measure it on the model
-you are on. On Opus 5.5, Opus 5, Fable 5.1, Mythos 5.1 and Sonnet 5.5 (with thinking on —
-a 400 under `between_tools`) a `role: "system"` message carrying
+you are on. On Opus 5.5, Opus 5, Fable 5.1, Mythos 5.1, Sonnet 5.5 and Haiku 5.5 (with
+thinking on — a 400 under `between_tools`, or with thinking disabled on Haiku 5.5) a
+`role: "system"` message carrying
 `output_config: {effort: …}` and an empty `content` changes effort from that point
 without the messages-cache invalidation a top-level change causes (beta
 `mid-conversation-output-config-2026-07-01`; Claude API and Google Cloud). Unlike a

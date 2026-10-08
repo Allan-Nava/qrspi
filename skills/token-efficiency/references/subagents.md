@@ -39,8 +39,8 @@ nothing from the parent's cache. For reuse: copy `system`/`tools`/`model`
 
 **3. This is also the correct way to use a cheap model.**
 Caches are model-scoped: switching models mid-session invalidates everything. Do not
-downgrade the main loop — put Haiku 4.5 in a reading subagent and leave the main loop
-on Opus 5.
+downgrade the main loop — put a Haiku in a reading subagent (Haiku 5.5 takes `effort`;
+Haiku 4.5 does not) and leave the main loop on Opus 5.
 
 ## Programmatic tool calling
 

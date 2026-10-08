@@ -39,7 +39,7 @@ Re-measure on the **same tasks** as week 1. It is the only valid comparison.
 
 # Reference numbers
 
-## Models (cached: 2026-10-03)
+## Models (cached: 2026-10-08)
 
 | Model | ID | Context | Input $/1M | Output $/1M |
 |---|---|---|---|---|
@@ -50,12 +50,15 @@ Re-measure on the **same tasks** as week 1. It is the only valid comparison.
 | Claude Opus 4.8 | `claude-opus-4-8` | 1M | $5.00 | $25.00 |
 | Claude Sonnet 5.5 | `claude-sonnet-5-5` | 1M | $2.00 | $10.00 |
 | Claude Sonnet 5 | `claude-sonnet-5` | 1M | $2.00 | $10.00 |
+| Claude Haiku 5.5 | `claude-haiku-5-5` | 1M | $0.10 | $0.50 |
 | Claude Haiku 4.5 | `claude-haiku-4-5` | 200K | $1.00 | $5.00 |
 
-Output = 5× input across the board. This is why `effort` is a bigger lever than it
-looks. Opus 5.5 is Claude Code's default model since v2.1.280 (unless the account's best
-model is Fable and available) and defaults to `medium` effort on the API; every other
-model defaults to `high` there. Claude Code may set its own per-model default above that
+Haiku 5.5's price holds while the prompt is 100K tokens or fewer; above that it is
+$0.50/$2.50, and its newer tokenizer counts the same text as about 30% more tokens than
+Haiku 4.5's. Output = 5× input across the board. This is why `effort` is a bigger lever
+than it looks. Opus 5.5 is Claude Code's default model since v2.1.280 (unless the
+account's best model is Fable and available; still so on 2.1.294). Opus 5.5 and Haiku 5.5
+default to `medium` effort on the API; every other model defaults to `high` there. Claude Code may set its own per-model default above that
 (`xhigh` for some tiers) — check `/effort` rather than assume.
 
 ## Other cost levers

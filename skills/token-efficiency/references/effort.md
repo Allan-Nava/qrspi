@@ -13,8 +13,8 @@ client.messages.create(
 )
 ```
 
-Default: `high` on every model that takes `effort` — except Opus 5.5, which starts at
-`medium`, so a request that omits it runs one level lower there than on Opus 5. Lower
+Default: `high` on every model that takes `effort` — except Opus 5.5 and Haiku 5.5, which
+start at `medium`, so a request that omits it runs one level lower there than on Opus 5. Lower
 effort means fewer preambles, more consolidated tool calls, terser confirmations, less
 thinking.
 
@@ -31,13 +31,15 @@ thinking.
 | Implement | `high` / `xhigh` | Opus 5 | quality/token sweet spot |
 | Review / verification | `high` | Opus 5 | |
 
-`effort` is **rejected on Haiku 4.5** — hence a Sonnet on the subagent row, the
-cheapest tier that takes it. Sonnet 5.5, the current Sonnet, costs the same $2/$10 as
-Sonnet 5 but **recalibrated** its levels: `low` there is not `low` on Sonnet 5, so
-re-measure before moving the row to it (its own starting points: `low` for search and
-extraction, `medium` for agentic work). Haiku 4.5 is cheaper still ($1/$5 against
-$2/$10) and remains a fine reading subagent, but it is configured the old way:
-`thinking: {type: "enabled", budget_tokens: N}`, no `effort`.
+`effort` is **rejected on Haiku 4.5** — which is why the subagent row was given a
+Sonnet. That reason no longer holds: **Haiku 5.5**, the current Haiku, takes `effort`
+(`low` to `max`, default `medium`) and costs $0.10/$0.50 while the prompt is 100K
+tokens or fewer, a twentieth of Sonnet's $2/$10, even after its tokenizer counts about
+30% more tokens. The API reference names sub-agent work as what it is for. The row
+still says Sonnet 5 because moving it is a decision, measured on real Research runs,
+not a correction — and Sonnet 5.5, the current Sonnet at the same $2/$10,
+**recalibrated** its levels (`low` there is not `low` on Sonnet 5). Haiku 4.5 is
+configured the old way: `thinking: {type: "enabled", budget_tokens: N}`, no `effort`.
 
 The principle: **spend effort where errors propagate.** A Plan error multiplies
 across the whole implementation; a Research error gets caught by the Design review.
@@ -47,12 +49,13 @@ across the whole implementation; a Research error gets caught by the Design revi
 On every current model except Haiku 4.5 use `thinking: {type: "adaptive"}` — Claude
 decides how much to think. Haiku 4.5 still takes `{type: "enabled", budget_tokens: N}`
 (minimum 1024, and less than `max_tokens`). `budget_tokens` is **removed** on Opus 5.5 /
-5 / 4.8 / 4.7, Sonnet 5.5, Sonnet 5, Fable 5 and Fable 5.1 (returns 400). On Opus 5.5,
-Opus 5, Sonnet 5.5, Sonnet 5 and the Fable models thinking is **on by default**: omit the
-parameter and it still runs adaptive. On **Opus 5.5** — Claude Code's default — and Fable 5.1 it cannot be
+5 / 4.8 / 4.7, Sonnet 5.5, Sonnet 5, Haiku 5.5, Fable 5 and Fable 5.1 (returns 400). On
+Opus 5.5, Opus 5, Sonnet 5.5, Sonnet 5, Haiku 5.5 and the Fable models thinking is **on
+by default**: omit the parameter and it still runs adaptive. On **Opus 5.5** — Claude Code's default — and Fable 5.1 it cannot be
 turned off at all: `{type: "disabled"}` and `budget_tokens` are both a 400 at every
-effort level, so effort is the only control over how much it thinks. (Opus 5 still
-accepts `disabled` at effort `high` or below; that does not carry over to 5.5.)
+effort level, so effort is the only control over how much it thinks. (Opus 5 and
+Haiku 5.5 accept `disabled` at effort `high` or below; that does not carry over to
+Opus 5.5.)
 **Sonnet 5.5** also rejects `disabled`; its lowest setting is `thinking: {type:
 "between_tools"}` — no extended thinking, only short progress notes between tool calls —
 accepted at effort `high` or below, with no other field in `thinking`, no per-message
@@ -107,9 +110,8 @@ set it per model, or in project or managed settings, which apply to every model.
 back to the highest one it supports (`xhigh` runs as `high` on Opus 4.6); Haiku 4.5
 supports none, and there the lever is `MAX_THINKING_TOKENS`, which adaptive-reasoning
 models in turn ignore. `maxEffortLevel` caps it from any scope, including managed
-settings. On Fable 5.1 and Opus 5.5 a mid-session `/effort` keeps the prompt cache
-(see `caching.md`); on every other model it starts one over — a harness fact not
-re-verified against 2.1.286, whose API reference adds Sonnet 5.5 to the models that
-take per-message effort. The phase
+settings. On Fable 5.1, Opus 5.5, Sonnet 5.5 and Haiku 5.5 a mid-session `/effort`
+keeps the prompt cache; on Opus 5 and Sonnet 5 it starts one over (read off
+`per_turn_effort_active` in 2.1.294, see `caching.md`). The phase
 prompts state their recommended effort; `claude --effort <level>` when opening the
 phase session is the cheapest way to honour it.

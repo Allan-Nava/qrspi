@@ -199,7 +199,15 @@ Do not weaken these when editing; they are the plugin's whole thesis.
   They are the likeliest thing here to be quietly wrong. Re-verify them against the
   current API reference rather than from memory, keep the `(cached: YYYY-MM-DD)` date
   on the model table honest, and treat a stale price as a bug: the whole skill argues
-  from those numbers. Last audited 2026-10-03 (#131, findings in #130), against the
+  from those numbers. Last audited 2026-10-08, against the claude-api reference bundled
+  with Claude Code 2.1.293 and the 2.1.294 binary itself — the first pass that could read
+  the harness's claims off the binary rather than mark them unverifiable: 76 claims, 59
+  hold, 3 wrong, 9 incomplete, 5 unverifiable. One model arrived — Haiku 5.5 ($0.10/$0.50
+  up to a 100K prompt, takes `effort`, default `medium`), which made `effort.md`'s reason
+  for a Sonnet on the subagent row wrong; the row itself stays, moving it is a decision.
+  `/effort` keeps the cache on Fable 5.1, Opus 5.5, Sonnet 5.5 and Haiku 5.5, not Opus 5
+  (`per_turn_effort_active` in the `init` event). No price changed. Before that,
+  2026-10-03 (#131, findings in #130), against the
   Claude Code 2.1.286 reference: 72 claims, 47 hold, 3 wrong, 10 incomplete, 12
   unverifiable. One model arrived — Sonnet 5.5 ($2/$10, rejects `disabled` thinking, uses
   `between_tools`), added to the model table and the thinking, caching and

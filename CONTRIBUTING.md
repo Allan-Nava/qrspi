@@ -88,9 +88,19 @@ compete. This is the executable form of #25's done-when.
 The same border runs between `qrspi` and `token-efficiency` — both speak of the 40%
 rule and compaction — and on 2026-09-30 it gained cross-negatives in both directions
 (#106): the 40% rule and auto-compact asked as questions belong to `token-efficiency`;
-closing a phase session at 42% and asking for the next prompt belongs to `qrspi`. That
-border has **not been measured yet**: the 198-run result below covers `handoff` against
-`token-efficiency` only.
+closing a phase session at 42% and asking for the next prompt belongs to `qrspi`.
+Measured 2026-10-08, `claude-opus-5-5`, CLI 2.1.294, one worker, two runs per query, 56
+slash commands and 20 skills visible to `claude -p`, both descriptions unchanged:
+
+| Skill | Positives | Negatives fired | The border prompts |
+|---|---:|---:|---|
+| `qrspi` | 17/18 | 0/26 | *"the 40% context rule — real or folklore?"* and *"is auto-compact good enough?"* 0/2 each; *"at 45% and drifting, compact at a phase boundary"* 2/2 |
+| `token-efficiency` | 16/18 | 0/24 | the same two questions 2/2 each; *"my plan session is at 42%, close it out and give me the implement prompt"* 0/2 |
+
+No false trigger in 50 negative runs, the cross-negatives included, so the shared
+vocabulary — 40%, compaction — does not make the two compete. The descriptions stay as
+they ship. The three misses are 1/2 each, inside the noise. The model is not the
+2026-09-18 one: on a Pro plan `claude-fable-5-1` needs usage credits (next list).
 
 To run one:
 
@@ -100,8 +110,8 @@ cd <skill-creator dir> && python -m scripts.run_eval \
   --model claude-opus-5 --runs-per-query 3 --verbose
 ```
 
-Three things will otherwise produce a clean-looking zero that means nothing — all three
-were hit on 2026-09-09 before the harness gave a real number on 2026-09-12:
+Each of these will otherwise produce a clean-looking zero that means nothing — the
+first three were hit on 2026-09-09 before the harness gave a real number on 2026-09-12:
 
 - **`--num-workers 1`, always.** The harness injects one stub command per worker, all
   with the same description and names differing only by a hash. With N workers the
@@ -117,6 +127,10 @@ were hit on 2026-09-09 before the harness gave a real number on 2026-09-12:
   "Failed to authenticate" — and the harness, which discards stderr, scores all forty
   runs as "did not trigger". 0/18 positives *and* 0/22 negatives is that, not a
   measurement: check `claude auth status` before believing a zero (hit 2026-09-18).
+- **A model the account can run.** On a plan without usage credits, `claude -p --model
+  claude-fable-5-1` answers *"Fable 5.1 requires usage credits"* as a successful result,
+  and the harness scores every run as "did not trigger" (hit 2026-10-08). Run one query
+  by hand with the same `--model` before the set.
 - **A machine that stays awake.** Each run has a 30-second timeout and a timeout
   counts as "did not trigger", so a laptop that sleeps mid-eval hands back a run that
   took hours and a number that means nothing — 5/18 for a description measured at

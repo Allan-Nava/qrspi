@@ -149,6 +149,8 @@ Do not weaken these when editing; they are the plugin's whole thesis.
   Keep `handoff`'s description on *writing* a handoff and `token-efficiency`'s on
   *diagnosing cost*, or the two compete — measured not to, 2026-09-18: 0 false triggers
   in 198 negative runs (`evals/trigger/`, CONTRIBUTING has the numbers and the traps).
+  `qrspi` and `token-efficiency` share the 40% rule and compaction; that border holds
+  too — 0 false triggers in 50 negative runs, 2026-10-08 (#106).
 - **Command frontmatter** carries `description`, `argument-hint`, and a tight
   `allowed-tools` list. Keep `allowed-tools` minimal; widen only with a reason. The one
   widening so far: `/qrspi:next` and `/qrspi:review` may run `git log` (read-only) to

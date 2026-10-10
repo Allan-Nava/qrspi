@@ -43,7 +43,8 @@ site/
 scripts/
   measure-context-cost.mjs  count_tokens over the plugin's own text (needs a key)
   measure-run.mjs      KPIs 1, 3, 4 of a real run, from ~/.claude/projects/<slug>/*.jsonl
-                       — no key; reads the phase off each session's first prompt.
+                       — no key; reads the phase off each session's first prompt and
+                       counts its subagents (`<session>/subagents/`, #144).
                        Both are contributor tooling, kept out of the npm tarball by
                        package.json#files
 evals/

@@ -10,6 +10,12 @@
 //   KPI 3  tokens per task   summed across the sessions you pass in
 //   KPI 4  cache hit ratio   cache_read / (cache_read + uncached input), per session
 //
+// A session's subagents are counted with it (#144): Claude Code writes each one's
+// transcript to <session>/subagents/[<subdir>/]agent-<id>.jsonl, and Research
+// delegates every exploration to one. Their tokens go into the session's output,
+// cache and total, and `agents` says how many there were; peak context stays the
+// main thread's, since a subagent has a window of its own.
+//
 // KPI 2 (compression ratio) also needs the artifact's own token count — that is
 // scripts/measure-context-cost.mjs, and a key. KPI 5 (rework) is a count of phases
 // you re-ran, which only you know.
@@ -25,7 +31,7 @@
 //
 // Reads only. Nothing leaves the machine.
 
-import { readFileSync, readdirSync, statSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { basename, join } from 'node:path'
 
 const argv = process.argv.slice(2)
@@ -53,8 +59,29 @@ const files = paths.flatMap((p) => {
 const text = (content) =>
   typeof content === 'string' ? content : (content ?? []).map((b) => b.text ?? '').join('\n')
 
+// Every agent-*.jsonl under <session>/subagents/, at any depth.
+function subagentsOf(file) {
+  const walk = (dir) => readdirSync(dir).flatMap((f) => {
+    const p = join(dir, f)
+    return statSync(p).isDirectory() ? walk(p) : f.endsWith('.jsonl') ? [p] : []
+  })
+  const dir = join(file.replace(/\.jsonl$/, ''), 'subagents')
+  return existsSync(dir) ? walk(dir) : []
+}
+
 function measure(file) {
-  const s = { file, phase: '—', turns: 0, peak: 0, output: 0, input: 0, write: 0, read: 0, start: null }
+  const s = { file, phase: '—', turns: 0, agents: 0, peak: 0, output: 0, input: 0, write: 0, read: 0, start: null }
+  read(file, s, true)
+  for (const f of subagentsOf(file)) {
+    s.agents++
+    read(f, s, false)
+  }
+  return s
+}
+
+// Adds one transcript's usage to s. Only the main thread sets the phase, the start,
+// the turn count and the peak.
+function read(file, s, main) {
   // One API response is written as one entry per content block, each repeating the
   // response's full usage — so a response is counted once per message id (#142).
   const seen = new Set()
@@ -62,7 +89,7 @@ function measure(file) {
     if (!line) continue
     let e
     try { e = JSON.parse(line) } catch { continue }
-    if (e.type === 'user' && s.phase === '—') {
+    if (main && e.type === 'user' && s.phase === '—') {
       // A scoped re-entry (recovery.md) opens "You are re-entering the **Design** phase"
       // and is shown with "(re)", so its cost is not mistaken for the first pass (#114).
       const m = text(e.message?.content).match(/You are (in|re-entering) the \*\*(\w+)\*\* phase|\/qrspi:(new)\b/)
@@ -75,17 +102,18 @@ function measure(file) {
       if (seen.has(id)) continue
       seen.add(id)
     }
-    s.start ??= e.timestamp
     const write = u.cache_creation_input_tokens ?? 0
-    const read = u.cache_read_input_tokens ?? 0
-    s.turns++
-    s.peak = Math.max(s.peak, u.input_tokens + write + read)
+    const cached = u.cache_read_input_tokens ?? 0
+    if (main) {
+      s.start ??= e.timestamp
+      s.turns++
+      s.peak = Math.max(s.peak, u.input_tokens + write + cached)
+    }
     s.input += u.input_tokens
     s.write += write
-    s.read += read
+    s.read += cached
     s.output += u.output_tokens ?? 0
   }
-  return s
 }
 
 const rows = files.map(measure).filter((s) => s.turns).sort((a, b) => (a.start ?? '').localeCompare(b.start ?? ''))
@@ -96,17 +124,18 @@ if (!rows.length) {
 
 const n = (x) => x.toLocaleString('en-GB')
 const pct = (a, b) => (b ? `${((100 * a) / b).toFixed(1)}%` : '—')
-const cols = ['phase', 'session', 'turns', 'peak ctx', 'of window', 'output', 'uncached in', 'cache write', 'cache read', 'hit']
+const cols = ['phase', 'session', 'turns', 'agents', 'peak ctx', 'of window', 'output', 'uncached in', 'cache write', 'cache read', 'hit']
 const data = rows.map((s) => [
-  s.phase, basename(s.file, '.jsonl'), n(s.turns), n(s.peak), pct(s.peak, WINDOW),
+  s.phase, basename(s.file, '.jsonl'), n(s.turns), s.agents ? n(s.agents) : '—', n(s.peak), pct(s.peak, WINDOW),
   n(s.output), n(s.input), n(s.write), n(s.read), pct(s.read, s.read + s.input),
 ])
 const total = rows.reduce((t, s) => ({ output: t.output + s.output, input: t.input + s.input, write: t.write + s.write, read: t.read + s.read }), { output: 0, input: 0, write: 0, read: 0 })
-data.push(['total', `${rows.length} sessions`, '', '', '', n(total.output), n(total.input), n(total.write), n(total.read), pct(total.read, total.read + total.input)])
+const agents = rows.reduce((a, s) => a + s.agents, 0)
+data.push(['total', `${rows.length} sessions`, '', agents ? n(agents) : '', '', '', n(total.output), n(total.input), n(total.write), n(total.read), pct(total.read, total.read + total.input)])
 
 const w = cols.map((c, i) => Math.max(c.length, ...data.map((r) => r[i].length)))
 const fmt = (r) => r.map((c, i) => (i < 2 ? c.padEnd(w[i]) : c.padStart(w[i]))).join('  ')
 console.log(fmt(cols))
 console.log(w.map((x) => '-'.repeat(x)).join('  '))
 for (const r of data) console.log(fmt(r))
-console.log(`\nwindow ${n(WINDOW)}. "peak ctx" is KPI 1 — the number to hold under 40%. Billable tokens per task are output + uncached in + cache write (KPI 3); cache read is what the cache saved you.`)
+console.log(`\nwindow ${n(WINDOW)}. "peak ctx" is KPI 1 — the number to hold under 40%. Billable tokens per task are output + uncached in + cache write (KPI 3); cache read is what the cache saved you. Subagents (\`agents\`) are in every figure but peak ctx.`)

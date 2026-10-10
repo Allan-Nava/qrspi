@@ -2,7 +2,8 @@
 // Measure a QRSPI run from Claude Code's own session transcripts — no API key.
 //
 // Every fresh session is one JSONL under ~/.claude/projects/<slug>/, and every
-// assistant message in it carries `usage`. That is enough for three of the five
+// assistant response in it carries `usage` — repeated on each of the entries the
+// response is split into, so it is read once per message id. That is enough for three of the five
 // KPIs in skills/token-efficiency/SKILL.md, per session and so per phase:
 //
 //   KPI 1  peak context      max over turns of input + cache_creation + cache_read
@@ -54,6 +55,9 @@ const text = (content) =>
 
 function measure(file) {
   const s = { file, phase: '—', turns: 0, peak: 0, output: 0, input: 0, write: 0, read: 0, start: null }
+  // One API response is written as one entry per content block, each repeating the
+  // response's full usage — so a response is counted once per message id (#142).
+  const seen = new Set()
   for (const line of readFileSync(file, 'utf8').split('\n')) {
     if (!line) continue
     let e
@@ -66,6 +70,11 @@ function measure(file) {
     }
     const u = e.message?.usage
     if (e.type !== 'assistant' || !u) continue
+    const id = e.message.id ?? e.requestId
+    if (id) {
+      if (seen.has(id)) continue
+      seen.add(id)
+    }
     s.start ??= e.timestamp
     const write = u.cache_creation_input_tokens ?? 0
     const read = u.cache_read_input_tokens ?? 0

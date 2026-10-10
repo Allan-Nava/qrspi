@@ -96,10 +96,16 @@ One week of this log on real tasks is worth more than any amount of theory.
   MCP servers, the conversation. This is the "fixed starting context" item above, read
   directly.
 - **The transcripts.** Every session is a JSONL under `~/.claude/projects/<slug>/`,
-  with `usage` on each assistant turn. `scripts/measure-run.mjs` in the plugin
-  repository reads a directory of them and prints, per session, peak context (KPI 1),
-  output and cache traffic, hit ratio (KPI 4), and a total (KPI 3). No key, nothing
-  leaves the machine. A fresh session per phase makes one file per phase.
+  with `usage` on each assistant turn, and each subagent it launched has its own under
+  `<session>/subagents/`. `scripts/measure-run.mjs` in the plugin repository reads a
+  directory of them and prints, per session and so per phase, peak context (KPI 1),
+  output and cache traffic with the subagents' counted in, hit ratio (KPI 4), and a
+  total. No key, nothing leaves the machine. A fresh session per phase makes one file
+  per phase.
+- **KPI 3 per task, not per session.** A QRSPI task lives on one branch, and every
+  phase session records it. [agent-ledger](https://github.com/Allan-Nava/agent-ledger)
+  groups by it — `npx @allan_nava/agent-ledger --by branch` is one row per task, every
+  phase and subagent summed, at list price. `measure-run.mjs` stays the per-phase view.
 - **`/insights`** — a report on how you work rather than how much you spent: friction,
   misunderstood requests, sessions that re-explored. It is the qualitative half of
   KPI 5.

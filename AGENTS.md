@@ -45,7 +45,7 @@ to disk and the next phase starts from a fresh session reading only that artifac
 | `plugins/qrspi-pane/` | a second plugin: a Claude Code mod (function hooks, `hooks/register.tsx`) drawing `thoughts/` as a pane, `/qrspi-status`; read-only; not in the npm package — `claude plugin validate plugins/qrspi-pane` checks it |
 | `evals/trigger/` | should/should-not-trigger prompts per skill; not shipped |
 | `scripts/measure-context-cost.mjs` | `count_tokens` over the plugin's own text (needs a key); not shipped |
-| `scripts/measure-run.mjs` | KPIs 1, 3, 4 of a real run from session transcripts; not shipped |
+| `scripts/measure-run.mjs` | KPIs 1, 3, 4 of a real run from session transcripts, subagents included; not shipped |
 | `site/build.mjs` | generates the GitHub Pages site from `README.md`, plus `sitemap.xml` and JSON-LD |
 | `assets/` | the logo (single source) and the social card (`.html` source, `.png` render); not shipped |
 | `.github/workflows/ci.yml` | `npm test` on Node 18/20/22/24, a copy-mode round trip, site build, `npm pack` |

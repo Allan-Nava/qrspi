@@ -18,7 +18,7 @@
 | S3 | ✅ done | 2026-10-11 | `a922982` | U0-U8 pass; page byte-identical to `8f0a1e6`; re-verified after rebase onto S2 |
 | S4 | ✅ done | 2026-10-11 | — (commits nothing) | V1-V3 pass: `package/bin/pipeline.mjs` ships; it resolves from the extracted tarball; the tarball's `check` reports no pipeline or import problem (only the known `qrspi-pane` one, #152) |
 | S5 | ✅ done | 2026-10-11 | `aac58ea` | edits 1-7 verbatim; W1-W9 pass, re-run by the owner on the merged branch |
-| S6 | 🔄 in progress | 2026-10-11 | — | page built from `a406677` and shown to the human; awaiting the observation |
+| S6 | ✅ done | 2026-10-11 | (this commit) | observed by Allan Nava on the page built from `a406677` |
 | S7 | ⬜ todo | — | — | last, on the pushed branch |
 
 Legend: ⬜ todo · 🔄 in progress · ✅ done · ⏸️ blocked · ❌ failed
@@ -27,7 +27,7 @@ Legend: ⬜ todo · 🔄 in progress · ✅ done · ⏸️ blocked · ❌ failed
 
 ## Where I left off
 
-**Current step:** S4 and S5 complete; S6 (human) awaiting the observation. Then **S7** on the pushed branch.
+**Current step:** S1-S6 complete. Next is **S7**: push `fix/141-pipeline-rows`, open the PR, record the CI run.
 
 **Done so far:**
 - S1 — `bin/pipeline.mjs`, `ef94760` (see the S1 rows below).
@@ -97,6 +97,8 @@ the mutations, line numbers and assertions are the plan's.
 | S4 V1-V3 (`npm pack`, extract, import `package/bin/pipeline.mjs`, run the extracted `check`) | S4 | **pass** — V1 `1` line for `package/bin/pipeline.mjs`; V2 `resolves`, exit 0; V3 exit 1 with the single known `qrspi-pane` problem (#152) and `0` lines matching `pipeline\|not a row\|Cannot find module`; the extracted module parses the extracted README to 6 rows, 0 refused |
 | S5 W1-W9 | S5 | **pass** — W1 nothing; W2 `2`; W3 `2`; W3b `1`; W4 links resolve; W5 `npm test` green; W6 `2`; W7 `1`; W8 `0`; W9 `1` |
 | Owner, after fast-forwarding S5 | merge | **pass** — `npm test` green; W1 `0`, W2 `2`, W3 `2`, W3b `1`, W6 `2`, W8 `0`, W9 `1` |
+
+| `npm run build:site && open site/dist/index.html` | S6 | observed: the six phase rows draw with their context, arrow, artifact and size; no `<pre>` in the hero; the lede carries no stray heading line — Allan Nava, 2026-10-11, on a screenshot of the page built from `a406677` (`pipeline: 6 rows`), "ok tutto a posto" |
 
 ---
 

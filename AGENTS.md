@@ -50,7 +50,7 @@ to disk and the next phase starts from a fresh session reading only that artifac
 | `scripts/measure-run.mjs` | KPIs 1, 3, 4 of a real run from session transcripts, subagents included; not shipped |
 | `site/build.mjs` | generates the GitHub Pages site from `README.md`, plus `sitemap.xml` and JSON-LD |
 | `assets/` | the logo (single source) and the social card (`.html` source, `.png` render); not shipped |
-| `.github/workflows/ci.yml` | `npm test` on Node 18/20/22/24, a copy-mode round trip, site build, `npm pack` |
+| `.github/workflows/ci.yml` | `npm test` on Node 18/20/22/24, a copy-mode round trip, site build, `npm pack`, and `check` from the packed tarball |
 | `.github/workflows/release.yml` | on tag `qrspi--v*`: npm publish over OIDC, GitHub release, close milestone |
 | `.github/workflows/release-drift.yml` | fails when `main` carries a version with no tag for two hours |
 | `.github/workflows/pages.yml` | builds and deploys the site on push to `main` |

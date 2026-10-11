@@ -54,3 +54,12 @@ jobs:
       - run: npm run build:site
       # What `npm publish` would actually ship.
       - run: npm pack --dry-run
+      # And `check` passes inside it: a user's `npx qrspi check` runs from the package,
+      # not from a checkout, and failed there on an unshipped plugin for two releases (#152).
+      - name: check from the packed tarball
+        run: |
+          dir="$RUNNER_TEMP/pkg"
+          mkdir -p "$dir"
+          tarball=$(npm pack --pack-destination "$dir" --silent)
+          tar -xzf "$dir/$tarball" -C "$dir"
+          node "$dir/package/bin/qrspi.mjs" check

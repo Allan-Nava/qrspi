@@ -11,6 +11,7 @@ import { marked } from 'marked'
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { readPipeline } from '../bin/pipeline.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const OUT = resolve(ROOT, process.argv.includes('--out') ? process.argv[process.argv.indexOf('--out') + 1] : 'site/dist')
@@ -20,6 +21,41 @@ const SITE = 'https://allan-nava.github.io/qrspi/'
 
 const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8'))
 const md = readFileSync(join(ROOT, 'README.md'), 'utf8')
+
+// The generator's one failure path, mirroring die() in bin/qrspi.mjs:31-34. There was
+// none before: a pipeline row that did not parse was skipped and the hero shipped short
+// (#141).
+const die = (msg) => {
+  console.error(`site/build.mjs: ${msg}`)
+  process.exit(1)
+}
+
+// The first H2 outside a fence, 1-based — the rule parseReadme uses below, recomputed on
+// the README's own lines because the intro is sliced from them by line number. Returns
+// lines.length + 1 when the file has no H2.
+function firstSectionLine(lines) {
+  let fenced = false
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].startsWith('```')) fenced = !fenced
+    else if (!fenced && lines[i].startsWith('## ')) return i + 1
+  }
+  return lines.length + 1
+}
+
+// The pipeline diagram is the hero, so it is validated before a byte of HTML exists (D6):
+// no block, a line inside it that is neither blank nor a row, no rows at all, or a block
+// outside the intro, and the build says which and exits 1 instead of quietly drawing
+// fewer rows. bin/pipeline.mjs is the same module `npx qrspi check` reads it with.
+const mdLines = md.split('\n')
+const pipe = readPipeline(md)
+const sectionLine = firstSectionLine(mdLines)
+if (!pipe.found) die('README.md: no pipeline block — the hero draws it')
+for (const r of pipe.refused) console.error(`site/build.mjs: README.md:${r.line}: not a pipeline row — "${r.text}"`)
+if (pipe.refused.length) process.exit(1)
+if (!pipe.rows.length) die('README.md: the pipeline block holds no rows')
+if (pipe.end >= sectionLine) {
+  die(`README.md: the pipeline block (lines ${pipe.start}-${pipe.end}) is not in the intro — the first "## " is line ${sectionLine}`)
+}
 
 // One logo, three consumers: the favicon (inlined), the header, the hero.
 const logo = readFileSync(join(ROOT, 'assets', 'logo.svg'), 'utf8')
@@ -60,41 +96,28 @@ function parseReadme(source) {
   }
   sections.push(current)
 
-  const intro = sections.shift()
-  return { title, intro: intro.lines.join('\n').trim(), sections: sections.map((s) => ({ ...s, body: s.lines.join('\n').trim() })) }
+  sections.shift()
+  return { title, sections: sections.map((s) => ({ ...s, body: s.lines.join('\n').trim() })) }
 }
 
-// The intro carries three things: the lede, the pipeline diagram, and the
-// paragraph that explains why the pipeline matters. Pull them apart so the hero
-// can lay them out instead of dumping one blob of prose.
-function parseIntro(raw) {
-  // The README opens with an HTML logo block for GitHub; the page draws its own.
-  const intro = raw
-    .split('\n')
-    .filter((l) => !/^\s*<\/?(p|img|div|a|picture|source)\b/i.test(l))
+// The intro carries three things: the lede, the pipeline diagram, and the paragraph that
+// explains why the pipeline matters. The diagram's bounds come from bin/pipeline.mjs, so
+// the lede is everything above the opening fence and the after-text everything between the
+// closing fence and the first H2 — this function no longer looks for a fence itself.
+function parseIntro(lines, pipe, sectionLine) {
+  const lede = lines
+    .slice(0, pipe.start - 1)
+    // The README opens with an HTML logo block for GitHub; the page draws its own. The H1
+    // goes with it — it becomes the hero, exactly as parseReadme drops it.
+    .filter((l) => !l.startsWith('# ') && !/^\s*<\/?(p|img|div|a|picture|source)\b/i.test(l))
     .join('\n')
     .trim()
-  const m = intro.match(/^([\s\S]*?)```\n([\s\S]*?)```([\s\S]*)$/)
-  if (!m) return { lede: intro, pipeline: null, after: '' }
-  return { lede: m[1].trim(), pipeline: m[2].replace(/\n$/, ''), after: m[3].trim() }
-}
-
-// `Questions   ~20k burned   →  00-questions.md   (~3k)`
-function parsePipeline(block) {
-  if (!block) return null
-  const rows = []
-  for (const line of block.split('\n')) {
-    const m = line.match(/^(\S+)\s{2,}(.+?)\s+→\s+(.+?)(?:\s{2,}\((.+)\))?\s*$/)
-    if (!m) continue
-    rows.push({ phase: m[1], context: m[2].trim(), output: m[3].trim(), size: m[4]?.trim() ?? null })
-  }
-  return rows.length >= 3 ? rows : null
+  return { lede, after: lines.slice(pipe.end, sectionLine - 1).join('\n').trim() }
 }
 
 // --- html fragments ---------------------------------------------------------
 
-function renderPipeline(rows, fallback) {
-  if (!rows) return `<pre class="fallback">${esc(fallback ?? '')}</pre>`
+function renderPipeline(rows) {
   const items = rows
     .map(
       (r, i) => `      <li class="flow-row">
@@ -169,9 +192,8 @@ ${g.refs.map((r) => `          <li><a href="${BLOB}/skills/${g.skill}/references
 
 // --- assemble ---------------------------------------------------------------
 
-const { title, intro, sections } = parseReadme(md)
-const { lede, pipeline, after } = parseIntro(intro)
-const rows = parsePipeline(pipeline)
+const { title, sections } = parseReadme(md)
+const { lede, after } = parseIntro(mdLines, pipe, sectionLine)
 const description = lede
   .replace(/\*\*/g, '')
   .replace(/\n/g, ' ')
@@ -416,7 +438,7 @@ ${nav.map((s) => `      <a href="#${slug(s.heading)}">${esc(s.heading)}</a>`).jo
       <a href="${REPO}">Source</a>
       <a href="https://www.npmjs.com/package/${pkg.name}">npm</a>
     </div>
-    ${renderPipeline(rows, pipeline)}
+    ${renderPipeline(pipe.rows)}
     <div class="note">${linkifyPaths(marked.parse(after))}</div>
   </div>
 
@@ -493,4 +515,4 @@ writeFileSync(
 `,
 )
 
-console.log(`built ${join(OUT, 'index.html')} — ${(html.length / 1024).toFixed(1)} kB, ${rendered.length} sections, pipeline: ${rows ? `${rows.length} rows` : 'fallback <pre>'}, + sitemap.xml`)
+console.log(`built ${join(OUT, 'index.html')} — ${(html.length / 1024).toFixed(1)} kB, ${rendered.length} sections, pipeline: ${pipe.rows.length} rows, + sitemap.xml`)

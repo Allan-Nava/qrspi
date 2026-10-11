@@ -11,6 +11,7 @@ import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statS
 import { homedir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { readPipeline } from './pipeline.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const CLAUDE_DIR = process.env.CLAUDE_CONFIG_DIR || join(homedir(), '.claude')
@@ -254,22 +255,10 @@ function uninstall(flags) {
 
 const PHASES = ['Questions', 'Research', 'Design', 'Structure', 'Plan', 'Implement']
 
-// The pipeline diagram is drawn in three files, and compaction.md draws an extra
-// arrow — so compare the parsed rows, not the bytes. The row shape is the one
-// site/build.mjs parses; keep the two in step.
-function pipelineRows(text) {
-  const block = [...text.matchAll(/```\n([\s\S]*?)```/g)]
-    .map((m) => m[1])
-    .find((b) => b.includes('00-questions.md'))
-  if (!block) return null
-  const rows = []
-  for (const line of block.split('\n')) {
-    const m = line.match(/^(\S+)\s{2,}(.+?)\s+\u2192\s+(.+?)(?:\s{2,}\((.+)\))?\s*$/)
-    if (!m) continue
-    rows.push([m[1], m[2].replace(/^\u2192\s*/, ''), m[3], m[4] ?? ''].map((c) => c.trim()).join(' | '))
-  }
-  return rows
-}
+// The pipeline diagram is drawn in three files. Which files is check's policy; the
+// grammar — which block, what a row is, what else a line inside it may be — lives in
+// bin/pipeline.mjs, which site/build.mjs imports too (#141).
+const PIPELINE_FILES = ['README.md', 'skills/qrspi/SKILL.md', 'skills/token-efficiency/references/compaction.md']
 
 // The per-phase effort allocation is tabulated three times, in three different
 // column layouts. Reduce each to phase -> set of effort levels, then compare.
@@ -528,23 +517,35 @@ function check() {
     }
   }
 
-  // The pipeline diagram, duplicated in three files.
-  const drawn = ['README.md', 'skills/qrspi/SKILL.md', 'skills/token-efficiency/references/compaction.md'].map(
-    (f) => ({ f, rows: existsSync(join(ROOT, f)) ? pipelineRows(readFileSync(join(ROOT, f), 'utf8')) : null }),
-  )
+  // The pipeline diagram, duplicated in three files. bin/pipeline.mjs holds the one
+  // grammar, so what `check` reads and what the site draws cannot differ (#141) — and a
+  // line inside the block that is neither blank nor a row is named, not skipped.
+  const drawn = PIPELINE_FILES.map((f) => {
+    const pipe = existsSync(join(ROOT, f)) ? readPipeline(readFileSync(join(ROOT, f), 'utf8')) : { found: false }
+    return { f, found: pipe.found, keys: (pipe.rows ?? []).map((r) => r.key), refused: pipe.refused ?? [] }
+  })
+  for (const d of drawn) {
+    for (const r of d.refused) problems.push(`${d.f}:${r.line}: not a pipeline row — "${r.text}"`)
+  }
+  const why = (d) => {
+    if (!d.found) return 'no pipeline block found'
+    if (!d.keys.length) return 'pipeline block holds no rows'
+    return null
+  }
   const [canonical, ...copies] = drawn
-  if (!canonical.rows?.length) {
-    problems.push(`${canonical.f}: no pipeline block found — site/build.mjs reads it too`)
+  if (why(canonical)) {
+    problems.push(`${canonical.f}: ${why(canonical)} — site/build.mjs reads it too`)
   } else {
     for (const copy of copies) {
-      if (!copy.rows?.length) {
-        problems.push(`${copy.f}: no pipeline block found`)
+      const problem = why(copy)
+      if (problem) {
+        problems.push(`${copy.f}: ${problem}`)
         continue
       }
-      for (let i = 0; i < Math.max(canonical.rows.length, copy.rows.length); i++) {
-        if (canonical.rows[i] !== copy.rows[i]) {
+      for (let i = 0; i < Math.max(canonical.keys.length, copy.keys.length); i++) {
+        if (canonical.keys[i] !== copy.keys[i]) {
           problems.push(
-            `pipeline row ${i + 1} disagrees\n      ${canonical.f}: ${canonical.rows[i] ?? '(missing)'}\n      ${copy.f}: ${copy.rows[i] ?? '(missing)'}`,
+            `pipeline row ${i + 1} disagrees\n      ${canonical.f}: ${canonical.keys[i] ?? '(missing)'}\n      ${copy.f}: ${copy.keys[i] ?? '(missing)'}`,
           )
         }
       }

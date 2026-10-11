@@ -16,9 +16,9 @@
 | S1 | ✅ done | 2026-10-11 | `ef94760` | `bin/pipeline.mjs` written verbatim from the plan; all three verifies pass |
 | S2 | ✅ done | 2026-10-11 | `b9046d1` | T0-T6 pass; T2 (the ticket) exits 1 with three `path:line` refusals where `8be8a5d` exits 0 |
 | S3 | ✅ done | 2026-10-11 | `a922982` | U0-U8 pass; page byte-identical to `8f0a1e6`; re-verified after rebase onto S2 |
-| S4 | ⬜ todo | — | — | unblocked — S2 and S3 landed |
-| S5 | ⬜ todo | — | — | unblocked — S2 and S3 landed |
-| S6 | ⬜ todo | — | — | unblocked — S2 and S3 landed |
+| S4 | ✅ done | 2026-10-11 | — (commits nothing) | V1-V3 pass: `package/bin/pipeline.mjs` ships; it resolves from the extracted tarball; the tarball's `check` reports no pipeline or import problem (only the known `qrspi-pane` one, #152) |
+| S5 | ✅ done | 2026-10-11 | `aac58ea` | edits 1-7 verbatim; W1-W9 pass, re-run by the owner on the merged branch |
+| S6 | 🔄 in progress | 2026-10-11 | — | page built from `a406677` and shown to the human; awaiting the observation |
 | S7 | ⬜ todo | — | — | last, on the pushed branch |
 
 Legend: ⬜ todo · 🔄 in progress · ✅ done · ⏸️ blocked · ❌ failed
@@ -27,7 +27,7 @@ Legend: ⬜ todo · 🔄 in progress · ✅ done · ⏸️ blocked · ❌ failed
 
 ## Where I left off
 
-**Current step:** S2 ‖ S3 — both complete, merged and committed. Next is **S4 ‖ S5 ‖ S6**.
+**Current step:** S4 and S5 complete; S6 (human) awaiting the observation. Then **S7** on the pushed branch.
 
 **Done so far:**
 - S1 — `bin/pipeline.mjs`, `ef94760` (see the S1 rows below).
@@ -93,6 +93,10 @@ the mutations, line numbers and assertions are the plan's.
 | S2 T0-T6 (`node bin/qrspi.mjs check` on mutated copies) | S2 | **pass** — T1 `README.md:26: not a pipeline row — "not a row"` exit 1; T2 three refusals, 0 `disagrees`, exit 1; T3 `pipeline row 1 disagrees` ×2; T4 `no pipeline block found`; T5 `pipeline block holds no rows` plus `README.md:20` refused; T6 `pipelineRows` count 0; clean tree exit 0. T2 against the `8be8a5d` check: exit 0 (the bug) |
 | S3 U0-U8 | S3 | **pass** — U1 `page did not move` (index and sitemap); U2 `6`/`0`; U5, U5b, U6, U7 each exit 1 with nothing written; U8 `npm test` green |
 | Owner, after merging S2 and rebasing S3 onto it | merge | **pass** — `npm test` green; `node site/build.mjs` output `cmp`-identical to a build of `8f0a1e6`; with `not a row` inserted at `README.md:26` the site exits 1 naming `README.md:26` and `check` exits 1; README restored, tree clean |
+
+| S4 V1-V3 (`npm pack`, extract, import `package/bin/pipeline.mjs`, run the extracted `check`) | S4 | **pass** — V1 `1` line for `package/bin/pipeline.mjs`; V2 `resolves`, exit 0; V3 exit 1 with the single known `qrspi-pane` problem (#152) and `0` lines matching `pipeline\|not a row\|Cannot find module`; the extracted module parses the extracted README to 6 rows, 0 refused |
+| S5 W1-W9 | S5 | **pass** — W1 nothing; W2 `2`; W3 `2`; W3b `1`; W4 links resolve; W5 `npm test` green; W6 `2`; W7 `1`; W8 `0`; W9 `1` |
+| Owner, after fast-forwarding S5 | merge | **pass** — `npm test` green; W1 `0`, W2 `2`, W3 `2`, W3b `1`, W6 `2`, W8 `0`, W9 `1` |
 
 ---
 

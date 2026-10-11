@@ -19,7 +19,7 @@
 | S4 | ✅ done | 2026-10-11 | — (commits nothing) | V1-V3 pass: `package/bin/pipeline.mjs` ships; it resolves from the extracted tarball; the tarball's `check` reports no pipeline or import problem (only the known `qrspi-pane` one, #152) |
 | S5 | ✅ done | 2026-10-11 | `aac58ea` | edits 1-7 verbatim; W1-W9 pass, re-run by the owner on the merged branch |
 | S6 | ✅ done | 2026-10-11 | (this commit) | observed by Allan Nava on the page built from `a406677` |
-| S7 | ⬜ todo | — | — | last, on the pushed branch |
+| S7 | ✅ done | 2026-10-11 | (this commit) | PR #153; CI green on Node 18/20/22/24 and the site job |
 
 Legend: ⬜ todo · 🔄 in progress · ✅ done · ⏸️ blocked · ❌ failed
 
@@ -27,7 +27,7 @@ Legend: ⬜ todo · 🔄 in progress · ✅ done · ⏸️ blocked · ❌ failed
 
 ## Where I left off
 
-**Current step:** S1-S6 complete. Next is **S7**: push `fix/141-pipeline-rows`, open the PR, record the CI run.
+**Current step:** all seven steps complete. PR #153 is open and green; what remains is the human's review and merge (without squashing — `landing.md`).
 
 **Done so far:**
 - S1 — `bin/pipeline.mjs`, `ef94760` (see the S1 rows below).
@@ -99,6 +99,8 @@ the mutations, line numbers and assertions are the plan's.
 | Owner, after fast-forwarding S5 | merge | **pass** — `npm test` green; W1 `0`, W2 `2`, W3 `2`, W3b `1`, W6 `2`, W8 `0`, W9 `1` |
 
 | `npm run build:site && open site/dist/index.html` | S6 | observed: the six phase rows draw with their context, arrow, artifact and size; no `<pre>` in the hero; the lede carries no stray heading line — Allan Nava, 2026-10-11, on a screenshot of the page built from `a406677` (`pipeline: 6 rows`), "ok tutto a posto" |
+
+| `gh pr checks 153` | S7 | observed: check (18), check (20), check (22), check (24) and site all pass on `5dc26db` — https://github.com/Allan-Nava/qrspi/actions/runs/38163158147 |
 
 ---
 

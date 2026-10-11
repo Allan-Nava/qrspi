@@ -305,15 +305,25 @@ function check() {
   if (versions.size > 1) problems.push(`version mismatch across manifests: ${[...versions].join(', ')}`)
   // Every plugin the marketplace lists exists, under its own name; a second plugin
   // (plugins/qrspi-pane) stays out of the npm package, which ships qrspi alone.
+  // That makes the walk a check on the repository, not on an installed copy: run from
+  // the npm package (no .git beside it), a source package.json#files does not ship is
+  // absent by design, and reporting it made `npx qrspi check` fail for every user (#152).
+  // In a checkout every entry is still required.
   try {
     const mp = JSON.parse(readFileSync(join(ROOT, '.claude-plugin', 'marketplace.json'), 'utf8'))
+    const files = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')).files ?? []
+    const checkout = existsSync(join(ROOT, '.git'))
+    const shipped = (source) => {
+      const top = (source ?? '').replace(/^\.\//, '').split('/')[0]
+      return top === '' || top === '.' || files.some((f) => f.replace(/\/$/, '') === top)
+    }
     for (const p of mp.plugins ?? []) {
+      if (!checkout && !shipped(p.source)) continue
       const manifest = join(ROOT, p.source ?? '', '.claude-plugin', 'plugin.json')
       if (!existsSync(manifest)) { problems.push(`marketplace.json: plugin ${p.name} has no .claude-plugin/plugin.json under ${p.source}`); continue }
       const name = JSON.parse(readFileSync(manifest, 'utf8')).name
       if (name !== p.name) problems.push(`marketplace.json: plugin ${p.name} points at a manifest named ${name}`)
     }
-    const files = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')).files ?? []
     if (files.some((f) => f === 'plugins' || f.startsWith('plugins/'))) problems.push('package.json#files ships plugins/ — the npm package is qrspi alone')
   } catch {
     // an unreadable manifest is already reported above

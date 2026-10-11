@@ -57,7 +57,8 @@ evals/
                        skill-creator harness — see CONTRIBUTING.md; not in the tarball
 .github/workflows/
   ci.yml               check on Node 18/20/22/24 with no npm install, plus a copy-mode round
-                       trip; site build + npm pack on 22 — every PR and push to main
+                       trip; site build + npm pack on 22, and `check` run from the packed
+                       tarball (#152) — every PR and push to main
   release.yml          on tag qrspi--v*: publish to npm, cut the release, close the milestone
   release-drift.yml    fails when main carries a version with no tag for 2h; runs daily
   pages.yml            builds and deploys the site to GitHub Pages on push to main

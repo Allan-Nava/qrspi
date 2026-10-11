@@ -6,9 +6,10 @@ Guidance for Claude Code when working in this repository.
 
 `qrspi` is a **Claude Code plugin**, not an application. There is no build step and no
 dependency: every file that matters is Markdown or JSON, and the "product" is the
-prompt text itself. The single piece of executable code is
-[bin/qrspi.mjs](bin/qrspi.mjs), the `npx qrspi` installer — it exists only to put the
-Markdown where Claude Code can see it.
+prompt text itself. The executable code that ships is the `npx qrspi` installer,
+[bin/qrspi.mjs](bin/qrspi.mjs), which exists only to put the Markdown where Claude Code
+can see it, plus the one module it imports — [bin/pipeline.mjs](bin/pipeline.mjs), the
+pipeline diagram's grammar, which the site reads too.
 
 It ships three things:
 
@@ -32,6 +33,10 @@ Nothing in this repo is generated at runtime.
 ```
 bin/
   qrspi.mjs            `npx qrspi` installer (install / uninstall / path / check)
+  pipeline.mjs         the pipeline diagram's one grammar — which fenced block, what a
+                       row is, what else a line inside it may be. `readPipeline(text)`
+                       is the only export; bin/qrspi.mjs and site/build.mjs both import
+                       it, so they cannot read the block differently (#141)
 assets/
   logo.svg             the mark — single source for the favicon, the site, the README
   logo-mono.svg        same shapes in currentColor, no tile
@@ -272,8 +277,10 @@ length, every `${CLAUDE_PLUGIN_ROOT}` reference, the `> **PROMPT` blockquote tha
 `/qrspi:next` prints and `/qrspi:new` strips, and the checkbox markers that
 `/qrspi:next` greps for. It also enforces the content rules this file states and
 nothing else used to check: the `## Status` block in every artifact template, the
-pipeline diagram across the three files that draw it, the per-phase effort
-allocation across the three that tabulate it, and what `/qrspi:new` would leave in
+pipeline diagram across the three files that draw it — every line inside each block is
+blank or a row, and a line that is neither is reported as `path:line` with the line
+quoted (#141) — the per-phase effort allocation across the three that tabulate it, and
+what `/qrspi:new` would leave in
 `thoughts/` — each template with its prompt block removed is still gateable (Status,
 checkboxes, placeholders) and the block itself was contiguous. Two more since the 2026-09-30 audit: the phase-detection count in `/qrspi:next` and its twin is scoped to the `## Status` block (a Plan's acceptance criteria stay open until Implement, #97), and the progress template's step table holds placeholders only (#98). It also fails on a file URL or an absolute home path in a tracked text file (#99). And it keeps the parallel-Implement execution plan in `/qrspi:next` and its twin (#122), and a human box — one naming `<who>` — in every artifact template's Status block, so no phase closes on a session's own ticks (#126). Run it before every commit and extend
 it whenever you add
@@ -324,13 +331,20 @@ speaks for every project site under it, generating its `Sitemap:` lines in CI fr
 sites whose `sitemap.xml` returns 200. Shipping the sitemap is what gets qrspi listed
 there.
 
-The generator parses the README: the H1 becomes the hero, the first fenced block is
-parsed into the pipeline diagram (`Phase  context  →  artifact  (size)` — a row that
-does not match is skipped, and if fewer than three match the whole block falls back to
-a `<pre>`), and each `##` becomes a section. Renaming a README heading renames a nav
-entry and an anchor; reshaping the pipeline block silently drops rows, so re-run the
-build and look at the output. `marked` is a devDependency used only here — it never
-reaches the published npm package, which stays dependency-free.
+The generator parses the README: the H1 becomes the hero and each `##` becomes a section.
+The pipeline diagram in the intro is read by [bin/pipeline.mjs](bin/pipeline.mjs), the one
+grammar `npx qrspi check` reads it with too (#141): the block is the first bare fence whose
+body names `00-questions.md`, so a fenced block added above it changes nothing, and every
+line inside that block must be blank or a row (`Phase  context  →  artifact  (size)`). A
+line that is neither stops the build, named as `README.md:<line>` and quoted; so does a
+missing block, an empty one, or one whose bounds fall outside the intro. No row is dropped
+and there is no `<pre>` to degrade to — the hero draws every row, or the build writes
+nothing and exits 1. `pages.yml` runs `npm test` before the build, so in CI the check names
+the line first. Renaming a README heading renames a nav entry and an anchor; reshaping the
+pipeline block now fails loudly — but still re-run the build and look at the output,
+because a byte-identical `diff` says the page did not move, not that it is right. `marked`
+is a devDependency used only here — it never reaches the published npm package, which
+stays dependency-free.
 
 ## Brand assets
 

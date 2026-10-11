@@ -7,8 +7,9 @@ is the vendor-neutral subset and the two must agree.
 ## Project
 
 `qrspi` is a **Claude Code and Codex CLI plugin** distributed as Markdown and JSON. No
-build step, no dependencies. The deliverable is prompt text; the only executable file
-the package ships is `bin/qrspi.mjs`, the `npx qrspi` installer.
+build step, no dependencies. The deliverable is prompt text; the executable files the
+package ships are `bin/qrspi.mjs`, the `npx qrspi` installer, and `bin/pipeline.mjs`,
+the pipeline diagram's grammar, which `qrspi check` and the site generator both import.
 
 It implements QRSPI — Questions → Research → Spec (Design + Structure) → Plan →
 Implement — a phase-gated workflow where each phase writes one self-contained artifact
@@ -31,6 +32,7 @@ to disk and the next phase starts from a fresh session reading only that artifac
 |---|---|
 | `package.json` | npm distribution: `bin` → `bin/qrspi.mjs`, `test` → `qrspi check` |
 | `bin/qrspi.mjs` | installer CLI: `install` / `uninstall` / `path` / `check`; copy mode guards unmarked directories |
+| `bin/pipeline.mjs` | the pipeline diagram's one grammar: which fenced block, what a row is, what else a line inside it may be. `readPipeline(text)` is the only export; `bin/qrspi.mjs` and `site/build.mjs` both import it (#141) |
 | `.claude-plugin/plugin.json` | Claude Code plugin manifest |
 | `.claude-plugin/marketplace.json` | marketplace manifest: `qrspi` (`source: "./"`) and `qrspi-pane` (`./plugins/qrspi-pane`); Codex reads it as a legacy marketplace |
 | `.codex-plugin/plugin.json` | Codex CLI plugin manifest (`skills: ./skills/`) |
@@ -115,7 +117,9 @@ render of `assets/social-preview.html` (CLAUDE.md has the exact command).
   session's own ticks. Do not change the markers in isolation.
 - The duplicated numbers: the pipeline diagram (README, `skills/qrspi/SKILL.md`,
   `compaction.md`) and the effort table (SKILL.md, `commands/next.md`, `effort.md`).
-  Change a row in all three of its files; `npm test` compares them.
+  Change a row in all three of its files; `npm test` compares them. Inside a pipeline
+  block every line must be blank or a row: a line that is neither now fails `npm test`,
+  named as `path:line` and quoted, and fails the site build (#141).
 - Keep the version in sync across the four manifests (`npm test` enforces it).
 - Copy mode rewrites `${CLAUDE_PLUGIN_ROOT}/skills` to `~/.claude/skills`
   (`rewritePluginRoot()` in `bin/qrspi.mjs`); a `${CLAUDE_PLUGIN_ROOT}` reference to
